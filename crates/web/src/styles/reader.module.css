@@ -2,7 +2,6 @@
   height: 100dvh;
   display: flex;
   flex-direction: column;
-  background: var(--color-parchment-50);
   overflow: hidden;
 }
 
@@ -13,18 +12,6 @@
   height: 0;
   overflow: hidden;
 }
-
-.themeDark {
-  background: #1a1a1a;
-  color: #e5e5e5;
-}
-
-.themeSepia {
-  background: #f4ecd8;
-}
-
-.fontSerif { font-family: var(--font-serif); }
-.fontSans { font-family: var(--font-sans); }
 
 .text {
   flex: 1;
@@ -44,6 +31,11 @@
 
 .verseNum {
   font-size: 0.7em;
-  color: var(--color-gold-600);
+  color: var(--accent-text);
   vertical-align: super;
+}
+
+.verseBlock {
+  display: block;
+  margin-bottom: 0.5em;
 }

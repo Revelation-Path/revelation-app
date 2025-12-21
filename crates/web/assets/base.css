@@ -35,35 +35,6 @@
   --leading-relaxed: 1.8;
 
   /* ─────────────────────────────────────────────────────────────
-     FONTS
-     ───────────────────────────────────────────────────────────── */
-  --font-sans: 'Inter', system-ui, sans-serif;
-  --font-serif: 'Merriweather', Georgia, serif;
-
-  /* ─────────────────────────────────────────────────────────────
-     COLORS
-     ───────────────────────────────────────────────────────────── */
-  --color-gold-50: #fefce8;
-  --color-gold-100: #fef9c3;
-  --color-gold-200: #fef08a;
-  --color-gold-300: #fde047;
-  --color-gold-400: #facc15;
-  --color-gold-500: #c9a227;
-  --color-gold-600: #a67c00;
-  --color-gold-700: #854d0e;
-
-  --color-parchment-50: #fefdfb;
-  --color-parchment-100: #fdf8f0;
-  --color-parchment-200: #f9f1e4;
-
-  --color-text-primary: #1f2937;
-  --color-text-secondary: #4b5563;
-  --color-text-muted: #6b7280;
-
-  --color-border: rgba(0, 0, 0, 0.06);
-  --color-hover: rgba(0, 0, 0, 0.04);
-
-  /* ─────────────────────────────────────────────────────────────
      LAYOUT
      ───────────────────────────────────────────────────────────── */
   --header-height: 3.25rem;
@@ -83,7 +54,7 @@
   --radius-full: 9999rem;
 
   /* ─────────────────────────────────────────────────────────────
-     SHADOWS
+     SHADOWS (static)
      ───────────────────────────────────────────────────────────── */
   --shadow-sm: 0 0.0625rem 0.125rem rgba(0, 0, 0, 0.05);
   --shadow-md: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
@@ -133,8 +104,6 @@ body {
   font-family: var(--font-sans);
   font-size: var(--text-md);
   line-height: var(--leading-normal);
-  color: var(--color-text-primary);
-  background: var(--color-parchment-50);
   min-height: 100dvh;
 }
 

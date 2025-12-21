@@ -33,28 +33,12 @@ pub fn Sidebar() -> impl IntoView {
     let location = use_location();
     let current_path = move || location.pathname.get();
 
-    let bg_color = move || {
-        let opacity = 0.15;
-        let color = match current_book.get() {
-            1..=5 => "59, 130, 246",
-            6..=17 => "34, 197, 94",
-            18..=22 => "234, 179, 8",
-            23..=27 => "244, 63, 94",
-            28..=39 => "236, 72, 153",
-            40..=43 => "245, 158, 11",
-            44 => "99, 102, 241",
-            45..=57 => "139, 92, 246",
-            58..=65 => "20, 184, 166",
-            66 => "239, 68, 68",
-            _ => "201, 162, 39"
-        };
-        format!("rgba({}, {})", color, opacity)
-    };
+    let book_color = move || get_book_color(current_book.get());
 
     view! {
         <aside
             class=move || format!("{} {}", nav::sidebar, if collapsed.get() { nav::sidebarCollapsed } else { nav::sidebarExpanded })
-            style:background=bg_color
+            style:background=book_color
         >
             <div class=nav::sidebarHeader>
                 <button class=nav::sidebarLogo on:click=move |_| collapsed.update(|v| *v = !*v)>
@@ -127,7 +111,6 @@ fn SidebarItem(
                 nav::sidebarItem,
                 if is_active() { nav::sidebarItemActive } else { "" }
             )
-            attr:style="color: var(--color-text-secondary);"
         >
             {match icon {
                 NavIcon::Feed => view! { <FeedIcon/> }.into_any(),
@@ -246,5 +229,22 @@ fn ProfileIcon() -> impl IntoView {
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
             <circle cx="12" cy="7" r="4"/>
         </svg>
+    }
+}
+
+/// Get book category color based on book ID (synced with colors.module.css)
+fn get_book_color(book_id: i16) -> &'static str {
+    match book_id {
+        1..=5 => "#93b1d6",    // Torah - soft blue
+        6..=17 => "#86bc9e",   // History - soft green
+        18..=22 => "#dac282",  // Wisdom - soft gold
+        23..=27 => "#cd96a0",  // Major Prophets - soft rose
+        28..=39 => "#c6a2b8",  // Minor Prophets - soft mauve
+        40..=43 => "#c9a264",  // Gospels - soft amber
+        44 => "#9ca2c6",       // Acts - soft indigo
+        45..=57 => "#ac9cc6",  // Pauline Epistles - soft violet
+        58..=65 => "#8cbcb6",  // General Epistles - soft teal
+        66 => "#c69c9c",       // Revelation - soft coral
+        _ => "#c9a264"         // Default - soft amber
     }
 }

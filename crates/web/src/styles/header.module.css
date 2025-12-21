@@ -7,7 +7,7 @@
   justify-content: space-between;
   padding: var(--space-sm) var(--space-md);
   background: transparent;
-  border-bottom: 0.0625rem solid var(--color-border);
+  border-bottom: 0.0625rem solid var(--border);
   overflow: hidden;
 }
 
@@ -16,7 +16,6 @@
   top: 0;
   left: 0;
   height: 100%;
-  opacity: 0.2;
   z-index: -1;
   transition: width 0.15s ease-out;
 }
@@ -37,7 +36,7 @@
 .chapter {
   display: block;
   font-size: var(--text-xs);
-  color: var(--color-text-muted);
+  color: var(--text-muted);
 }
 
 .chapterBtn {
@@ -46,54 +45,35 @@
   gap: 0.5rem;
   font-size: 0.9375rem;
   font-weight: 500;
-  color: var(--color-gold-700, #92400e);
+  color: var(--accent-text);
   padding: 0.5rem 1rem;
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(245, 158, 11, 0.1) 100%);
-  border: 1px solid rgba(251, 191, 36, 0.3);
+  background: var(--accent-soft);
+  border: 1px solid var(--border);
   border-radius: 100px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px var(--shadow);
+  transition: all 0.2s ease;
   cursor: pointer;
 }
 
 .chapterBtn:hover {
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.25) 0%, rgba(245, 158, 11, 0.2) 100%);
-  border-color: rgba(251, 191, 36, 0.5);
-  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.2);
+  background: var(--hover);
+  box-shadow: 0 4px 12px var(--shadow);
   transform: translateY(-1px);
 }
 
 .chapterBtn:active {
   transform: translateY(0);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .chapterBtn svg {
   width: 1rem;
   height: 1rem;
-  color: var(--color-gold-600, #d97706);
+  color: var(--accent-text);
   transition: transform 0.2s ease;
 }
 
 .chapterBtn:hover svg {
   transform: translateY(1px);
-}
-
-:global(.theme-dark) .chapterBtn {
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(245, 158, 11, 0.15) 100%);
-  border-color: rgba(251, 191, 36, 0.3);
-  color: #fbbf24;
-}
-
-:global(.theme-dark) .chapterBtn:hover {
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.3) 0%, rgba(245, 158, 11, 0.25) 100%);
-  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.15);
-}
-
-:global(.theme-sepia) .chapterBtn {
-  background: linear-gradient(135deg, rgba(180, 140, 80, 0.2) 0%, rgba(160, 120, 60, 0.15) 100%);
-  border-color: rgba(180, 140, 80, 0.3);
-  color: #78350f;
 }
 
 .btn {
@@ -103,8 +83,11 @@
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-lg);
+  color: var(--text-secondary);
+  transition: background 0.15s, color 0.15s;
 }
 
 .btn:hover {
-  background: var(--color-hover);
+  background: var(--hover);
+  color: var(--text);
 }

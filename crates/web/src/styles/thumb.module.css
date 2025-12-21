@@ -29,7 +29,7 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.15s ease;
-  color: #6b7280;
+  color: var(--text-muted);
   white-space: nowrap;
   overflow: hidden;
 }
@@ -59,13 +59,12 @@
   margin-right: 0.25rem;
 }
 
-/* Hover and active states - show full name, hide abbreviation */
 .tab:hover,
 .tab.active {
   width: max-content;
   padding: 0 0.5rem;
   z-index: 50;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px var(--shadow);
 }
 
 .tab:hover .abbrev,
@@ -80,10 +79,10 @@
 
 .tab.active {
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--text);
   text-shadow:
-    -1px -1px 0 white,
-    1px -1px 0 white,
-    -1px 1px 0 white,
-    1px 1px 0 white;
+    -1px -1px 0 var(--bg),
+    1px -1px 0 var(--bg),
+    -1px 1px 0 var(--bg),
+    1px 1px 0 var(--bg);
 }

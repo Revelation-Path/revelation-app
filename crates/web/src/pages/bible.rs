@@ -1,9 +1,17 @@
 //! Bible reading pages - Book-style interface with dual thumb index
 
-use leptos::{prelude::*, reactive::computed::Memo};
+use leptos::{ev::Event, prelude::*, reactive::computed::Memo};
 use leptos_router::hooks::use_params_map;
 use shared::Book;
+use ui::{FontFamily, Theme, use_theme};
 use wasm_bindgen::JsCast;
+
+fn event_target_checked(ev: &Event) -> bool {
+    ev.target()
+        .and_then(|t| t.dyn_into::<web_sys::HtmlInputElement>().ok())
+        .map(|el| el.checked())
+        .unwrap_or(false)
+}
 
 use crate::{api, components::BottomNav};
 
@@ -52,17 +60,17 @@ pub fn BibleChapter() -> impl IntoView {
 /// Main Bible reader component
 #[component]
 fn BibleReader(initial_book: i16, initial_chapter: i16) -> impl IntoView {
-    let state = expect_context::<crate::state::AppState>();
-    let current_book = state.current_book;
-    let current_chapter = state.current_chapter;
-    state.current_book.set(initial_book);
-    state.current_chapter.set(initial_chapter);
+    let app_state = expect_context::<crate::state::AppState>();
+    let theme_state = use_theme();
+
+    let current_book = app_state.current_book;
+    let current_chapter = app_state.current_chapter;
+    app_state.current_book.set(initial_book);
+    app_state.current_chapter.set(initial_chapter);
+
     let (settings_open, set_settings_open) = signal(false);
     let (chapters_open, set_chapters_open) = signal(false);
-
-    let (font_size, set_font_size) = signal(18_u8);
-    let (theme, set_theme) = signal(Theme::Light);
-    let (font_family, set_font_family) = signal(FontFamily::Serif);
+    let (verse_per_line, set_verse_per_line) = signal(false);
     let (scroll_progress, set_scroll_progress) = signal(1.0_f64);
 
     let all_books = LocalResource::new(|| async { api::get_books().await.ok() });
@@ -96,14 +104,7 @@ fn BibleReader(initial_book: i16, initial_chapter: i16) -> impl IntoView {
     };
 
     view! {
-        <div
-            class=reader::reader
-            style:font-size=move || format!("{}px", font_size.get())
-            class:theme-dark=move || theme.get() == Theme::Dark
-            class:theme-sepia=move || theme.get() == Theme::Sepia
-            class:font-serif=move || font_family.get() == FontFamily::Serif
-            class:font-sans=move || font_family.get() == FontFamily::Sans
-        >
+        <div class=reader::reader>
             <header class=header::header>
                 <div
                     class=header::progress
@@ -132,12 +133,8 @@ fn BibleReader(initial_book: i16, initial_chapter: i16) -> impl IntoView {
 
             <Show when=move || settings_open.get()>
                 <SettingsPanel
-                    font_size=font_size
-                    set_font_size=set_font_size
-                    theme=theme
-                    set_theme=set_theme
-                    font_family=font_family
-                    set_font_family=set_font_family
+                    verse_per_line=verse_per_line
+                    set_verse_per_line=set_verse_per_line
                     on_close=move || set_settings_open.set(false)
                 />
             </Show>
@@ -179,12 +176,15 @@ fn BibleReader(initial_book: i16, initial_chapter: i16) -> impl IntoView {
                         <Suspense fallback=|| view! { <VersesLoading/> }>
                             {move || verses.get().flatten().map(|verses| view! {
                                 <div>
-                                    {verses.into_iter().map(|v| view! {
-                                        <span>
-                                            <sup class=reader::verseNum>{v.verse}</sup>
-                                            {v.text}
-                                            " "
-                                        </span>
+                                    {verses.into_iter().map(|v| {
+                                        let text = v.text.clone();
+                                        view! {
+                                            <span class=move || if verse_per_line.get() { reader::verseBlock } else { "" }>
+                                                <sup class=reader::verseNum>{v.verse}</sup>
+                                                {text}
+                                                " "
+                                            </span>
+                                        }
                                     }).collect::<Vec<_>>()}
                                 </div>
                             })}
@@ -239,21 +239,6 @@ enum Side {
     Right
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, Default)]
-enum Theme {
-    #[default]
-    Light,
-    Dark,
-    Sepia
-}
-
-#[derive(Clone, Copy, PartialEq, Eq, Default)]
-enum FontFamily {
-    #[default]
-    Serif,
-    Sans
-}
-
 /// Thumb index component
 #[component]
 fn ThumbIndex(
@@ -274,11 +259,13 @@ fn ThumbIndex(
                 let abbrev = book.abbreviation.clone();
                 let full_name = book.name_ru.clone();
                 let color_class = get_book_color_class(book.id);
+                let active_color = get_book_active_color(book.id);
                 let is_active = move || current_book.get() == book_id;
 
                 view! {
                     <button
                         class=move || format!("{} {} {}", thumb::tab, color_class, if is_active() { thumb::active } else { "" })
+                        style:background=move || if is_active() { active_color } else { "" }
                         on:click=move |_| on_select(book_id)
                     >
                         <span class=thumb::abbrev>{abbrev.clone()}</span>
@@ -293,14 +280,15 @@ fn ThumbIndex(
 /// Settings panel
 #[component]
 fn SettingsPanel(
-    font_size: ReadSignal<u8>,
-    set_font_size: WriteSignal<u8>,
-    theme: ReadSignal<Theme>,
-    set_theme: WriteSignal<Theme>,
-    font_family: ReadSignal<FontFamily>,
-    set_font_family: WriteSignal<FontFamily>,
+    verse_per_line: ReadSignal<bool>,
+    set_verse_per_line: WriteSignal<bool>,
     on_close: impl Fn() + Copy + 'static
 ) -> impl IntoView {
+    let ts = use_theme();
+    let theme = ts.theme;
+    let font_family = ts.font_family;
+    let font_size = ts.font_size;
+
     view! {
         <div class=settings::panel>
             <div class=settings::header>
@@ -313,27 +301,57 @@ fn SettingsPanel(
             <div class=settings::row>
                 <span class=settings::label>"Размер текста"</span>
                 <div class=settings::control>
-                    <button on:click=move |_| set_font_size.update(|s| *s = (*s).saturating_sub(2).max(12))>"A-"</button>
+                    <button on:click=move |_| font_size.update(|s| *s = (*s).saturating_sub(2).max(12))>"A-"</button>
                     <span>{move || font_size.get()}</span>
-                    <button on:click=move |_| set_font_size.update(|s| *s = (*s + 2).min(32))>"A+"</button>
+                    <button on:click=move |_| font_size.update(|s| *s = (*s + 2).min(32))>"A+"</button>
                 </div>
             </div>
 
             <div class=settings::row>
                 <span class=settings::label>"Тема"</span>
                 <div class=settings::control>
-                    <button on:click=move |_| set_theme.set(Theme::Light)/>
-                    <button on:click=move |_| set_theme.set(Theme::Sepia)/>
-                    <button on:click=move |_| set_theme.set(Theme::Dark)/>
+                    <button
+                        class=move || format!("{} {} {}", settings::themeBtn, settings::themeBtnLight, if theme.get() == Theme::Light { settings::themeBtnActive } else { "" })
+                        on:click=move |_| theme.set(Theme::Light)
+                    />
+                    <button
+                        class=move || format!("{} {} {}", settings::themeBtn, settings::themeBtnSepia, if theme.get() == Theme::Sepia { settings::themeBtnActive } else { "" })
+                        on:click=move |_| theme.set(Theme::Sepia)
+                    />
+                    <button
+                        class=move || format!("{} {} {}", settings::themeBtn, settings::themeBtnDark, if theme.get() == Theme::Dark { settings::themeBtnActive } else { "" })
+                        on:click=move |_| theme.set(Theme::Dark)
+                    />
                 </div>
             </div>
 
             <div class=settings::row>
                 <span class=settings::label>"Шрифт"</span>
                 <div class=settings::control>
-                    <button on:click=move |_| set_font_family.set(FontFamily::Serif)>"Aa"</button>
-                    <button on:click=move |_| set_font_family.set(FontFamily::Sans)>"Aa"</button>
+                    <button
+                        class=move || format!("{} {} {}", settings::fontBtn, settings::fontBtnSerif, if font_family.get() == FontFamily::Serif { settings::fontBtnActive } else { "" })
+                        on:click=move |_| font_family.set(FontFamily::Serif)
+                    >"Aa"</button>
+                    <button
+                        class=move || format!("{} {} {}", settings::fontBtn, settings::fontBtnSans, if font_family.get() == FontFamily::Sans { settings::fontBtnActive } else { "" })
+                        on:click=move |_| font_family.set(FontFamily::Sans)
+                    >"Aa"</button>
                 </div>
+            </div>
+
+            <div class=settings::row>
+                <span class=settings::label>"Каждый стих с новой строки"</span>
+                <label class=settings::toggle>
+                    <input
+                        type="checkbox"
+                        prop:checked=move || verse_per_line.get()
+                        on:change=move |ev| {
+                            let checked = event_target_checked(&ev);
+                            set_verse_per_line.set(checked);
+                        }
+                    />
+                    <span class=settings::slider></span>
+                </label>
             </div>
         </div>
     }
@@ -500,19 +518,20 @@ fn get_book_color_class(book_id: i16) -> &'static str {
     }
 }
 
+/// Get book category color (synced with colors.module.css)
 fn get_book_active_color(book_id: i16) -> &'static str {
     match book_id {
-        1..=5 => "#3b82f6",
-        6..=17 => "#22c55e",
-        18..=22 => "#eab308",
-        23..=27 => "#f43f5e",
-        28..=39 => "#ec4899",
-        40..=43 => "#f59e0b",
-        44 => "#6366f1",
-        45..=57 => "#8b5cf6",
-        58..=65 => "#14b8a6",
-        66 => "#ef4444",
-        _ => "#c9a227"
+        1..=5 => "#93b1d6",    // Torah - soft blue
+        6..=17 => "#86bc9e",   // History - soft green
+        18..=22 => "#dac282",  // Wisdom - soft gold
+        23..=27 => "#cd96a0",  // Major Prophets - soft rose
+        28..=39 => "#c6a2b8",  // Minor Prophets - soft mauve
+        40..=43 => "#c9a264",  // Gospels - soft amber
+        44 => "#9ca2c6",       // Acts - soft indigo
+        45..=57 => "#ac9cc6",  // Pauline Epistles - soft violet
+        58..=65 => "#8cbcb6",  // General Epistles - soft teal
+        66 => "#c69c9c",       // Revelation - soft coral
+        _ => "#c9a264"         // Default - soft amber
     }
 }
 

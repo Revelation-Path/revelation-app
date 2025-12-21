@@ -6,7 +6,7 @@ use leptos_router::{
     components::{Route, Router, Routes},
     path
 };
-use ui::ToastProvider;
+use ui::{THEME_CSS, ThemeProvider, ToastProvider};
 
 use crate::{components::Sidebar, pages::*, state::AppState};
 
@@ -29,31 +29,34 @@ pub fn App() -> impl IntoView {
         <Meta name="apple-mobile-web-app-status-bar-style" content="default"/>
         <Title text="Revelation - Библия"/>
         <Style>{ui_styles}</Style>
+        <Style>{THEME_CSS}</Style>
 
-        <ToastProvider>
-            <Router>
-                <div class="flex min-h-screen">
-                    // Desktop sidebar
-                    <Sidebar/>
+        <ThemeProvider>
+            <ToastProvider>
+                <Router>
+                    <div class="flex">
+                        // Desktop sidebar
+                        <Sidebar/>
 
-                    // Main content area
-                    <div class="flex-1 lg:min-h-screen">
-                        <Routes fallback=|| view! { <NotFound/> }>
-                            <Route path=path!("/") view=Home/>
-                            <Route path=path!("/onboarding") view=Onboarding/>
-                            <Route path=path!("/feed") view=Feed/>
-                            <Route path=path!("/bible") view=Bible/>
-                            <Route path=path!("/bible/:book/:chapter") view=BibleChapter/>
-                            <Route path=path!("/search") view=Search/>
-                            <Route path=path!("/today") view=DailyReading/>
-                            <Route path=path!("/churches") view=Churches/>
-                            <Route path=path!("/church/:id") view=ChurchDetail/>
-                            <Route path=path!("/profile") view=Profile/>
-                            <Route path=path!("/settings") view=Settings/>
-                        </Routes>
+                        // Main content area
+                        <div class="flex-1">
+                            <Routes fallback=|| view! { <NotFound/> }>
+                                <Route path=path!("/") view=Home/>
+                                <Route path=path!("/onboarding") view=Onboarding/>
+                                <Route path=path!("/feed") view=Feed/>
+                                <Route path=path!("/bible") view=Bible/>
+                                <Route path=path!("/bible/:book/:chapter") view=BibleChapter/>
+                                <Route path=path!("/search") view=Search/>
+                                <Route path=path!("/today") view=DailyReading/>
+                                <Route path=path!("/churches") view=Churches/>
+                                <Route path=path!("/church/:id") view=ChurchDetail/>
+                                <Route path=path!("/profile") view=Profile/>
+                                <Route path=path!("/settings") view=Settings/>
+                            </Routes>
+                        </div>
                     </div>
-                </div>
-            </Router>
-        </ToastProvider>
+                </Router>
+            </ToastProvider>
+        </ThemeProvider>
     }
 }

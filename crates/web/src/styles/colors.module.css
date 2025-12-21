@@ -1,29 +1,59 @@
-.torah { background: #dbeafe; }
-.torah.active { background: #3b82f6; }
+.torah {
+  --book-color: 147, 177, 214;
+  background: rgba(var(--book-color), 0.2);
+}
+.torah.active { background: rgb(var(--book-color)); }
 
-.history { background: #dcfce7; }
-.history.active { background: #22c55e; }
+.history {
+  --book-color: 134, 188, 158;
+  background: rgba(var(--book-color), 0.2);
+}
+.history.active { background: rgb(var(--book-color)); }
 
-.wisdom { background: #fef9c3; }
-.wisdom.active { background: #eab308; }
+.wisdom {
+  --book-color: 218, 194, 130;
+  background: rgba(var(--book-color), 0.2);
+}
+.wisdom.active { background: rgb(var(--book-color)); }
 
-.majorProphets { background: #ffe4e6; }
-.majorProphets.active { background: #f43f5e; }
+.majorProphets {
+  --book-color: 205, 150, 160;
+  background: rgba(var(--book-color), 0.2);
+}
+.majorProphets.active { background: rgb(var(--book-color)); }
 
-.minorProphets { background: #fce7f3; }
-.minorProphets.active { background: #ec4899; }
+.minorProphets {
+  --book-color: 198, 162, 184;
+  background: rgba(var(--book-color), 0.2);
+}
+.minorProphets.active { background: rgb(var(--book-color)); }
 
-.gospels { background: #fef3c7; }
-.gospels.active { background: #f59e0b; }
+.gospels {
+  --book-color: 201, 162, 100;
+  background: rgba(var(--book-color), 0.2);
+}
+.gospels.active { background: rgb(var(--book-color)); }
 
-.acts { background: #e0e7ff; }
-.acts.active { background: #6366f1; }
+.acts {
+  --book-color: 156, 162, 198;
+  background: rgba(var(--book-color), 0.2);
+}
+.acts.active { background: rgb(var(--book-color)); }
 
-.paul { background: #ddd6fe; }
-.paul.active { background: #8b5cf6; }
+.paul {
+  --book-color: 172, 156, 198;
+  background: rgba(var(--book-color), 0.2);
+}
+.paul.active { background: rgb(var(--book-color)); }
 
-.general { background: #ccfbf1; }
-.general.active { background: #14b8a6; }
+.general {
+  --book-color: 140, 188, 182;
+  background: rgba(var(--book-color), 0.2);
+}
+.general.active { background: rgb(var(--book-color)); }
 
-.revelation { background: #fee2e2; }
-.revelation.active { background: #ef4444; }
+.revelation {
+  --book-color: 198, 156, 156;
+  background: rgba(var(--book-color), 0.2);
+}
+.revelation.active { background: rgb(var(--book-color)); }
