@@ -4,7 +4,7 @@ use leptos::{ev::Event, prelude::*, reactive::computed::Memo, tachys::dom::windo
 use leptos_router::hooks::use_params_map;
 use shared::{Book, Testament};
 use ui::{FontFamily, Theme, use_theme};
-use wasm_bindgen::{closure::Closure, prelude::*, JsCast};
+use wasm_bindgen::{JsCast, closure::Closure, prelude::*};
 
 #[wasm_bindgen]
 extern "C" {
@@ -30,8 +30,7 @@ fn event_target_checked(ev: &Event) -> bool {
 
 fn request_animation_frame(f: impl FnOnce() + 'static) {
     let closure = Closure::once_into_js(f);
-    let _ = window()
-        .request_animation_frame(closure.unchecked_ref());
+    let _ = window().request_animation_frame(closure.unchecked_ref());
 }
 
 use crate::{api, components::BottomNav};
