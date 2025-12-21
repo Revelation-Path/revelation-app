@@ -1,14 +1,14 @@
 [workspace]
 resolver = "3"
 members = [
-    "crates/shared",
-    "crates/bible",
-    "crates/server",
-    "crates/gateway",
-    "crates/payments",
-    "crates/bot",
-    "crates/ui",
-    "crates/web",
+  "crates/shared",
+  "crates/bible",
+  "crates/server",
+  "crates/gateway",
+  "crates/payments",
+  "crates/bot",
+  "crates/ui",
+  "crates/web",
 ]
 
 [workspace.package]
@@ -25,18 +25,36 @@ tokio = { version = "1", features = ["full"] }
 # Web framework
 axum = { version = "0.8", features = ["macros"] }
 tower = "0.5"
-tower-http = { version = "0.6", features = ["cors", "trace", "compression-gzip"] }
+tower-http = { version = "0.6", features = [
+  "cors",
+  "trace",
+  "compression-gzip",
+] }
 
 # Database
-sqlx = { version = "0.8", features = ["runtime-tokio", "postgres", "uuid", "chrono", "json"] }
+sqlx = { version = "0.8", features = [
+  "runtime-tokio",
+  "postgres",
+  "uuid",
+  "chrono",
+  "json",
+] }
 
 # Serialization
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 
 # Error handling
-masterror = { version = "0.26", features = ["axum", "sqlx", "teloxide", "validator", "tracing"] }
-masterror-frontend = { version = "0.26", package = "masterror", features = ["frontend"] }
+masterror = { version = "0.26", features = [
+  "axum",
+  "sqlx",
+  "teloxide",
+  "validator",
+  "tracing",
+] }
+masterror-frontend = { version = "0.26", package = "masterror", features = [
+  "frontend",
+] }
 
 # Logging
 tracing = "0.1"
@@ -48,16 +66,16 @@ chrono = { version = "0.4", features = ["serde"] }
 dotenvy = "0.15"
 
 # Validation
-validator = { version = "0.19", features = ["derive"] }
+validator = { version = "0.20", features = ["derive"] }
 
 # Password hashing
 argon2 = "0.5"
 
 # JWT
-jsonwebtoken = "9"
+jsonwebtoken = { version = "10", features = ["rust_crypto"] }
 
 # Telegram bot
-teloxide = { version = "0.13", features = ["macros"] }
+teloxide = { version = "0.17", features = ["macros"] }
 
 # Leptos
 leptos = { version = "0.8" }
@@ -66,8 +84,8 @@ leptos_router = { version = "0.8" }
 leptos_meta = { version = "0.8" }
 
 # gRPC (for inter-service communication)
-tonic = "0.12"
-prost = "0.13"
+tonic = "0.14"
+prost = "0.14"
 
 # Testing
 tokio-test = "0.4"
