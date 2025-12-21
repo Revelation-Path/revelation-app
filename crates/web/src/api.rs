@@ -2,11 +2,21 @@ use gloo_net::http::Request;
 use shared::{Book, ChapterInfo, DailyReading, Pericope, SearchResult, Testament, User, Verse};
 use uuid::Uuid;
 
-const API_BASE: &str = "/api";
+fn api_base() -> String {
+    let host = web_sys::window()
+        .and_then(|w| w.location().host().ok())
+        .unwrap_or_default();
+
+    if host.contains("revelation-path.ru") {
+        "https://api.revelation-path.ru/api".to_string()
+    } else {
+        "/api".to_string()
+    }
+}
 
 pub async fn get_or_create_user(user_id: Uuid) -> Result<User, String> {
     // Try to get user first
-    let response = Request::get(&format!("{}/users/{}", API_BASE, user_id))
+    let response = Request::get(&format!("{}/users/{}", api_base(), user_id))
         .send()
         .await
         .map_err(|e| e.to_string())?;
@@ -16,7 +26,7 @@ pub async fn get_or_create_user(user_id: Uuid) -> Result<User, String> {
     }
 
     // Create user if not exists
-    let response = Request::post(&format!("{}/users", API_BASE))
+    let response = Request::post(&format!("{}/users", api_base()))
         .json(&serde_json::json!({ "id": user_id }))
         .map_err(|e| e.to_string())?
         .send()
@@ -27,7 +37,7 @@ pub async fn get_or_create_user(user_id: Uuid) -> Result<User, String> {
 }
 
 pub async fn get_books() -> Result<Vec<Book>, String> {
-    let response = Request::get(&format!("{}/bible/books", API_BASE))
+    let response = Request::get(&format!("{}/bible/books", api_base()))
         .send()
         .await
         .map_err(|e| e.to_string())?;
@@ -42,7 +52,8 @@ pub async fn get_books_by_testament(testament: Testament) -> Result<Vec<Book>, S
     };
     let response = Request::get(&format!(
         "{}/bible/books?testament={}",
-        API_BASE, testament_str
+        api_base(),
+        testament_str
     ))
     .send()
     .await
@@ -54,7 +65,9 @@ pub async fn get_books_by_testament(testament: Testament) -> Result<Vec<Book>, S
 pub async fn get_chapter(book_id: i16, chapter: i16) -> Result<Vec<Verse>, String> {
     let response = Request::get(&format!(
         "{}/bible/books/{}/chapters/{}",
-        API_BASE, book_id, chapter
+        api_base(),
+        book_id,
+        chapter
     ))
     .send()
     .await
@@ -64,7 +77,7 @@ pub async fn get_chapter(book_id: i16, chapter: i16) -> Result<Vec<Verse>, Strin
 }
 
 pub async fn get_pericopes(book_id: i16) -> Result<Vec<Pericope>, String> {
-    let response = Request::get(&format!("{}/bible/books/{}/pericopes", API_BASE, book_id))
+    let response = Request::get(&format!("{}/bible/books/{}/pericopes", api_base(), book_id))
         .send()
         .await
         .map_err(|e| e.to_string())?;
@@ -75,7 +88,8 @@ pub async fn get_pericopes(book_id: i16) -> Result<Vec<Pericope>, String> {
 pub async fn get_chapters_info(book_id: i16) -> Result<Vec<ChapterInfo>, String> {
     let response = Request::get(&format!(
         "{}/bible/books/{}/chapters-info",
-        API_BASE, book_id
+        api_base(),
+        book_id
     ))
     .send()
     .await
@@ -85,7 +99,7 @@ pub async fn get_chapters_info(book_id: i16) -> Result<Vec<ChapterInfo>, String>
 }
 
 pub async fn search_bible(query: &str) -> Result<Vec<SearchResult>, String> {
-    let response = Request::get(&format!("{}/bible/search?q={}", API_BASE, query))
+    let response = Request::get(&format!("{}/bible/search?q={}", api_base(), query))
         .send()
         .await
         .map_err(|e| e.to_string())?;
@@ -94,7 +108,7 @@ pub async fn search_bible(query: &str) -> Result<Vec<SearchResult>, String> {
 }
 
 pub async fn get_symphony(word: &str) -> Result<SymphonyResponse, String> {
-    let response = Request::get(&format!("{}/bible/symphony/{}", API_BASE, word))
+    let response = Request::get(&format!("{}/bible/symphony/{}", api_base(), word))
         .send()
         .await
         .map_err(|e| e.to_string())?;
@@ -110,7 +124,7 @@ pub struct SymphonyResponse {
 }
 
 pub async fn get_today_reading() -> Result<Option<DailyReading>, String> {
-    let response = Request::get(&format!("{}/bible/today", API_BASE))
+    let response = Request::get(&format!("{}/bible/today", api_base()))
         .send()
         .await
         .map_err(|e| e.to_string())?;

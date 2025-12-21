@@ -5,4 +5,3 @@ pub mod pages;
 pub mod state;
 
 pub use app::App;
-// trigger build
