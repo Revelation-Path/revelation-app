@@ -253,6 +253,12 @@ fn BibleReader(initial_book: i16, initial_chapter: i16) -> impl IntoView {
                                         </div>
                                     })}
                                 </Suspense>
+                                <ChapterNav
+                                    current_book=current_book
+                                    current_chapter=current_chapter
+                                    all_books=all_books
+                                />
+                                <div class=reader::navSpacer></div>
                             }
                         >
                             {move || current_book_info().map(|book| {
@@ -435,6 +441,87 @@ fn SettingsPanel(
                     <span class=settings::slider></span>
                 </label>
             </div>
+        </div>
+    }
+}
+
+/// Chapter navigation buttons (prev/next)
+#[component]
+fn ChapterNav(
+    current_book: RwSignal<i16>,
+    current_chapter: RwSignal<i16>,
+    all_books: LocalResource<Option<Vec<Book>>>
+) -> impl IntoView {
+    let current_book_info = move || {
+        all_books
+            .get()
+            .flatten()
+            .and_then(|books| books.into_iter().find(|b| b.id == current_book.get()))
+    };
+
+    let can_go_prev = move || {
+        let ch = current_chapter.get();
+        let book = current_book.get();
+        ch > 1 || book > 1
+    };
+
+    let can_go_next = move || {
+        let ch = current_chapter.get();
+        let book = current_book.get();
+        let max_ch = current_book_info().map(|b| b.chapters_count).unwrap_or(1);
+        ch < max_ch || book < 66
+    };
+
+    let go_prev = move |_| {
+        let ch = current_chapter.get();
+        if ch > 1 {
+            current_chapter.set(ch - 1);
+        } else {
+            let book = current_book.get();
+            if book > 1 {
+                current_book.set(book - 1);
+                // Set to last chapter of previous book
+                if let Some(books) = all_books.get().flatten() {
+                    if let Some(prev_book) = books.iter().find(|b| b.id == book - 1) {
+                        current_chapter.set(prev_book.chapters_count);
+                    }
+                }
+            }
+        }
+    };
+
+    let go_next = move |_| {
+        let ch = current_chapter.get();
+        let max_ch = current_book_info().map(|b| b.chapters_count).unwrap_or(1);
+        if ch < max_ch {
+            current_chapter.set(ch + 1);
+        } else {
+            let book = current_book.get();
+            if book < 66 {
+                current_book.set(book + 1);
+                current_chapter.set(1);
+            }
+        }
+    };
+
+    view! {
+        <div class=reader::chapterNav>
+            <button
+                class=reader::navBtn
+                disabled=move || !can_go_prev()
+                on:click=go_prev
+            >
+                <ChevronLeftIcon/>
+                "Назад"
+            </button>
+            <button
+                class=reader::navBtn
+                disabled=move || !can_go_next()
+                on:click=go_next
+            >
+                "Далее"
+                <ChevronRightIcon/>
+            </button>
         </div>
     }
 }

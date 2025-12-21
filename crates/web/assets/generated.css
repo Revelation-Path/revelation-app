@@ -689,6 +689,57 @@
   margin-bottom: 0.5em;
 }
 
+.chapterNav-1add189 {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.5rem 0;
+  margin-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.navSpacer-1add189 {
+  height: var(--bottom-nav-height);
+  flex-shrink: 0;
+}
+
+@media (min-width: 64rem) {
+  .navSpacer-1add189 {
+    display: none;
+  }
+}
+
+.navBtn-1add189 {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.navBtn-1add189:hover:not(:disabled) {
+  background: var(--hover);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+.navBtn-1add189:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.navBtn-1add189 svg {
+  width: 1rem;
+  height: 1rem;
+}
+
 
 .panel-294f62b {
   position: fixed;

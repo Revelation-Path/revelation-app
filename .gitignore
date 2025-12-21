@@ -22,3 +22,5 @@ Thumbs.db
 # Build artifacts
 /dist/
 /pkg/
+
+API_KEYS
