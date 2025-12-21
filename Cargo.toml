@@ -16,7 +16,7 @@ version = "0.1.0"
 edition = "2024"
 authors = ["Revelation Team"]
 license = "MIT"
-repository = "https://github.com/revelation-app/revelation"
+repository = "https://github.com/Revelation-Path/revelation"
 
 [workspace.dependencies]
 # Async runtime
