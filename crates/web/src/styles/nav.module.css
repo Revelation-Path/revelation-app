@@ -53,9 +53,8 @@
   position: sticky;
   top: 0;
   border-right: 0.0625rem solid var(--color-border);
-  background: white;
   overflow: hidden;
-  transition: width var(--duration-normal) var(--ease-out);
+  transition: all var(--duration-normal) var(--ease-out);
 }
 
 .sidebarExpanded { width: var(--sidebar-width); }

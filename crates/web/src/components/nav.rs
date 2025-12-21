@@ -29,11 +29,33 @@ pub fn BottomNav() -> impl IntoView {
 pub fn Sidebar() -> impl IntoView {
     let state = expect_context::<crate::state::AppState>();
     let collapsed = state.sidebar_collapsed;
+    let current_book = state.current_book;
     let location = use_location();
     let current_path = move || location.pathname.get();
 
+    let bg_color = move || {
+        let opacity = 0.15;
+        let color = match current_book.get() {
+            1..=5 => "59, 130, 246",
+            6..=17 => "34, 197, 94",
+            18..=22 => "234, 179, 8",
+            23..=27 => "244, 63, 94",
+            28..=39 => "236, 72, 153",
+            40..=43 => "245, 158, 11",
+            44 => "99, 102, 241",
+            45..=57 => "139, 92, 246",
+            58..=65 => "20, 184, 166",
+            66 => "239, 68, 68",
+            _ => "201, 162, 39"
+        };
+        format!("rgba({}, {})", color, opacity)
+    };
+
     view! {
-        <aside class=move || format!("{} {}", nav::sidebar, if collapsed.get() { nav::sidebarCollapsed } else { nav::sidebarExpanded })>
+        <aside
+            class=move || format!("{} {}", nav::sidebar, if collapsed.get() { nav::sidebarCollapsed } else { nav::sidebarExpanded })
+            style:background=bg_color
+        >
             <div class=nav::sidebarHeader>
                 <button class=nav::sidebarLogo on:click=move |_| collapsed.update(|v| *v = !*v)>
                     <CrossIcon/>

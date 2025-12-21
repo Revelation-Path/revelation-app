@@ -3,6 +3,7 @@
 use leptos::{prelude::*, reactive::computed::Memo};
 use leptos_router::hooks::use_params_map;
 use shared::Book;
+use wasm_bindgen::JsCast;
 
 use crate::{api, components::BottomNav};
 
@@ -51,14 +52,18 @@ pub fn BibleChapter() -> impl IntoView {
 /// Main Bible reader component
 #[component]
 fn BibleReader(initial_book: i16, initial_chapter: i16) -> impl IntoView {
-    let (current_book, set_current_book) = signal(initial_book);
-    let (current_chapter, set_current_chapter) = signal(initial_chapter);
+    let state = expect_context::<crate::state::AppState>();
+    let current_book = state.current_book;
+    let current_chapter = state.current_chapter;
+    state.current_book.set(initial_book);
+    state.current_chapter.set(initial_chapter);
     let (settings_open, set_settings_open) = signal(false);
     let (chapters_open, set_chapters_open) = signal(false);
 
     let (font_size, set_font_size) = signal(18_u8);
     let (theme, set_theme) = signal(Theme::Light);
     let (font_family, set_font_family) = signal(FontFamily::Serif);
+    let (scroll_progress, set_scroll_progress) = signal(1.0_f64);
 
     let all_books = LocalResource::new(|| async { api::get_books().await.ok() });
 
@@ -86,8 +91,8 @@ fn BibleReader(initial_book: i16, initial_chapter: i16) -> impl IntoView {
     };
 
     let navigate_to = move |book_id: i16| {
-        set_current_book.set(book_id);
-        set_current_chapter.set(1);
+        current_book.set(book_id);
+        current_chapter.set(1);
     };
 
     view! {
@@ -100,6 +105,11 @@ fn BibleReader(initial_book: i16, initial_chapter: i16) -> impl IntoView {
             class:font-sans=move || font_family.get() == FontFamily::Sans
         >
             <header class=header::header>
+                <div
+                    class=header::progress
+                    style:width=move || format!("{}%", scroll_progress.get() * 100.0)
+                    style:background=move || get_book_active_color(current_book.get())
+                ></div>
                 <div></div>
 
                 <div class=header::title>
@@ -132,29 +142,37 @@ fn BibleReader(initial_book: i16, initial_chapter: i16) -> impl IntoView {
                 />
             </Show>
 
-            // Thumb indexes - fixed position layers
-            <Suspense fallback=|| ()>
-                {move || all_books.get().flatten().map(|books| {
-                    let left_books: Vec<_> = books.iter().take(33).cloned().collect();
-                    let right_books: Vec<_> = books.iter().skip(33).cloned().collect();
-                    view! {
-                        <ThumbIndex
-                            books=left_books
-                            side=Side::Left
-                            current_book=current_book
-                            on_select=navigate_to
-                        />
-                        <ThumbIndex
-                            books=right_books
-                            side=Side::Right
-                            current_book=current_book
-                            on_select=navigate_to
-                        />
-                    }
-                })}
-            </Suspense>
+            <div class=reader::content>
+                <Suspense fallback=|| ()>
+                    {move || all_books.get().flatten().map(|books| {
+                        let left_books: Vec<_> = books.iter().take(33).cloned().collect();
+                        view! {
+                            <ThumbIndex
+                                books=left_books
+                                side=Side::Left
+                                current_book=current_book
+                                on_select=navigate_to
+                            />
+                        }
+                    })}
+                </Suspense>
 
-            <main class=reader::text>
+                <main
+                    class=reader::text
+                    on:scroll=move |ev| {
+                        let target = ev.target().unwrap();
+                        let el = target.unchecked_ref::<web_sys::HtmlElement>();
+                        let scroll_top = el.scroll_top() as f64;
+                        let scroll_height = el.scroll_height() as f64;
+                        let client_height = el.client_height() as f64;
+                        let max_scroll = scroll_height - client_height;
+                        if max_scroll > 0.0 {
+                            set_scroll_progress.set(scroll_top / max_scroll);
+                        } else {
+                            set_scroll_progress.set(1.0);
+                        }
+                    }
+                >
                 <Show
                     when=move || chapters_open.get()
                     fallback=move || view! {
@@ -185,7 +203,7 @@ fn BibleReader(initial_book: i16, initial_chapter: i16) -> impl IntoView {
                                     chapters_info=ch_info
                                     current_chapter=current_chapter
                                     on_select=move |ch| {
-                                        set_current_chapter.set(ch);
+                                        current_chapter.set(ch);
                                         set_chapters_open.set(false);
                                     }
                                 />
@@ -193,7 +211,22 @@ fn BibleReader(initial_book: i16, initial_chapter: i16) -> impl IntoView {
                         }
                     })}
                 </Show>
-            </main>
+                </main>
+
+                <Suspense fallback=|| ()>
+                    {move || all_books.get().flatten().map(|books| {
+                        let right_books: Vec<_> = books.iter().skip(33).cloned().collect();
+                        view! {
+                            <ThumbIndex
+                                books=right_books
+                                side=Side::Right
+                                current_book=current_book
+                                on_select=navigate_to
+                            />
+                        }
+                    })}
+                </Suspense>
+            </div>
 
             <BottomNav/>
         </div>
@@ -226,23 +259,11 @@ enum FontFamily {
 fn ThumbIndex(
     books: Vec<Book>,
     side: Side,
-    current_book: ReadSignal<i16>,
+    current_book: RwSignal<i16>,
     on_select: impl Fn(i16) + Copy + 'static
 ) -> impl IntoView {
-    let state = expect_context::<crate::state::AppState>();
-    let collapsed = state.sidebar_collapsed;
-
-    let side_class = move || match side {
-        Side::Left => format!(
-            "{} {} {}",
-            thumb::index,
-            thumb::left,
-            if collapsed.get() {
-                thumb::leftCollapsed
-            } else {
-                ""
-            }
-        ),
+    let side_class = match side {
+        Side::Left => format!("{} {}", thumb::index, thumb::left),
         Side::Right => format!("{} {}", thumb::index, thumb::right)
     };
 
@@ -324,7 +345,7 @@ fn ChaptersList(
     chapters_count: i16,
     pericopes: Vec<shared::Pericope>,
     chapters_info: Vec<shared::ChapterInfo>,
-    current_chapter: ReadSignal<i16>,
+    current_chapter: RwSignal<i16>,
     on_select: impl Fn(i16) + Copy + Send + Sync + 'static
 ) -> impl IntoView {
     let (expanded, set_expanded) = signal::<Option<i16>>(None);
@@ -476,6 +497,22 @@ fn get_book_color_class(book_id: i16) -> &'static str {
         58..=65 => colors::general,
         66 => colors::revelation,
         _ => ""
+    }
+}
+
+fn get_book_active_color(book_id: i16) -> &'static str {
+    match book_id {
+        1..=5 => "#3b82f6",
+        6..=17 => "#22c55e",
+        18..=22 => "#eab308",
+        23..=27 => "#f43f5e",
+        28..=39 => "#ec4899",
+        40..=43 => "#f59e0b",
+        44 => "#6366f1",
+        45..=57 => "#8b5cf6",
+        58..=65 => "#14b8a6",
+        66 => "#ef4444",
+        _ => "#c9a227"
     }
 }
 

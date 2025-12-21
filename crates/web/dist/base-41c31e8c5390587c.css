@@ -1,0 +1,162 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap");
+
+:root {
+  /* ─────────────────────────────────────────────────────────────
+     SPACING SCALE (rem-based, 1rem = 16px default)
+     ───────────────────────────────────────────────────────────── */
+  --space-3xs: 0.125rem;  /* 2 */
+  --space-2xs: 0.25rem;   /* 4 */
+  --space-xs: 0.5rem;     /* 8 */
+  --space-sm: 0.75rem;    /* 12 */
+  --space-md: 1rem;       /* 16 */
+  --space-lg: 1.5rem;     /* 24 */
+  --space-xl: 2rem;       /* 32 */
+  --space-2xl: 3rem;      /* 48 */
+  --space-3xl: 4rem;      /* 64 */
+
+  /* ─────────────────────────────────────────────────────────────
+     TYPOGRAPHY SCALE
+     ───────────────────────────────────────────────────────────── */
+  --text-2xs: 0.625rem;   /* 10 */
+  --text-xs: 0.75rem;     /* 12 */
+  --text-sm: 0.875rem;    /* 14 */
+  --text-md: 1rem;        /* 16 */
+  --text-lg: 1.25rem;     /* 20 */
+  --text-xl: 1.5rem;      /* 24 */
+  --text-2xl: 2rem;       /* 32 */
+
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.8;
+
+  /* ─────────────────────────────────────────────────────────────
+     FONTS
+     ───────────────────────────────────────────────────────────── */
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-serif: 'Merriweather', Georgia, serif;
+
+  /* ─────────────────────────────────────────────────────────────
+     COLORS
+     ───────────────────────────────────────────────────────────── */
+  --color-gold-50: #fefce8;
+  --color-gold-100: #fef9c3;
+  --color-gold-200: #fef08a;
+  --color-gold-300: #fde047;
+  --color-gold-400: #facc15;
+  --color-gold-500: #c9a227;
+  --color-gold-600: #a67c00;
+  --color-gold-700: #854d0e;
+
+  --color-parchment-50: #fefdfb;
+  --color-parchment-100: #fdf8f0;
+  --color-parchment-200: #f9f1e4;
+
+  --color-text-primary: #1f2937;
+  --color-text-secondary: #4b5563;
+  --color-text-muted: #6b7280;
+
+  --color-border: rgba(0, 0, 0, 0.06);
+  --color-hover: rgba(0, 0, 0, 0.04);
+
+  /* ─────────────────────────────────────────────────────────────
+     LAYOUT
+     ───────────────────────────────────────────────────────────── */
+  --header-height: 3.25rem;
+  --bottom-nav-height: 3.5rem;
+  --sidebar-width: 16rem;
+  --sidebar-collapsed: 4rem;
+  --thumb-width: 2.25rem;
+  --content-max-width: 45rem;
+
+  /* ─────────────────────────────────────────────────────────────
+     RADII
+     ───────────────────────────────────────────────────────────── */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999rem;
+
+  /* ─────────────────────────────────────────────────────────────
+     SHADOWS
+     ───────────────────────────────────────────────────────────── */
+  --shadow-sm: 0 0.0625rem 0.125rem rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.15);
+  --shadow-gold: 0 0.125rem 0.5rem rgba(201, 162, 39, 0.3);
+
+  /* ─────────────────────────────────────────────────────────────
+     TRANSITIONS
+     ───────────────────────────────────────────────────────────── */
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+  --ease-out: ease-out;
+  --ease-in-out: ease-in-out;
+
+  /* ─────────────────────────────────────────────────────────────
+     Z-INDEX SCALE
+     ───────────────────────────────────────────────────────────── */
+  --z-base: 0;
+  --z-thumb: 30;
+  --z-thumb-hover: 35;
+  --z-header: 40;
+  --z-modal: 50;
+  --z-tooltip: 60;
+
+  /* ─────────────────────────────────────────────────────────────
+     BREAKPOINTS (for reference, use in media queries)
+     ───────────────────────────────────────────────────────────── */
+  --bp-sm: 40rem;   /* 640 */
+  --bp-md: 48rem;   /* 768 */
+  --bp-lg: 64rem;   /* 1024 */
+  --bp-xl: 80rem;   /* 1280 */
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  line-height: var(--leading-normal);
+  color: var(--color-text-primary);
+  background: var(--color-parchment-50);
+  min-height: 100dvh;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  font: inherit;
+}
+
+a { color: inherit; text-decoration: none; }
+img, svg { display: block; max-width: 100%; }
+
+/* Layout utilities */
+.flex { display: flex; }
+.flex-1 { flex: 1; }
+.flex-col { flex-direction: column; }
+.min-h-screen { min-height: 100vh; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+
+@media (min-width: 64rem) {
+  .lg\:min-h-screen { min-height: 100vh; }
+}

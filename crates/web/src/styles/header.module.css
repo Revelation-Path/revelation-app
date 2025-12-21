@@ -6,8 +6,19 @@
   align-items: center;
   justify-content: space-between;
   padding: var(--space-sm) var(--space-md);
-  background: var(--color-parchment-50);
+  background: transparent;
   border-bottom: 0.0625rem solid var(--color-border);
+  overflow: hidden;
+}
+
+.progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  opacity: 0.2;
+  z-index: -1;
+  transition: width 0.15s ease-out;
 }
 
 .title {

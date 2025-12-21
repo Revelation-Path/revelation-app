@@ -10,7 +10,9 @@ pub struct AppState {
     pub user_id:           RwSignal<Uuid>,
     pub user:              RwSignal<Option<User>>,
     pub is_loading:        RwSignal<bool>,
-    pub sidebar_collapsed: RwSignal<bool>
+    pub sidebar_collapsed: RwSignal<bool>,
+    pub current_book:      RwSignal<i16>,
+    pub current_chapter:   RwSignal<i16>
 }
 
 impl AppState {
@@ -29,7 +31,9 @@ impl AppState {
             user_id:           RwSignal::new(user_id),
             user:              RwSignal::new(None),
             is_loading:        RwSignal::new(true),
-            sidebar_collapsed: RwSignal::new(false)
+            sidebar_collapsed: RwSignal::new(false),
+            current_book:      RwSignal::new(1),
+            current_chapter:   RwSignal::new(1)
         }
     }
 
