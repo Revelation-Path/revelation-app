@@ -16,7 +16,7 @@ spec:
         app: revelation-web
     spec:
       imagePullSecrets:
-        - name: regcred
+        - name: craas-revelation-registry
       containers:
         - name: web
           image: revelation-registry.registry.twcstorage.ru/revelation-web:latest
