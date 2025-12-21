@@ -1,3 +1,5 @@
+#![allow(ambiguous_glob_reexports)]
+
 mod bible;
 mod churches;
 mod daily;

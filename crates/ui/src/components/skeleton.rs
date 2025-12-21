@@ -95,7 +95,7 @@ pub fn Skeleton(
         view! {
             <div class="ui-skeleton-group">
                 {(0..count).map(|_| view! {
-                    <div class=classes.clone() style=style.clone()></div>
+                    <div class=classes style=style></div>
                 }).collect_view()}
             </div>
         }

@@ -87,7 +87,6 @@ pub fn Drawer(
     };
 
     let handle_animation_end = {
-        let on_close = on_close.clone();
         move |_: web_sys::AnimationEvent| {
             if leaving.get() {
                 leaving.set(false);
@@ -126,22 +125,20 @@ pub fn Drawer(
                     }
                 };
 
-                let handle_animation_end = handle_animation_end.clone();
                 let aria_label = aria_label.clone();
-
                 view! {
                     <div
                         class=overlay_classes
                         role="presentation"
                         on:click=handle_overlay_click
-                        on:animationend=handle_animation_end.clone()
+                        on:animationend=handle_animation_end
                     >
                         <div
                             class=drawer_classes
                             style=height.style()
                             role="dialog"
                             aria-modal="true"
-                            aria-label=aria_label
+                            aria-label=aria_label.clone()
                             on:click=stop_propagation
                             on:animationend=handle_animation_end
                         >

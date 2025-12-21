@@ -112,7 +112,7 @@ async fn handle_command(
         Command::Link => {
             let telegram_id = msg.from.as_ref().map(|u| u.id.0 as i64);
 
-            if let Some(tg_id) = telegram_id {
+            if let Some(_tg_id) = telegram_id {
                 // Generate one-time link token
                 let token = uuid::Uuid::now_v7();
 

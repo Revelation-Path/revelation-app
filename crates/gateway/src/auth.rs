@@ -22,24 +22,23 @@ impl AuthLayer {
 
     fn get_user_id(request: &Request) -> Option<Uuid> {
         // Try X-User-ID header first
-        if let Some(header) = request.headers().get("X-User-ID") {
-            if let Ok(s) = header.to_str() {
-                if let Ok(uuid) = Uuid::parse_str(s) {
-                    return Some(uuid);
-                }
-            }
+        if let Some(header) = request.headers().get("X-User-ID")
+            && let Ok(s) = header.to_str()
+            && let Ok(uuid) = Uuid::parse_str(s)
+        {
+            return Some(uuid);
         }
 
         // Try cookie
-        if let Some(cookie) = request.headers().get(header::COOKIE) {
-            if let Ok(s) = cookie.to_str() {
-                for part in s.split(';') {
-                    let part = part.trim();
-                    if let Some(value) = part.strip_prefix("user_id=") {
-                        if let Ok(uuid) = Uuid::parse_str(value) {
-                            return Some(uuid);
-                        }
-                    }
+        if let Some(cookie) = request.headers().get(header::COOKIE)
+            && let Ok(s) = cookie.to_str()
+        {
+            for part in s.split(';') {
+                let part = part.trim();
+                if let Some(value) = part.strip_prefix("user_id=")
+                    && let Ok(uuid) = Uuid::parse_str(value)
+                {
+                    return Some(uuid);
                 }
             }
         }
@@ -49,4 +48,5 @@ impl AuthLayer {
 }
 
 #[derive(Debug, Clone, Copy)]
+#[allow(dead_code)]
 pub struct UserId(pub Uuid);

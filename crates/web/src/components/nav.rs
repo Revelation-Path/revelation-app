@@ -3,7 +3,11 @@
 use leptos::{prelude::*, reactive::wrappers::read::Signal};
 use leptos_router::{components::A, hooks::use_location};
 
-stylance::import_crate_style!(nav, "src/styles/nav.module.css");
+#[allow(dead_code)]
+mod styles {
+    stylance::import_crate_style!(pub nav, "src/styles/nav.module.css");
+}
+use styles::nav;
 
 /// Responsive navigation - bottom on mobile, sidebar on desktop
 #[component]

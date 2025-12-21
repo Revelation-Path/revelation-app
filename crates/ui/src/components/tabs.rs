@@ -111,7 +111,6 @@ pub fn Tabs(
                 let tab_id_for_aria = tab.id.clone();
                 let tab_id_for_click = tab.id.clone();
                 let tab_disabled = tab.disabled;
-                let on_change = on_change.clone();
 
                 view! {
                     <button
@@ -229,7 +228,6 @@ where
                 let opt_for_class = opt_value.clone();
                 let opt_for_aria = opt_value.clone();
                 let opt_for_click = opt_value.clone();
-                let on_change = on_change.clone();
 
                 view! {
                     <button

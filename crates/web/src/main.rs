@@ -1,4 +1,3 @@
-use leptos::prelude::*;
 use web::App;
 
 fn main() {

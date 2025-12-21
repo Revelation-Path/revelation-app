@@ -35,12 +35,16 @@ fn request_animation_frame(f: impl FnOnce() + 'static) {
 
 use crate::{api, components::BottomNav};
 
-stylance::import_crate_style!(reader, "src/styles/reader.module.css");
-stylance::import_crate_style!(header, "src/styles/header.module.css");
-stylance::import_crate_style!(books, "src/styles/books.module.css");
-stylance::import_crate_style!(colors, "src/styles/colors.module.css");
-stylance::import_crate_style!(settings, "src/styles/settings.module.css");
-stylance::import_crate_style!(chapters, "src/styles/chapters.module.css");
+#[allow(dead_code)]
+mod styles {
+    stylance::import_crate_style!(pub reader, "src/styles/reader.module.css");
+    stylance::import_crate_style!(pub header, "src/styles/header.module.css");
+    stylance::import_crate_style!(pub books, "src/styles/books.module.css");
+    stylance::import_crate_style!(pub colors, "src/styles/colors.module.css");
+    stylance::import_crate_style!(pub settings, "src/styles/settings.module.css");
+    stylance::import_crate_style!(pub chapters, "src/styles/chapters.module.css");
+}
+use styles::*;
 
 /// Bible reader with book-style navigation
 #[component]
@@ -81,7 +85,7 @@ pub fn BibleChapter() -> impl IntoView {
 #[component]
 fn BibleReader(initial_book: i16, initial_chapter: i16) -> impl IntoView {
     let app_state = expect_context::<crate::state::AppState>();
-    let theme_state = use_theme();
+    let _theme_state = use_theme();
 
     let current_book = app_state.current_book;
     let current_chapter = app_state.current_chapter;
@@ -559,10 +563,10 @@ fn ChapterNav(
             if book > 1 {
                 current_book.set(book - 1);
                 // Set to last chapter of previous book
-                if let Some(books) = all_books.get().flatten() {
-                    if let Some(prev_book) = books.iter().find(|b| b.id == book - 1) {
-                        current_chapter.set(prev_book.chapters_count);
-                    }
+                if let Some(books) = all_books.get().flatten()
+                    && let Some(prev_book) = books.iter().find(|b| b.id == book - 1)
+                {
+                    current_chapter.set(prev_book.chapters_count);
                 }
             }
         }

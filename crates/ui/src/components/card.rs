@@ -73,10 +73,8 @@ pub fn Card(
     children: Children
 ) -> impl IntoView {
     let handle_click = move |_| {
-        if clickable {
-            if let Some(cb) = on_click {
-                cb.run(());
-            }
+        if clickable && let Some(cb) = on_click {
+            cb.run(());
         }
     };
 

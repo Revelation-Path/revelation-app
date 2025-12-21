@@ -2,7 +2,7 @@ use axum::{
     Router,
     extract::Request,
     http::StatusCode,
-    middleware::{self, Next},
+    middleware,
     response::Response,
     routing::any
 };
@@ -51,13 +51,14 @@ async fn main() -> AppResult<()> {
 }
 
 #[derive(Clone)]
+#[allow(dead_code)]
 struct GatewayState {
     server_url:   String,
     payments_url: String
 }
 
 async fn proxy_server(
-    axum::extract::State(state): axum::extract::State<GatewayState>,
+    axum::extract::State(_state): axum::extract::State<GatewayState>,
     request: Request
 ) -> Result<Response, StatusCode> {
     // TODO: Implement actual proxy using hyper client
@@ -66,7 +67,7 @@ async fn proxy_server(
 }
 
 async fn proxy_payments(
-    axum::extract::State(state): axum::extract::State<GatewayState>,
+    axum::extract::State(_state): axum::extract::State<GatewayState>,
     request: Request
 ) -> Result<Response, StatusCode> {
     // TODO: Implement actual proxy using hyper client

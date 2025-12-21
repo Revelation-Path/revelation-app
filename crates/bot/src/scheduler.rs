@@ -17,10 +17,11 @@ pub async fn run_daily_scheduler(bot: Bot, pool: PgPool) {
         let vladivostok_hour = (now.hour() + 10) % 24;
 
         // Send at 7:00 AM Vladivostok time
-        if vladivostok_hour == 7 && now.minute() == 0 {
-            if let Err(e) = send_daily_verses(&bot, &pool).await {
-                tracing::error!("Failed to send daily verses: {}", e);
-            }
+        if vladivostok_hour == 7
+            && now.minute() == 0
+            && let Err(e) = send_daily_verses(&bot, &pool).await
+        {
+            tracing::error!("Failed to send daily verses: {}", e);
         }
     }
 }

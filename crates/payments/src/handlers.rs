@@ -167,6 +167,7 @@ async fn delete_card(State(state): State<AppState>, Path(card_id): Path<Uuid>) -
 }
 
 #[derive(serde::Deserialize)]
+#[allow(dead_code)]
 pub struct WebhookPayload {
     event_type: String,
     payment_id: String,
