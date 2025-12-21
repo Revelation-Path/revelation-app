@@ -47,6 +47,7 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
 # Build application
 COPY Cargo.toml Cargo.lock ./
 COPY .sqlx ./.sqlx
+COPY migrations ./migrations
 COPY crates ./crates
 
 ENV SQLX_OFFLINE=true
