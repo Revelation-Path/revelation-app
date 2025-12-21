@@ -33,7 +33,7 @@ async fn main() -> AppResult<()> {
     sqlx::migrate!("../../migrations")
         .run(&pool)
         .await
-        .map_err(|e| AppError::internal(e.to_string()))?;
+        .map_err(|e: sqlx::migrate::MigrateError| AppError::internal(e.to_string()))?;
 
     let state = AppState::new(pool);
 
