@@ -3,7 +3,7 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # Chef stage - install cargo-chef and sccache
 # ─────────────────────────────────────────────────────────────────────────────
-FROM rust:1.85-slim AS chef
+FROM rust:1.91-slim AS chef
 
 ENV SCCACHE_VERSION=0.8.2
 ENV CARGO_HOME=/usr/local/cargo
