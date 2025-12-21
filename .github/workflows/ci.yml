@@ -9,8 +9,8 @@ on:
 env:
   CARGO_TERM_COLOR: always
   SQLX_OFFLINE: true
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  REGISTRY: revelation-registry.registry.twcstorage.ru
+  IMAGE_NAME: revelation
 
 jobs:
   # ─────────────────────────────────────────────────────────────────────────────
@@ -77,12 +77,12 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Login to GHCR
+      - name: Login to Registry
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push
         uses: docker/build-push-action@v6
@@ -90,11 +90,9 @@ jobs:
           context: .
           target: ${{ matrix.target }}
           push: true
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.target }}:${{ needs.prepare.outputs.version }}
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.target }}:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.target }}:${{ needs.prepare.outputs.version }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.target }}:cache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.target }}:cache,mode=max
           provenance: false
 
   # ─────────────────────────────────────────────────────────────────────────────
@@ -123,9 +121,54 @@ jobs:
         run: |
           cd k8s/base
           kustomize edit set image \
-            revelation/server=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/server:${VERSION} \
-            revelation/gateway=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/gateway:${VERSION} \
-            revelation/payments=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/payments:${VERSION} \
-            revelation/bot=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/bot:${VERSION}
+            revelation-server=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-server:${VERSION} \
+            revelation-gateway=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-gateway:${VERSION} \
+            revelation-payments=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-payments:${VERSION} \
+            revelation-bot=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-bot:${VERSION}
           kubectl apply -k .
           kubectl -n revelation rollout status deployment --timeout=300s
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Cleanup old images (keep last 10)
+  # ─────────────────────────────────────────────────────────────────────────────
+  cleanup:
+    name: Cleanup Registry
+    runs-on: ubuntu-latest
+    needs: [deploy]
+    steps:
+      - name: Cleanup old tags
+        env:
+          REGISTRY: ${{ env.REGISTRY }}
+          USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          for SERVICE in server gateway payments bot; do
+            REPO="revelation-${SERVICE}"
+
+            # Get all tags (excluding cache)
+            TAGS=$(curl -s -u "${USERNAME}:${PASSWORD}" \
+              "https://${REGISTRY}/v2/${REPO}/tags/list" | \
+              jq -r '.tags[]? // empty' | grep -v '^cache$' | sort -V)
+
+            # Count tags
+            COUNT=$(echo "$TAGS" | grep -c . || echo 0)
+
+            if [ "$COUNT" -gt 10 ]; then
+              # Get tags to delete (all except last 10)
+              TO_DELETE=$(echo "$TAGS" | head -n -10)
+
+              for TAG in $TO_DELETE; do
+                # Get digest
+                DIGEST=$(curl -s -I -u "${USERNAME}:${PASSWORD}" \
+                  -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
+                  "https://${REGISTRY}/v2/${REPO}/manifests/${TAG}" | \
+                  grep -i docker-content-digest | awk '{print $2}' | tr -d '\r')
+
+                if [ -n "$DIGEST" ]; then
+                  curl -s -u "${USERNAME}:${PASSWORD}" -X DELETE \
+                    "https://${REGISTRY}/v2/${REPO}/manifests/${DIGEST}"
+                  echo "Deleted ${REPO}:${TAG}"
+                fi
+              done
+            fi
+          done
