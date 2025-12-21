@@ -46,7 +46,11 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
 
 # Build application
 COPY Cargo.toml Cargo.lock ./
+COPY .sqlx ./.sqlx
 COPY crates ./crates
+
+ENV SQLX_OFFLINE=true
+
 RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
     --mount=type=cache,target=/usr/local/cargo/git,sharing=locked \
     --mount=type=cache,target=/sccache,sharing=locked \
@@ -54,10 +58,7 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
     cargo build --release \
     && sccache --show-stats \
     && mkdir -p /out \
-    && cp target/release/revelation-server /out/ \
-    && cp target/release/revelation-gateway /out/ \
-    && cp target/release/revelation-payments /out/ \
-    && cp target/release/revelation-bot /out/
+    && cp target/release/revelation-server /out/
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Runtime stage - minimal image
