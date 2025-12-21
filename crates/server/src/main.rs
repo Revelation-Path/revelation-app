@@ -38,6 +38,7 @@ async fn main() -> AppResult<()> {
     let state = AppState::new(pool);
 
     let app = Router::new()
+        .route("/health", axum::routing::get(|| async { "ok" }))
         .nest("/api", handlers::api_routes())
         .with_state(state)
         .layer(CompressionLayer::new())
