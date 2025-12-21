@@ -33,7 +33,7 @@ pub fn Sidebar() -> impl IntoView {
     let location = use_location();
     let current_path = move || location.pathname.get();
 
-    let book_color = move || get_book_color(current_book.get());
+    let book_color = move || get_book_category_var(current_book.get());
 
     view! {
         <aside
@@ -232,19 +232,19 @@ fn ProfileIcon() -> impl IntoView {
     }
 }
 
-/// Get book category color based on book ID (synced with colors.module.css)
-fn get_book_color(book_id: i16) -> &'static str {
+/// Get book category CSS variable
+fn get_book_category_var(book_id: i16) -> &'static str {
     match book_id {
-        1..=5 => "#93b1d6",    // Torah - soft blue
-        6..=17 => "#86bc9e",   // History - soft green
-        18..=22 => "#dac282",  // Wisdom - soft gold
-        23..=27 => "#cd96a0",  // Major Prophets - soft rose
-        28..=39 => "#c6a2b8",  // Minor Prophets - soft mauve
-        40..=43 => "#c9a264",  // Gospels - soft amber
-        44 => "#9ca2c6",       // Acts - soft indigo
-        45..=57 => "#ac9cc6",  // Pauline Epistles - soft violet
-        58..=65 => "#8cbcb6",  // General Epistles - soft teal
-        66 => "#c69c9c",       // Revelation - soft coral
-        _ => "#c9a264"         // Default - soft amber
+        1..=5 => "var(--cat-torah)",
+        6..=17 => "var(--cat-history)",
+        18..=22 => "var(--cat-wisdom)",
+        23..=27 => "var(--cat-major-prophets)",
+        28..=39 => "var(--cat-minor-prophets)",
+        40..=43 => "var(--cat-gospels)",
+        44 => "var(--cat-acts)",
+        45..=57 => "var(--cat-paul)",
+        58..=65 => "var(--cat-general)",
+        66 => "var(--cat-revelation)",
+        _ => "var(--cat-gospels)"
     }
 }

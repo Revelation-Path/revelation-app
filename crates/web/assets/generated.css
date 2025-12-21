@@ -1,3 +1,93 @@
+.bookNav-ab7efea {
+  width: var(--thumb-width);
+  height: calc(100dvh - var(--header-height) - var(--bottom-nav-height));
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+@media (min-width: 64rem) {
+  .bookNav-ab7efea {
+    height: calc(98dvh - var(--header-height));
+  }
+}
+
+.left-ab7efea {
+  align-items: flex-start;
+}
+
+.right-ab7efea {
+  align-items: flex-end;
+}
+
+.book-ab7efea {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 0.25rem;
+  font-size: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.left-ab7efea .book-ab7efea {
+  justify-content: center;
+  border-radius: 0 0.375rem 0.375rem 0;
+}
+
+.right-ab7efea .book-ab7efea {
+  justify-content: center;
+  border-radius: 0.375rem 0 0 0.375rem;
+}
+
+.abbrev-ab7efea {
+  flex-shrink: 0;
+}
+
+.full-ab7efea {
+  display: none;
+  margin-left: 0.25rem;
+}
+
+.right-ab7efea .full-ab7efea {
+  margin-left: 0;
+  margin-right: 0.25rem;
+}
+
+.book-ab7efea:hover,
+.book-ab7efea.active-ab7efea {
+  width: max-content;
+  padding: 0 0.5rem;
+  z-index: 50;
+  box-shadow: 0 0.125rem 0.5rem var(--shadow);
+}
+
+.book-ab7efea:hover .abbrev-ab7efea,
+.book-ab7efea.active-ab7efea .abbrev-ab7efea {
+  display: none;
+}
+
+.book-ab7efea:hover .full-ab7efea,
+.book-ab7efea.active-ab7efea .full-ab7efea {
+  display: inline;
+}
+
+.book-ab7efea.active-ab7efea {
+  font-weight: 600;
+  color: var(--text);
+  text-shadow:
+    -0.0625rem -0.0625rem 0 var(--bg),
+    0.0625rem -0.0625rem 0 var(--bg),
+    -0.0625rem 0.0625rem 0 var(--bg),
+    0.0625rem 0.0625rem 0 var(--bg);
+}
+
+
 .panel-62aa236 {
   display: flex;
   flex-direction: column;
@@ -169,64 +259,54 @@
 
 
 .torah-7845bfc {
-  --book-color: 147, 177, 214;
-  background: rgba(var(--book-color), 0.2);
+  background: color-mix(in srgb, var(--cat-torah) 20%, transparent);
 }
-.torah-7845bfc.active-7845bfc { background: rgb(var(--book-color)); }
+.torah-7845bfc.active-7845bfc { background: var(--cat-torah); }
 
 .history-7845bfc {
-  --book-color: 134, 188, 158;
-  background: rgba(var(--book-color), 0.2);
+  background: color-mix(in srgb, var(--cat-history) 20%, transparent);
 }
-.history-7845bfc.active-7845bfc { background: rgb(var(--book-color)); }
+.history-7845bfc.active-7845bfc { background: var(--cat-history); }
 
 .wisdom-7845bfc {
-  --book-color: 218, 194, 130;
-  background: rgba(var(--book-color), 0.2);
+  background: color-mix(in srgb, var(--cat-wisdom) 20%, transparent);
 }
-.wisdom-7845bfc.active-7845bfc { background: rgb(var(--book-color)); }
+.wisdom-7845bfc.active-7845bfc { background: var(--cat-wisdom); }
 
 .majorProphets-7845bfc {
-  --book-color: 205, 150, 160;
-  background: rgba(var(--book-color), 0.2);
+  background: color-mix(in srgb, var(--cat-major-prophets) 20%, transparent);
 }
-.majorProphets-7845bfc.active-7845bfc { background: rgb(var(--book-color)); }
+.majorProphets-7845bfc.active-7845bfc { background: var(--cat-major-prophets); }
 
 .minorProphets-7845bfc {
-  --book-color: 198, 162, 184;
-  background: rgba(var(--book-color), 0.2);
+  background: color-mix(in srgb, var(--cat-minor-prophets) 20%, transparent);
 }
-.minorProphets-7845bfc.active-7845bfc { background: rgb(var(--book-color)); }
+.minorProphets-7845bfc.active-7845bfc { background: var(--cat-minor-prophets); }
 
 .gospels-7845bfc {
-  --book-color: 201, 162, 100;
-  background: rgba(var(--book-color), 0.2);
+  background: color-mix(in srgb, var(--cat-gospels) 20%, transparent);
 }
-.gospels-7845bfc.active-7845bfc { background: rgb(var(--book-color)); }
+.gospels-7845bfc.active-7845bfc { background: var(--cat-gospels); }
 
 .acts-7845bfc {
-  --book-color: 156, 162, 198;
-  background: rgba(var(--book-color), 0.2);
+  background: color-mix(in srgb, var(--cat-acts) 20%, transparent);
 }
-.acts-7845bfc.active-7845bfc { background: rgb(var(--book-color)); }
+.acts-7845bfc.active-7845bfc { background: var(--cat-acts); }
 
 .paul-7845bfc {
-  --book-color: 172, 156, 198;
-  background: rgba(var(--book-color), 0.2);
+  background: color-mix(in srgb, var(--cat-paul) 20%, transparent);
 }
-.paul-7845bfc.active-7845bfc { background: rgb(var(--book-color)); }
+.paul-7845bfc.active-7845bfc { background: var(--cat-paul); }
 
 .general-7845bfc {
-  --book-color: 140, 188, 182;
-  background: rgba(var(--book-color), 0.2);
+  background: color-mix(in srgb, var(--cat-general) 20%, transparent);
 }
-.general-7845bfc.active-7845bfc { background: rgb(var(--book-color)); }
+.general-7845bfc.active-7845bfc { background: var(--cat-general); }
 
 .revelation-7845bfc {
-  --book-color: 198, 156, 156;
-  background: rgba(var(--book-color), 0.2);
+  background: color-mix(in srgb, var(--cat-revelation) 20%, transparent);
 }
-.revelation-7845bfc.active-7845bfc { background: rgb(var(--book-color)); }
+.revelation-7845bfc.active-7845bfc { background: var(--cat-revelation); }
 
 
 .header-e928854 {
@@ -478,6 +558,7 @@
   flex: 1;
   display: flex;
   align-items: stretch;
+  gap: var(--space-xs);
   height: 0;
   overflow: hidden;
 }
@@ -629,8 +710,8 @@
 }
 
 .themeBtnDark-294f62b {
-  background: #121212;
-  box-shadow: inset 0 0 0 1px #333;
+  background: #1a1a1a;
+  box-shadow: inset 0 0 0 1px #3a3a3a;
 }
 
 .fontBtn-294f62b {
@@ -688,94 +769,4 @@
   text-align: center;
   font-size: var(--text-sm);
   color: var(--text-secondary);
-}
-
-
-.index-29f5820 {
-  width: 28px;
-  height: calc(100dvh - var(--header-height) - var(--bottom-nav-height));
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-}
-
-@media (min-width: 64rem) {
-  .index-29f5820 {
-    height: calc(100dvh - var(--header-height));
-  }
-}
-
-.left-29f5820 {
-  align-items: flex-start;
-}
-
-.right-29f5820 {
-  align-items: flex-end;
-}
-
-.tab-29f5820 {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  padding: 0 0.25rem;
-  font-size: 0.5rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  color: var(--text-muted);
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-.left-29f5820 .tab-29f5820 {
-  justify-content: flex-start;
-  border-radius: 0 0.375rem 0.375rem 0;
-}
-
-.right-29f5820 .tab-29f5820 {
-  justify-content: flex-end;
-  border-radius: 0.375rem 0 0 0.375rem;
-  flex-direction: row-reverse;
-}
-
-.abbrev-29f5820 {
-  flex-shrink: 0;
-}
-
-.full-29f5820 {
-  display: none;
-  margin-left: 0.25rem;
-}
-
-.right-29f5820 .full-29f5820 {
-  margin-left: 0;
-  margin-right: 0.25rem;
-}
-
-.tab-29f5820:hover,
-.tab-29f5820.active-29f5820 {
-  width: max-content;
-  padding: 0 0.5rem;
-  z-index: 50;
-  box-shadow: 0 2px 8px var(--shadow);
-}
-
-.tab-29f5820:hover .abbrev-29f5820,
-.tab-29f5820.active-29f5820 .abbrev-29f5820 {
-  display: none;
-}
-
-.tab-29f5820:hover .full-29f5820,
-.tab-29f5820.active-29f5820 .full-29f5820 {
-  display: inline;
-}
-
-.tab-29f5820.active-29f5820 {
-  font-weight: 600;
-  color: var(--text);
-  text-shadow:
-    -1px -1px 0 var(--bg),
-    1px -1px 0 var(--bg),
-    -1px 1px 0 var(--bg),
-    1px 1px 0 var(--bg);
 }

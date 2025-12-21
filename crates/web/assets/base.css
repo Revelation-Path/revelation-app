@@ -39,7 +39,7 @@
      ───────────────────────────────────────────────────────────── */
   --header-height: 3.25rem;
   --bottom-nav-height: 3.5rem;
-  --sidebar-width: 16rem;
+  --sidebar-width: max-content;
   --sidebar-collapsed: 4rem;
   --thumb-width: 2.25rem;
   --content-max-width: 45rem;

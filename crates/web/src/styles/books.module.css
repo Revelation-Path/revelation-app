@@ -1,0 +1,88 @@
+.bookNav {
+  width: var(--thumb-width);
+  height: calc(100dvh - var(--header-height) - var(--bottom-nav-height));
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+@media (min-width: 64rem) {
+  .bookNav {
+    height: calc(98dvh - var(--header-height));
+  }
+}
+
+.left {
+  align-items: flex-start;
+}
+
+.right {
+  align-items: flex-end;
+}
+
+.book {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 0.25rem;
+  font-size: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.left .book {
+  justify-content: center;
+  border-radius: 0 0.375rem 0.375rem 0;
+}
+
+.right .book {
+  justify-content: center;
+  border-radius: 0.375rem 0 0 0.375rem;
+}
+
+.abbrev {
+  flex-shrink: 0;
+}
+
+.full {
+  display: none;
+  margin-left: 0.25rem;
+}
+
+.right .full {
+  margin-left: 0;
+  margin-right: 0.25rem;
+}
+
+.book:hover,
+.book.active {
+  width: max-content;
+  padding: 0 0.5rem;
+  z-index: 50;
+  box-shadow: 0 0.125rem 0.5rem var(--shadow);
+}
+
+.book:hover .abbrev,
+.book.active .abbrev {
+  display: none;
+}
+
+.book:hover .full,
+.book.active .full {
+  display: inline;
+}
+
+.book.active {
+  font-weight: 600;
+  color: var(--text);
+  text-shadow:
+    -0.0625rem -0.0625rem 0 var(--bg),
+    0.0625rem -0.0625rem 0 var(--bg),
+    -0.0625rem 0.0625rem 0 var(--bg),
+    0.0625rem 0.0625rem 0 var(--bg);
+}

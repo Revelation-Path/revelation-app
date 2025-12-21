@@ -19,16 +19,12 @@ pub fn App() -> impl IntoView {
     let state = AppState::init();
     provide_context(state);
 
-    // Inject UI component styles
-    let ui_styles = ui::STYLES;
-
     view! {
         <Meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
         <Meta name="theme-color" content="#fefdfb"/>
         <Meta name="apple-mobile-web-app-capable" content="yes"/>
         <Meta name="apple-mobile-web-app-status-bar-style" content="default"/>
         <Title text="Revelation - Библия"/>
-        <Style>{ui_styles}</Style>
         <Style>{THEME_CSS}</Style>
 
         <ThemeProvider>

@@ -1,11 +1,14 @@
 //! Theme system - dynamic theming with accent color calculation
 //!
+//! All colors are derived from a single accent hue via HSL rotation.
+//! Category colors automatically adapt to the selected theme.
+//!
 //! Usage:
 //! ```rust
-//! use ui::theme::{Theme, ThemeProvider};
+//! use ui::theme::ThemeProvider;
 //!
 //! view! {
-//!     <ThemeProvider theme=Theme::Dark accent="#c9a227">
+//!     <ThemeProvider>
 //!         // Your app content
 //!     </ThemeProvider>
 //! }
@@ -56,8 +59,7 @@ impl FontFamily {
 pub struct ThemeState {
     pub theme:       RwSignal<Theme>,
     pub font_family: RwSignal<FontFamily>,
-    pub font_size:   RwSignal<u8>,
-    pub accent:      RwSignal<&'static str>
+    pub font_size:   RwSignal<u8>
 }
 
 impl ThemeState {
@@ -66,8 +68,7 @@ impl ThemeState {
         Self {
             theme:       RwSignal::new(Theme::Light),
             font_family: RwSignal::new(FontFamily::Serif),
-            font_size:   RwSignal::new(18),
-            accent:      RwSignal::new("#c9a227")
+            font_size:   RwSignal::new(18)
         }
     }
 
@@ -95,14 +96,9 @@ pub fn ThemeProvider(children: Children) -> impl IntoView {
 
     let class = move || state.class();
     let font_size = move || format!("{}px", state.font_size.get());
-    let accent = move || state.accent.get();
 
     view! {
-        <div
-            class=class
-            style:font-size=font_size
-            style=("--accent", accent)
-        >
+        <div class=class style:font-size=font_size>
             {children()}
         </div>
     }
@@ -117,11 +113,16 @@ pub fn use_theme() -> ThemeState {
 pub const THEME_CSS: &str = r#"
 /* ═══════════════════════════════════════════════════════════════════════════
    THEME SYSTEM - Dynamic theming with accent color calculation
+   All colors derived from single accent via HSL hue rotation
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* Base variables */
 :root {
-  --accent: #c9a227;
+  /* Accent in HSL (gold: h=45, s=70%, l=47%) */
+  --accent-h: 45;
+  --accent-s: 70%;
+  --accent-l: 47%;
+  --accent: hsl(var(--accent-h), var(--accent-s), var(--accent-l));
 
   /* Fonts */
   --font-sans: 'Inter', system-ui, sans-serif;
@@ -151,6 +152,20 @@ pub const THEME_CSS: &str = r#"
   --accent-hover: color-mix(in srgb, var(--accent) 90%, black);
   --accent-text: var(--accent);
 
+  /* Category colors - soft pastels for light theme */
+  --cat-l: 78%;
+  --cat-s: 35%;
+  --cat-torah: hsl(calc(var(--accent-h) + 180), var(--cat-s), var(--cat-l));
+  --cat-history: hsl(calc(var(--accent-h) + 120), var(--cat-s), var(--cat-l));
+  --cat-wisdom: hsl(var(--accent-h), var(--cat-s), var(--cat-l));
+  --cat-major-prophets: hsl(calc(var(--accent-h) + 315), var(--cat-s), var(--cat-l));
+  --cat-minor-prophets: hsl(calc(var(--accent-h) + 270), var(--cat-s), var(--cat-l));
+  --cat-gospels: hsl(calc(var(--accent-h) + 15), var(--cat-s), var(--cat-l));
+  --cat-acts: hsl(calc(var(--accent-h) + 200), var(--cat-s), var(--cat-l));
+  --cat-paul: hsl(calc(var(--accent-h) + 240), var(--cat-s), var(--cat-l));
+  --cat-general: hsl(calc(var(--accent-h) + 150), var(--cat-s), var(--cat-l));
+  --cat-revelation: hsl(calc(var(--accent-h) + 330), var(--cat-s), var(--cat-l));
+
   color-scheme: light;
 }
 
@@ -158,15 +173,15 @@ pub const THEME_CSS: &str = r#"
    DARK THEME
    ───────────────────────────────────────────────────────────────────────────── */
 .theme-dark {
-  --bg: #121212;
-  --bg-secondary: #1e1e1e;
-  --bg-elevated: #2a2a2a;
-  --bg-overlay: rgba(0, 0, 0, 0.7);
+  --bg: #1a1a1a;
+  --bg-secondary: #242424;
+  --bg-elevated: #2e2e2e;
+  --bg-overlay: rgba(0, 0, 0, 0.6);
 
-  --text: #e5e5e5;
-  --text-secondary: #a3a3a3;
-  --text-muted: #737373;
-  --text-inverse: #121212;
+  --text: #d4d4d4;
+  --text-secondary: #a0a0a0;
+  --text-muted: #6b6b6b;
+  --text-inverse: #1a1a1a;
 
   --border: rgba(255, 255, 255, 0.1);
   --hover: rgba(255, 255, 255, 0.05);
@@ -176,6 +191,20 @@ pub const THEME_CSS: &str = r#"
   --accent-soft: color-mix(in srgb, var(--accent) 20%, transparent);
   --accent-hover: color-mix(in srgb, var(--accent) 80%, white);
   --accent-text: color-mix(in srgb, var(--accent) 80%, white);
+
+  /* Category colors - muted but visible on dark bg */
+  --cat-l: 45%;
+  --cat-s: 30%;
+  --cat-torah: hsl(calc(var(--accent-h) + 180), var(--cat-s), var(--cat-l));
+  --cat-history: hsl(calc(var(--accent-h) + 120), var(--cat-s), var(--cat-l));
+  --cat-wisdom: hsl(var(--accent-h), var(--cat-s), var(--cat-l));
+  --cat-major-prophets: hsl(calc(var(--accent-h) + 315), var(--cat-s), var(--cat-l));
+  --cat-minor-prophets: hsl(calc(var(--accent-h) + 270), var(--cat-s), var(--cat-l));
+  --cat-gospels: hsl(calc(var(--accent-h) + 15), var(--cat-s), var(--cat-l));
+  --cat-acts: hsl(calc(var(--accent-h) + 200), var(--cat-s), var(--cat-l));
+  --cat-paul: hsl(calc(var(--accent-h) + 240), var(--cat-s), var(--cat-l));
+  --cat-general: hsl(calc(var(--accent-h) + 150), var(--cat-s), var(--cat-l));
+  --cat-revelation: hsl(calc(var(--accent-h) + 330), var(--cat-s), var(--cat-l));
 
   color-scheme: dark;
 }
@@ -202,6 +231,20 @@ pub const THEME_CSS: &str = r#"
   --accent-soft: color-mix(in srgb, var(--accent) 12%, transparent);
   --accent-hover: color-mix(in srgb, var(--accent) 85%, #433422);
   --accent-text: color-mix(in srgb, var(--accent) 70%, #433422);
+
+  /* Category colors - warm, desaturated for sepia */
+  --cat-l: 62%;
+  --cat-s: 25%;
+  --cat-torah: hsl(calc(var(--accent-h) + 180), var(--cat-s), var(--cat-l));
+  --cat-history: hsl(calc(var(--accent-h) + 120), var(--cat-s), var(--cat-l));
+  --cat-wisdom: hsl(var(--accent-h), var(--cat-s), var(--cat-l));
+  --cat-major-prophets: hsl(calc(var(--accent-h) + 315), var(--cat-s), var(--cat-l));
+  --cat-minor-prophets: hsl(calc(var(--accent-h) + 270), var(--cat-s), var(--cat-l));
+  --cat-gospels: hsl(calc(var(--accent-h) + 15), var(--cat-s), var(--cat-l));
+  --cat-acts: hsl(calc(var(--accent-h) + 200), var(--cat-s), var(--cat-l));
+  --cat-paul: hsl(calc(var(--accent-h) + 240), var(--cat-s), var(--cat-l));
+  --cat-general: hsl(calc(var(--accent-h) + 150), var(--cat-s), var(--cat-l));
+  --cat-revelation: hsl(calc(var(--accent-h) + 330), var(--cat-s), var(--cat-l));
 
   color-scheme: light;
 }

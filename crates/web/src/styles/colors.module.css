@@ -1,59 +1,49 @@
 .torah {
-  --book-color: 147, 177, 214;
-  background: rgba(var(--book-color), 0.2);
+  background: color-mix(in srgb, var(--cat-torah) 20%, transparent);
 }
-.torah.active { background: rgb(var(--book-color)); }
+.torah.active { background: var(--cat-torah); }
 
 .history {
-  --book-color: 134, 188, 158;
-  background: rgba(var(--book-color), 0.2);
+  background: color-mix(in srgb, var(--cat-history) 20%, transparent);
 }
-.history.active { background: rgb(var(--book-color)); }
+.history.active { background: var(--cat-history); }
 
 .wisdom {
-  --book-color: 218, 194, 130;
-  background: rgba(var(--book-color), 0.2);
+  background: color-mix(in srgb, var(--cat-wisdom) 20%, transparent);
 }
-.wisdom.active { background: rgb(var(--book-color)); }
+.wisdom.active { background: var(--cat-wisdom); }
 
 .majorProphets {
-  --book-color: 205, 150, 160;
-  background: rgba(var(--book-color), 0.2);
+  background: color-mix(in srgb, var(--cat-major-prophets) 20%, transparent);
 }
-.majorProphets.active { background: rgb(var(--book-color)); }
+.majorProphets.active { background: var(--cat-major-prophets); }
 
 .minorProphets {
-  --book-color: 198, 162, 184;
-  background: rgba(var(--book-color), 0.2);
+  background: color-mix(in srgb, var(--cat-minor-prophets) 20%, transparent);
 }
-.minorProphets.active { background: rgb(var(--book-color)); }
+.minorProphets.active { background: var(--cat-minor-prophets); }
 
 .gospels {
-  --book-color: 201, 162, 100;
-  background: rgba(var(--book-color), 0.2);
+  background: color-mix(in srgb, var(--cat-gospels) 20%, transparent);
 }
-.gospels.active { background: rgb(var(--book-color)); }
+.gospels.active { background: var(--cat-gospels); }
 
 .acts {
-  --book-color: 156, 162, 198;
-  background: rgba(var(--book-color), 0.2);
+  background: color-mix(in srgb, var(--cat-acts) 20%, transparent);
 }
-.acts.active { background: rgb(var(--book-color)); }
+.acts.active { background: var(--cat-acts); }
 
 .paul {
-  --book-color: 172, 156, 198;
-  background: rgba(var(--book-color), 0.2);
+  background: color-mix(in srgb, var(--cat-paul) 20%, transparent);
 }
-.paul.active { background: rgb(var(--book-color)); }
+.paul.active { background: var(--cat-paul); }
 
 .general {
-  --book-color: 140, 188, 182;
-  background: rgba(var(--book-color), 0.2);
+  background: color-mix(in srgb, var(--cat-general) 20%, transparent);
 }
-.general.active { background: rgb(var(--book-color)); }
+.general.active { background: var(--cat-general); }
 
 .revelation {
-  --book-color: 198, 156, 156;
-  background: rgba(var(--book-color), 0.2);
+  background: color-mix(in srgb, var(--cat-revelation) 20%, transparent);
 }
-.revelation.active { background: rgb(var(--book-color)); }
+.revelation.active { background: var(--cat-revelation); }

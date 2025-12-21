@@ -1,10 +1,10 @@
 //! Bible reading pages - Book-style interface with dual thumb index
 
-use leptos::{ev::Event, prelude::*, reactive::computed::Memo};
+use leptos::{ev::Event, prelude::*, reactive::computed::Memo, tachys::dom::window};
 use leptos_router::hooks::use_params_map;
 use shared::Book;
 use ui::{FontFamily, Theme, use_theme};
-use wasm_bindgen::JsCast;
+use wasm_bindgen::{closure::Closure, JsCast};
 
 fn event_target_checked(ev: &Event) -> bool {
     ev.target()
@@ -13,11 +13,17 @@ fn event_target_checked(ev: &Event) -> bool {
         .unwrap_or(false)
 }
 
+fn request_animation_frame(f: impl FnOnce() + 'static) {
+    let closure = Closure::once_into_js(f);
+    let _ = window()
+        .request_animation_frame(closure.unchecked_ref());
+}
+
 use crate::{api, components::BottomNav};
 
 stylance::import_crate_style!(reader, "src/styles/reader.module.css");
 stylance::import_crate_style!(header, "src/styles/header.module.css");
-stylance::import_crate_style!(thumb, "src/styles/thumb.module.css");
+stylance::import_crate_style!(books, "src/styles/books.module.css");
 stylance::import_crate_style!(colors, "src/styles/colors.module.css");
 stylance::import_crate_style!(settings, "src/styles/settings.module.css");
 stylance::import_crate_style!(chapters, "src/styles/chapters.module.css");
@@ -71,7 +77,8 @@ fn BibleReader(initial_book: i16, initial_chapter: i16) -> impl IntoView {
     let (settings_open, set_settings_open) = signal(false);
     let (chapters_open, set_chapters_open) = signal(false);
     let (verse_per_line, set_verse_per_line) = signal(false);
-    let (scroll_progress, set_scroll_progress) = signal(1.0_f64);
+    let (scroll_progress, set_scroll_progress) = signal(0.0_f64);
+    let content_ref: NodeRef<leptos::html::Main> = NodeRef::new();
 
     let all_books = LocalResource::new(|| async { api::get_books().await.ok() });
 
@@ -89,6 +96,38 @@ fn BibleReader(initial_book: i16, initial_chapter: i16) -> impl IntoView {
         let b = current_book.get();
         let c = current_chapter.get();
         async move { api::get_chapter(b, c).await.ok() }
+    });
+
+    // Recalculate scroll progress when content changes
+    Effect::new(move |_| {
+        // Track these to re-run when they change
+        let has_content = verses.get().flatten().is_some();
+        let _ = current_book.get();
+        let _ = current_chapter.get();
+
+        // Only calculate when content is loaded
+        if !has_content {
+            return;
+        }
+
+        // Double RAF to ensure DOM is fully updated after Suspense
+        if let Some(el) = content_ref.get() {
+            request_animation_frame(move || {
+                request_animation_frame(move || {
+                    let scroll_height = el.scroll_height() as f64;
+                    let client_height = el.client_height() as f64;
+                    let max_scroll = scroll_height - client_height;
+                    if max_scroll > 1.0 {
+                        // Has scroll - start at 0
+                        let scroll_top = el.scroll_top() as f64;
+                        set_scroll_progress.set(scroll_top / max_scroll);
+                    } else {
+                        // No scroll - fully read
+                        set_scroll_progress.set(1.0);
+                    }
+                });
+            });
+        }
     });
 
     let current_book_info = move || {
@@ -109,7 +148,7 @@ fn BibleReader(initial_book: i16, initial_chapter: i16) -> impl IntoView {
                 <div
                     class=header::progress
                     style:width=move || format!("{}%", scroll_progress.get() * 100.0)
-                    style:background=move || get_book_active_color(current_book.get())
+                    style:background=move || get_book_category_var(current_book.get())
                 ></div>
                 <div></div>
 
@@ -155,6 +194,7 @@ fn BibleReader(initial_book: i16, initial_chapter: i16) -> impl IntoView {
                 </Suspense>
 
                 <main
+                    node_ref=content_ref
                     class=reader::text
                     on:scroll=move |ev| {
                         let target = ev.target().unwrap();
@@ -248,8 +288,8 @@ fn ThumbIndex(
     on_select: impl Fn(i16) + Copy + 'static
 ) -> impl IntoView {
     let side_class = match side {
-        Side::Left => format!("{} {}", thumb::index, thumb::left),
-        Side::Right => format!("{} {}", thumb::index, thumb::right)
+        Side::Left => format!("{} {}", books::bookNav, books::left),
+        Side::Right => format!("{} {}", books::bookNav, books::right)
     };
 
     view! {
@@ -259,17 +299,17 @@ fn ThumbIndex(
                 let abbrev = book.abbreviation.clone();
                 let full_name = book.name_ru.clone();
                 let color_class = get_book_color_class(book.id);
-                let active_color = get_book_active_color(book.id);
+                let active_color = get_book_category_var(book.id);
                 let is_active = move || current_book.get() == book_id;
 
                 view! {
                     <button
-                        class=move || format!("{} {} {}", thumb::tab, color_class, if is_active() { thumb::active } else { "" })
+                        class=move || format!("{} {} {}", books::book, color_class, if is_active() { books::active } else { "" })
                         style:background=move || if is_active() { active_color } else { "" }
                         on:click=move |_| on_select(book_id)
                     >
-                        <span class=thumb::abbrev>{abbrev.clone()}</span>
-                        <span class=thumb::full>{full_name.clone()}</span>
+                        <span class=books::abbrev>{abbrev.clone()}</span>
+                        <span class=books::full>{full_name.clone()}</span>
                     </button>
                 }
             }).collect::<Vec<_>>()}
@@ -518,20 +558,20 @@ fn get_book_color_class(book_id: i16) -> &'static str {
     }
 }
 
-/// Get book category color (synced with colors.module.css)
-fn get_book_active_color(book_id: i16) -> &'static str {
+/// Get book category CSS variable
+fn get_book_category_var(book_id: i16) -> &'static str {
     match book_id {
-        1..=5 => "#93b1d6",    // Torah - soft blue
-        6..=17 => "#86bc9e",   // History - soft green
-        18..=22 => "#dac282",  // Wisdom - soft gold
-        23..=27 => "#cd96a0",  // Major Prophets - soft rose
-        28..=39 => "#c6a2b8",  // Minor Prophets - soft mauve
-        40..=43 => "#c9a264",  // Gospels - soft amber
-        44 => "#9ca2c6",       // Acts - soft indigo
-        45..=57 => "#ac9cc6",  // Pauline Epistles - soft violet
-        58..=65 => "#8cbcb6",  // General Epistles - soft teal
-        66 => "#c69c9c",       // Revelation - soft coral
-        _ => "#c9a264"         // Default - soft amber
+        1..=5 => "var(--cat-torah)",
+        6..=17 => "var(--cat-history)",
+        18..=22 => "var(--cat-wisdom)",
+        23..=27 => "var(--cat-major-prophets)",
+        28..=39 => "var(--cat-minor-prophets)",
+        40..=43 => "var(--cat-gospels)",
+        44 => "var(--cat-acts)",
+        45..=57 => "var(--cat-paul)",
+        58..=65 => "var(--cat-general)",
+        66 => "var(--cat-revelation)",
+        _ => "var(--cat-gospels)"
     }
 }
 
