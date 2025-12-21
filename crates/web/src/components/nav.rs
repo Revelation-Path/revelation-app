@@ -56,6 +56,11 @@ pub fn Sidebar() -> impl IntoView {
             </nav>
             <div class=nav::sidebarBottom>
                 <SidebarItem href="/profile" icon=NavIcon::Profile label="Профиль" current=Signal::derive(current_path) collapsed=collapsed/>
+                <Show when=move || !collapsed.get()>
+                    <div class=nav::version>
+                        "v" {env!("CARGO_PKG_VERSION")}
+                    </div>
+                </Show>
             </div>
         </aside>
     }

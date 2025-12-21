@@ -3,7 +3,7 @@
 use leptos::prelude::*;
 use leptos_meta::*;
 use leptos_router::{
-    components::{Route, Router, Routes},
+    components::{Redirect, Route, Router, Routes},
     path
 };
 use ui::{THEME_CSS, ThemeProvider, ToastProvider};
@@ -37,7 +37,7 @@ pub fn App() -> impl IntoView {
                         // Main content area
                         <div class="flex-1">
                             <Routes fallback=|| view! { <NotFound/> }>
-                                <Route path=path!("/") view=Home/>
+                                <Route path=path!("/") view=|| view! { <Redirect path="/bible"/> }/>
                                 <Route path=path!("/onboarding") view=Onboarding/>
                                 <Route path=path!("/feed") view=Feed/>
                                 <Route path=path!("/bible") view=Bible/>
