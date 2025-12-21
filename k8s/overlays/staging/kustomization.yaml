@@ -1,0 +1,27 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: revelation-staging
+
+resources:
+  - ../../base
+
+namePrefix: staging-
+
+patches:
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+    target:
+      kind: Deployment
+
+  - patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: staging.revelation.ru
+      - op: replace
+        path: /spec/tls/0/hosts/0
+        value: staging.revelation.ru
+    target:
+      kind: Ingress

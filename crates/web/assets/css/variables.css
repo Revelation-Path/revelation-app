@@ -1,0 +1,54 @@
+:root {
+  /* Gold palette */
+  --color-gold-50: #fefce8;
+  --color-gold-100: #fef9c3;
+  --color-gold-200: #fef08a;
+  --color-gold-300: #fde047;
+  --color-gold-400: #facc15;
+  --color-gold-500: #c9a227;
+  --color-gold-600: #a67c00;
+  --color-gold-700: #854d0e;
+  --color-gold-800: #713f12;
+  --color-gold-900: #422006;
+
+  /* Parchment palette */
+  --color-parchment-50: #fefdfb;
+  --color-parchment-100: #fdf8f0;
+  --color-parchment-200: #f9f1e4;
+  --color-parchment-300: #f3e8d6;
+  --color-parchment-400: #e8d5b7;
+  --color-parchment-500: #d4bc94;
+
+  /* Text colors */
+  --color-text-primary: #1f2937;
+  --color-text-secondary: #4b5563;
+  --color-text-muted: #6b7280;
+  --color-text-light: #9ca3af;
+
+  /* Status colors */
+  --color-success: #059669;
+  --color-warning: #d97706;
+  --color-error: #dc2626;
+
+  /* Spacing */
+  --header-height: 52px;
+  --bottom-nav-height: 56px;
+  --sidebar-width: 256px;
+  --sidebar-collapsed-width: 64px;
+  --thumb-width: 28px;
+  --thumb-width-md: 36px;
+
+  /* Typography */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Merriweather', Georgia, serif;
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+  --shadow-gold: 0 4px 14px rgba(201, 162, 39, 0.3);
+}

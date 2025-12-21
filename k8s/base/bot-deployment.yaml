@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: revelation-bot
+  namespace: revelation
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: revelation-bot
+  template:
+    metadata:
+      labels:
+        app: revelation-bot
+    spec:
+      containers:
+        - name: bot
+          image: revelation/bot:latest
+          envFrom:
+            - configMapRef:
+                name: revelation-config
+            - secretRef:
+                name: revelation-secrets
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"

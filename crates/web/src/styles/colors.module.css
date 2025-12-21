@@ -1,0 +1,29 @@
+.torah { background: #dbeafe; }
+.torah.active { background: #3b82f6; }
+
+.history { background: #dcfce7; }
+.history.active { background: #22c55e; }
+
+.wisdom { background: #fef9c3; }
+.wisdom.active { background: #eab308; }
+
+.majorProphets { background: #ffe4e6; }
+.majorProphets.active { background: #f43f5e; }
+
+.minorProphets { background: #fce7f3; }
+.minorProphets.active { background: #ec4899; }
+
+.gospels { background: #fef3c7; }
+.gospels.active { background: #f59e0b; }
+
+.acts { background: #e0e7ff; }
+.acts.active { background: #6366f1; }
+
+.paul { background: #ddd6fe; }
+.paul.active { background: #8b5cf6; }
+
+.general { background: #ccfbf1; }
+.general.active { background: #14b8a6; }
+
+.revelation { background: #fee2e2; }
+.revelation.active { background: #ef4444; }

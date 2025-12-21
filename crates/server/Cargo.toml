@@ -1,0 +1,27 @@
+[package]
+name = "server"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "revelation-server"
+path = "src/main.rs"
+
+[dependencies]
+shared = { path = "../shared", features = ["db", "backend"] }
+bible = { path = "../bible" }
+
+axum = { workspace = true }
+tower = { workspace = true }
+tower-http = { workspace = true }
+tokio = { workspace = true }
+sqlx = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+uuid = { workspace = true }
+chrono = { workspace = true }
+dotenvy = { workspace = true }
+masterror = { workspace = true }
+validator = { workspace = true }

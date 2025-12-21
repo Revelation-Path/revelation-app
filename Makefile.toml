@@ -1,0 +1,151 @@
+[env]
+DATABASE_URL = { value = "postgresql://revelation:revelation@localhost:5432/revelation", condition = { env_not_set = ["DATABASE_URL"] } }
+RUST_LOG = { value = "info,tower_http=debug", condition = { env_not_set = ["RUST_LOG"] } }
+SERVER_URL = "http://localhost:3000"
+PAYMENTS_URL = "http://localhost:3001"
+
+# =============================================================================
+# Development
+# =============================================================================
+
+[tasks.dev]
+description = "Run full stack: server + web"
+workspace = false
+run_task = { name = ["dev-backend", "dev-frontend"], parallel = true }
+
+[tasks.dev-backend]
+description = "Run backend services (server + payments)"
+workspace = false
+run_task = { name = ["server", "payments"], parallel = true }
+
+[tasks.dev-frontend]
+description = "Run frontend with Trunk"
+workspace = false
+cwd = "./crates/web"
+install_crate = "trunk"
+command = "trunk"
+args = ["serve"]
+
+[tasks.server]
+description = "Run main API server (port 3000)"
+workspace = false
+command = "cargo"
+args = ["run", "-p", "server"]
+
+[tasks.payments]
+description = "Run payments service (port 3001)"
+workspace = false
+command = "cargo"
+args = ["run", "-p", "payments"]
+
+[tasks.gateway]
+description = "Run API gateway (port 8080)"
+workspace = false
+command = "cargo"
+args = ["run", "-p", "gateway"]
+
+[tasks.bot]
+description = "Run Telegram bot"
+workspace = false
+command = "cargo"
+args = ["run", "-p", "bot"]
+
+# =============================================================================
+# Database
+# =============================================================================
+
+[tasks.db-reset]
+description = "Reset database (drop + recreate + migrate)"
+workspace = false
+script = '''
+sqlx database drop -y || true
+sqlx database create
+sqlx migrate run
+echo "Database reset complete"
+'''
+
+[tasks.migrate]
+description = "Run database migrations"
+workspace = false
+command = "sqlx"
+args = ["migrate", "run"]
+
+# =============================================================================
+# Build
+# =============================================================================
+
+[tasks.build]
+description = "Build all crates"
+workspace = false
+command = "cargo"
+args = ["build", "--workspace"]
+
+[tasks.build-release]
+description = "Build all crates in release mode"
+workspace = false
+command = "cargo"
+args = ["build", "--workspace", "--release"]
+
+[tasks.build-web]
+description = "Build frontend for production"
+workspace = false
+cwd = "./crates/web"
+install_crate = "trunk"
+command = "trunk"
+args = ["build", "--release"]
+
+# =============================================================================
+# Quality
+# =============================================================================
+
+[tasks.check]
+description = "Run cargo check"
+workspace = false
+command = "cargo"
+args = ["check", "--workspace"]
+
+[tasks.fmt]
+description = "Format code"
+workspace = false
+command = "cargo"
+args = ["+nightly", "fmt"]
+
+[tasks.clippy]
+description = "Run clippy"
+workspace = false
+command = "cargo"
+args = ["clippy", "--workspace", "--", "-D", "warnings"]
+
+[tasks.test]
+description = "Run all tests"
+workspace = false
+command = "cargo"
+args = ["test", "--workspace"]
+
+[tasks.ci]
+description = "Run full CI pipeline locally"
+workspace = false
+dependencies = ["fmt", "clippy", "test"]
+
+# =============================================================================
+# Setup
+# =============================================================================
+
+[tasks.setup]
+description = "Initial project setup"
+workspace = false
+script = '''
+echo "Installing required tools..."
+cargo install trunk sqlx-cli
+
+echo "Running migrations..."
+sqlx migrate run
+
+echo "Setup complete! Run 'cargo make dev' to start development"
+'''
+
+[tasks.clean]
+description = "Clean build artifacts"
+workspace = false
+command = "cargo"
+args = ["clean"]

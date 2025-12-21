@@ -1,0 +1,36 @@
+.reader {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-parchment-50);
+}
+
+.themeDark {
+  background: #1a1a1a;
+  color: #e5e5e5;
+}
+
+.themeSepia {
+  background: #f4ecd8;
+}
+
+.fontSerif { font-family: var(--font-serif); }
+.fontSans { font-family: var(--font-sans); }
+
+.text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: var(--space-lg);
+  padding-left: calc(var(--thumb-width) + var(--space-md));
+  padding-right: calc(var(--thumb-width) + var(--space-md));
+  margin: 0 auto;
+  line-height: var(--leading-relaxed);
+}
+
+.verseNum {
+  font-size: 0.7em;
+  color: var(--color-gold-600);
+  vertical-align: super;
+}

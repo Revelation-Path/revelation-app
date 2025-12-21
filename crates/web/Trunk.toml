@@ -1,0 +1,21 @@
+[build]
+target = "index.html"
+dist = "dist"
+
+[watch]
+ignore = ["dist", "assets/generated.css"]
+
+[[hooks]]
+stage = "pre_build"
+command = "stylance"
+command_arguments = [".", "--output-file", "assets/generated.css"]
+
+[serve]
+addresses = ["127.0.0.1"]
+port = 8080
+open = false
+
+[[proxy]]
+rewrite = "/api/"
+backend = "http://127.0.0.1:3000/api/"
+

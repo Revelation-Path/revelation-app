@@ -1,0 +1,26 @@
+[package]
+name = "ui"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+leptos = { workspace = true, features = ["csr"] }
+leptos_router = { workspace = true }
+wasm-bindgen = "0.2"
+web-sys = { version = "0.3", features = [
+    "HtmlInputElement",
+    "HtmlElement",
+    "Element",
+    "DomTokenList",
+    "Window",
+    "Document",
+    "EventTarget",
+    "KeyboardEvent",
+    "MouseEvent",
+    "AnimationEvent",
+    "TouchEvent",
+    "Touch",
+    "TouchList",
+    "FocusEvent",
+] }
+gloo-timers = { version = "0.3", features = ["futures"] }

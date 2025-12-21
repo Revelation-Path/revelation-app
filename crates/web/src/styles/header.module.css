@@ -1,0 +1,99 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-parchment-50);
+  border-bottom: 0.0625rem solid var(--color-border);
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+}
+
+.book {
+  display: block;
+  font-size: var(--text-md);
+  font-weight: var(--font-semibold);
+}
+
+.chapter {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.chapterBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--color-gold-700, #92400e);
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(245, 158, 11, 0.1) 100%);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 100px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.chapterBtn:hover {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.25) 0%, rgba(245, 158, 11, 0.2) 100%);
+  border-color: rgba(251, 191, 36, 0.5);
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.2);
+  transform: translateY(-1px);
+}
+
+.chapterBtn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.chapterBtn svg {
+  width: 1rem;
+  height: 1rem;
+  color: var(--color-gold-600, #d97706);
+  transition: transform 0.2s ease;
+}
+
+.chapterBtn:hover svg {
+  transform: translateY(1px);
+}
+
+:global(.theme-dark) .chapterBtn {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(245, 158, 11, 0.15) 100%);
+  border-color: rgba(251, 191, 36, 0.3);
+  color: #fbbf24;
+}
+
+:global(.theme-dark) .chapterBtn:hover {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.3) 0%, rgba(245, 158, 11, 0.25) 100%);
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.15);
+}
+
+:global(.theme-sepia) .chapterBtn {
+  background: linear-gradient(135deg, rgba(180, 140, 80, 0.2) 0%, rgba(160, 120, 60, 0.15) 100%);
+  border-color: rgba(180, 140, 80, 0.3);
+  color: #78350f;
+}
+
+.btn {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-lg);
+}
+
+.btn:hover {
+  background: var(--color-hover);
+}
