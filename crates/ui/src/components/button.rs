@@ -77,7 +77,10 @@ pub fn Button(
     children: Children
 ) -> impl IntoView {
     let handle_click = move |_| {
-        if !disabled && !loading && let Some(ref cb) = on_click {
+        if !disabled
+            && !loading
+            && let Some(ref cb) = on_click
+        {
             cb.run(());
         }
     };

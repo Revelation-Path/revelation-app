@@ -1,10 +1,5 @@
 use axum::{
-    Router,
-    extract::Request,
-    http::StatusCode,
-    middleware,
-    response::Response,
-    routing::any
+    Router, extract::Request, http::StatusCode, middleware, response::Response, routing::any
 };
 use masterror::prelude::*;
 use tower_http::{cors::CorsLayer, trace::TraceLayer};
