@@ -7,10 +7,15 @@
     <meta name="theme-color" content="#fefdfb">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
     <title>Revelation</title>
     <link data-trunk rel="rust" data-bin="revelation-web" data-wasm-opt="z"/>
     <link data-trunk rel="css" href="assets/base.css"/>
     <link data-trunk rel="css" href="assets/generated.css"/>
+    <link data-trunk rel="copy-file" href="manifest.json"/>
+    <link data-trunk rel="copy-file" href="sw.js"/>
+    <link data-trunk rel="copy-dir" href="icons"/>
 </head>
 <body>
     <div id="loading" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#fefdfb;">
@@ -21,5 +26,46 @@
     </div>
     <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
     <script>document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>document.getElementById('loading')?.remove(),100));</script>
+    <script>
+        // Service Worker registration
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
+        }
+
+        // PWA install detection
+        let deferredPrompt = null;
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+            || window.navigator.standalone === true;
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const isAndroid = /Android/.test(navigator.userAgent);
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            window.dispatchEvent(new CustomEvent('pwainstallable'));
+        });
+
+        window.getPwaState = () => ({
+            canInstall: !!deferredPrompt,
+            isInstalled: isStandalone,
+            isIOS: isIOS,
+            isAndroid: isAndroid
+        });
+
+        window.triggerPwaInstall = async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const result = await deferredPrompt.userChoice;
+                if (result.outcome === 'accepted') {
+                    deferredPrompt = null;
+                    window.dispatchEvent(new CustomEvent('pwainstalled'));
+                }
+            }
+        };
+
+        window.isPwaInstallable = () => !!deferredPrompt;
+        window.isPwaInstalled = () => isStandalone;
+        window.isIOSDevice = () => isIOS;
+    </script>
 </body>
 </html>

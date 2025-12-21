@@ -4,7 +4,22 @@ use leptos::{ev::Event, prelude::*, reactive::computed::Memo, tachys::dom::windo
 use leptos_router::hooks::use_params_map;
 use shared::{Book, Testament};
 use ui::{FontFamily, Theme, use_theme};
-use wasm_bindgen::{closure::Closure, JsCast};
+use wasm_bindgen::{closure::Closure, prelude::*, JsCast};
+
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "isPwaInstallable")]
+    fn is_pwa_installable() -> bool;
+
+    #[wasm_bindgen(js_name = "isPwaInstalled")]
+    fn is_pwa_installed() -> bool;
+
+    #[wasm_bindgen(js_name = "isIOSDevice")]
+    fn is_ios_device() -> bool;
+
+    #[wasm_bindgen(js_name = "triggerPwaInstall")]
+    fn trigger_pwa_install();
+}
 
 fn event_target_checked(ev: &Event) -> bool {
     ev.target()
@@ -377,6 +392,21 @@ fn SettingsPanel(
     let font_family = ts.font_family;
     let font_size = ts.font_size;
 
+    let (pwa_installable, set_pwa_installable) = signal(is_pwa_installable());
+
+    Effect::new(move |_| {
+        if let Some(win) = web_sys::window() {
+            let closure = Closure::wrap(Box::new(move || {
+                set_pwa_installable.set(true);
+            }) as Box<dyn Fn()>);
+            let _ = win.add_event_listener_with_callback(
+                "pwainstallable",
+                closure.as_ref().unchecked_ref()
+            );
+            closure.forget();
+        }
+    });
+
     view! {
         <div class=settings::panel>
             <div class=settings::header>
@@ -441,6 +471,55 @@ fn SettingsPanel(
                     <span class=settings::slider></span>
                 </label>
             </div>
+
+            {move || {
+                let installed = is_pwa_installed();
+                let ios = is_ios_device();
+                let can_install = pwa_installable.get();
+
+                if installed {
+                    view! {
+                        <div class=settings::row>
+                            <span class=settings::label>"Приложение"</span>
+                            <span class=settings::installed>"Установлено"</span>
+                        </div>
+                    }.into_any()
+                } else if can_install {
+                    view! {
+                        <div class=settings::row>
+                            <span class=settings::label>"Добавить ярлык"</span>
+                            <button
+                                class=settings::installBtn
+                                on:click=move |_| {
+                                    trigger_pwa_install();
+                                    set_pwa_installable.set(false);
+                                }
+                            >
+                                <InstallIcon/>
+                                "Установить"
+                            </button>
+                        </div>
+                    }.into_any()
+                } else if ios {
+                    view! {
+                        <div class=settings::rowVertical>
+                            <span class=settings::label>"Добавить ярлык"</span>
+                            <span class=settings::hint>
+                                "Нажмите "
+                                <ShareIcon/>
+                                " → На экран Домой"
+                            </span>
+                        </div>
+                    }.into_any()
+                } else {
+                    view! {
+                        <div class=settings::row>
+                            <span class=settings::label>"Добавить ярлык"</span>
+                            <span class=settings::hint>"Меню браузера → Установить"</span>
+                        </div>
+                    }.into_any()
+                }
+            }}
         </div>
     }
 }
@@ -849,6 +928,32 @@ fn CloseIcon() -> impl IntoView {
              stroke-linejoin="round" width="20" height="20">
             <line x1="18" y1="6" x2="6" y2="18"/>
             <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+    }
+}
+
+#[component]
+fn InstallIcon() -> impl IntoView {
+    view! {
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round"
+             stroke-linejoin="round" width="18" height="18">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+    }
+}
+
+#[component]
+fn ShareIcon() -> impl IntoView {
+    view! {
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round"
+             stroke-linejoin="round" width="16" height="16" style="display:inline;vertical-align:middle;">
+            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+            <polyline points="16 6 12 2 8 6"/>
+            <line x1="12" y1="2" x2="12" y2="15"/>
         </svg>
     }
 }
