@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: revelation-config
+  namespace: default
+data:
+  RUST_LOG: "info,tower_http=debug"
+  APP_URL: "https://revelation-path.ru"
+  API_URL: "https://api.revelation-path.ru"

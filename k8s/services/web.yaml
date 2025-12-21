@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: revelation-web
+  namespace: default
+  labels:
+    app: revelation-web
+spec:
+  selector:
+    app: revelation-web
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP

@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: revelation-config
-  namespace: revelation
-data:
-  RUST_LOG: "info"
-  APP_URL: "https://app.revelation.ru"

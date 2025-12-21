@@ -2,7 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: revelation-server
-  namespace: revelation
+  namespace: default
+  labels:
+    app: revelation-server
 spec:
   replicas: 2
   selector:
@@ -13,9 +15,11 @@ spec:
       labels:
         app: revelation-server
     spec:
+      imagePullSecrets:
+        - name: regcred
       containers:
         - name: server
-          image: revelation/server:latest
+          image: revelation-registry.registry.twcstorage.ru/revelation-server:latest
           ports:
             - containerPort: 3000
           envFrom:
@@ -32,25 +36,13 @@ spec:
               cpu: "500m"
           livenessProbe:
             httpGet:
-              path: /api/health
+              path: /health
               port: 3000
             initialDelaySeconds: 10
             periodSeconds: 30
           readinessProbe:
             httpGet:
-              path: /api/health
+              path: /health
               port: 3000
             initialDelaySeconds: 5
             periodSeconds: 10
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: revelation-server
-  namespace: revelation
-spec:
-  selector:
-    app: revelation-server
-  ports:
-    - port: 3000
-      targetPort: 3000
