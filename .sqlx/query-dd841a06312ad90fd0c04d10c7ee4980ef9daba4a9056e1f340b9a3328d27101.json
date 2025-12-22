@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                sb.id, sb.code, sb.name, sb.name_ru, sb.description, sb.cover_url,\n                sb.songs_count,\n                COALESCE((SELECT COUNT(*) FROM songs s WHERE s.songbook_id = sb.id AND s.has_chords = true), 0)::int as \"songs_with_chords_count!\",\n                sb.is_public,\n                sb.year_first_published, sb.year_latest_edition, sb.edition_name, sb.total_songs_in_print,\n                sb.publisher, sb.editor, sb.isbn, sb.language, sb.country, sb.denomination,\n                sb.website_url, sb.purchase_url, sb.history, sb.notes\n            FROM songbooks sb\n            WHERE sb.is_public = true AND sb.is_visible = true\n            ORDER BY sb.name_ru\n            ",
+  "query": "\n            SELECT\n                sb.id, sb.code, sb.name, sb.name_ru, sb.description, sb.cover_url,\n                sb.songs_count,\n                COALESCE((SELECT COUNT(*) FROM songs s WHERE s.songbook_id = sb.id AND s.has_chords = true), 0)::int as \"songs_with_chords_count!\",\n                sb.is_public,\n                sb.year_first_published, sb.year_latest_edition, sb.edition_name, sb.total_songs_in_print,\n                sb.publisher, sb.editor, sb.isbn, sb.language, sb.country, sb.denomination,\n                sb.website_url, sb.purchase_url, sb.history, sb.notes\n            FROM songbooks sb\n            WHERE sb.is_public = true\n            ORDER BY sb.name_ru\n            ",
   "describe": {
     "columns": [
       {
@@ -148,5 +148,5 @@
       true
     ]
   },
-  "hash": "92a5ed57d4df253212488c0cc347b7aa75a55547a96ede4682ae28c1aeea7294"
+  "hash": "dd841a06312ad90fd0c04d10c7ee4980ef9daba4a9056e1f340b9a3328d27101"
 }

@@ -43,7 +43,7 @@ impl SongRepository {
                 sb.publisher, sb.editor, sb.isbn, sb.language, sb.country, sb.denomination,
                 sb.website_url, sb.purchase_url, sb.history, sb.notes
             FROM songbooks sb
-            WHERE sb.is_public = true AND sb.is_visible = true
+            WHERE sb.is_public = true
             ORDER BY sb.name_ru
             "#
         )
