@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                id, code, name, name_ru, description, cover_url, songs_count, is_public,\n                year_first_published, year_latest_edition, edition_name, total_songs_in_print,\n                publisher, editor, isbn, language, country, denomination,\n                website_url, purchase_url, history, notes\n            FROM songbooks\n            WHERE is_public = true\n            ORDER BY name_ru\n            ",
+  "query": "\n            SELECT\n                id, code, name, name_ru, description, cover_url, songs_count, is_public,\n                year_first_published, year_latest_edition, edition_name, total_songs_in_print,\n                publisher, editor, isbn, language, country, denomination,\n                website_url, purchase_url, history, notes\n            FROM songbooks\n            WHERE is_public = true AND is_visible = true\n            ORDER BY name_ru\n            ",
   "describe": {
     "columns": [
       {
@@ -142,5 +142,5 @@
       true
     ]
   },
-  "hash": "e39c50e67b8668db4d16294789ebf4149c2a3f193c780fa93799c60a42130fbe"
+  "hash": "a256355eb770a0f51af969577b537d69c2ae5366dff6f32bf752b273a222364c"
 }
