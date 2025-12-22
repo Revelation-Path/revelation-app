@@ -208,3 +208,32 @@
   display: inline;
   vertical-align: middle;
 }
+
+/* Toggle switch */
+.toggle {
+  width: 3rem;
+  height: 1.75rem;
+  padding: 0.125rem;
+  background: var(--bg-secondary);
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.toggleOn {
+  background: var(--accent);
+}
+
+.toggleThumb {
+  display: block;
+  width: 1.5rem;
+  height: 1.5rem;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0.0625rem 0.25rem var(--shadow);
+  transition: transform 0.2s;
+}
+
+.toggleOn .toggleThumb {
+  transform: translateX(1.25rem);
+}

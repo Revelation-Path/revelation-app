@@ -57,18 +57,20 @@ impl FontFamily {
 /// Global theme state
 #[derive(Clone, Copy)]
 pub struct ThemeState {
-    pub theme:       RwSignal<Theme>,
-    pub font_family: RwSignal<FontFamily>,
-    pub font_size:   RwSignal<u8>
+    pub theme:          RwSignal<Theme>,
+    pub font_family:    RwSignal<FontFamily>,
+    pub font_size:      RwSignal<u8>,
+    pub verse_per_line: RwSignal<bool>
 }
 
 impl ThemeState {
     /// Creates new theme state with defaults
     pub fn new() -> Self {
         Self {
-            theme:       RwSignal::new(Theme::Light),
-            font_family: RwSignal::new(FontFamily::Serif),
-            font_size:   RwSignal::new(18)
+            theme:          RwSignal::new(Theme::Light),
+            font_family:    RwSignal::new(FontFamily::Serif),
+            font_size:      RwSignal::new(18),
+            verse_per_line: RwSignal::new(false)
         }
     }
 

@@ -63,7 +63,8 @@ pub fn BibleChapter() -> impl IntoView {
 #[component]
 fn BibleReader(initial_book: i16, initial_chapter: i16) -> impl IntoView {
     let app_state = expect_context::<crate::state::AppState>();
-    let _theme_state = use_theme();
+    let theme_state = use_theme();
+    let verse_per_line = theme_state.verse_per_line;
 
     let current_book = app_state.current_book;
     let current_chapter = app_state.current_chapter;
@@ -72,7 +73,6 @@ fn BibleReader(initial_book: i16, initial_chapter: i16) -> impl IntoView {
 
     let (books_open, set_books_open) = signal(false);
     let (chapters_open, set_chapters_open) = signal(false);
-    let (verse_per_line, _set_verse_per_line) = signal(false);
     let (scroll_progress, set_scroll_progress) = signal::<Option<f64>>(None);
     let content_ref: NodeRef<leptos::html::Main> = NodeRef::new();
 

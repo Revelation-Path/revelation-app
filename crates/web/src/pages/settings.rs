@@ -29,6 +29,7 @@ pub fn Settings() -> impl IntoView {
     let theme = ts.theme;
     let font_family = ts.font_family;
     let font_size = ts.font_size;
+    let verse_per_line = ts.verse_per_line;
 
     let (pwa_installable, set_pwa_installable) = signal(is_pwa_installable());
 
@@ -105,6 +106,22 @@ pub fn Settings() -> impl IntoView {
                                     "Sans"
                                 </button>
                             </div>
+                        </div>
+
+                        <div class=styles::row>
+                            <span class=styles::rowLabel>"Стих с новой строки"</span>
+                            <button
+                                class=move || {
+                                    if verse_per_line.get() {
+                                        format!("{} {}", styles::toggle, styles::toggleOn)
+                                    } else {
+                                        styles::toggle.to_string()
+                                    }
+                                }
+                                on:click=move |_| verse_per_line.update(|v| *v = !*v)
+                            >
+                                <span class=styles::toggleThumb/>
+                            </button>
                         </div>
                     </div>
                 </div>
