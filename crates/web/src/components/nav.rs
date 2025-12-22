@@ -20,6 +20,7 @@ pub fn BottomNav() -> impl IntoView {
             <div class=nav::bottomNavInner>
                 <NavItem href="/feed" icon=NavIcon::Feed label="Лента" current=current_path/>
                 <NavItem href="/bible" icon=NavIcon::Bible label="Библия" current=current_path/>
+                <NavItem href="/songs" icon=NavIcon::Songs label="Песни" current=current_path/>
                 <NavItem href="/search" icon=NavIcon::Search label="Поиск" current=current_path/>
                 <NavItem href="/churches" icon=NavIcon::Church label="Церкви" current=current_path/>
                 <NavItem href="/profile" icon=NavIcon::Profile label="Профиль" current=current_path/>
@@ -54,6 +55,7 @@ pub fn Sidebar() -> impl IntoView {
             </div>
             <nav class=nav::sidebarNav>
                 <SidebarItem href="/bible" icon=NavIcon::Bible label="Библия" current=Signal::derive(current_path) collapsed=collapsed/>
+                <SidebarItem href="/songs" icon=NavIcon::Songs label="Песни" current=Signal::derive(current_path) collapsed=collapsed/>
                 <SidebarItem href="/search" icon=NavIcon::Search label="Поиск" current=Signal::derive(current_path) collapsed=collapsed/>
                 <SidebarItem href="/feed" icon=NavIcon::Feed label="Лента" current=Signal::derive(current_path) collapsed=collapsed/>
                 <SidebarItem href="/churches" icon=NavIcon::Church label="Церкви" current=Signal::derive(current_path) collapsed=collapsed/>
@@ -69,6 +71,7 @@ pub fn Sidebar() -> impl IntoView {
 enum NavIcon {
     Feed,
     Bible,
+    Songs,
     Search,
     Church,
     Profile
@@ -88,6 +91,7 @@ fn NavItem(
             {match icon {
                 NavIcon::Feed => view! { <FeedIcon/> }.into_any(),
                 NavIcon::Bible => view! { <BibleIcon/> }.into_any(),
+                NavIcon::Songs => view! { <SongsIcon/> }.into_any(),
                 NavIcon::Search => view! { <SearchIcon/> }.into_any(),
                 NavIcon::Church => view! { <ChurchIcon/> }.into_any(),
                 NavIcon::Profile => view! { <ProfileIcon/> }.into_any(),
@@ -119,6 +123,7 @@ fn SidebarItem(
             {match icon {
                 NavIcon::Feed => view! { <FeedIcon/> }.into_any(),
                 NavIcon::Bible => view! { <BibleIcon/> }.into_any(),
+                NavIcon::Songs => view! { <SongsIcon/> }.into_any(),
                 NavIcon::Search => view! { <SearchIcon/> }.into_any(),
                 NavIcon::Church => view! { <ChurchIcon/> }.into_any(),
                 NavIcon::Profile => view! { <ProfileIcon/> }.into_any(),
@@ -194,6 +199,19 @@ fn BibleIcon() -> impl IntoView {
             <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
             <path d="M12 6v8"/>
             <path d="M8 10h8"/>
+        </svg>
+    }
+}
+
+#[component]
+fn SongsIcon() -> impl IntoView {
+    view! {
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round"
+             stroke-linejoin="round" width="24" height="24">
+            <path d="M9 18V5l12-2v13"/>
+            <circle cx="6" cy="18" r="3"/>
+            <circle cx="18" cy="16" r="3"/>
         </svg>
     }
 }
