@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                id, code, name, name_ru, description, cover_url, songs_count, is_public,\n                year_first_published, year_latest_edition, edition_name, total_songs_in_print,\n                publisher, editor, isbn, language, country, denomination,\n                website_url, purchase_url, history, notes\n            FROM songbooks\n            WHERE code = $1\n            ",
+  "query": "\n            SELECT\n                sb.id, sb.code, sb.name, sb.name_ru, sb.description, sb.cover_url,\n                sb.songs_count,\n                COALESCE((SELECT COUNT(*) FROM songs s WHERE s.songbook_id = sb.id AND s.has_chords = true), 0)::int as \"songs_with_chords_count!\",\n                sb.is_public,\n                sb.year_first_published, sb.year_latest_edition, sb.edition_name, sb.total_songs_in_print,\n                sb.publisher, sb.editor, sb.isbn, sb.language, sb.country, sb.denomination,\n                sb.website_url, sb.purchase_url, sb.history, sb.notes\n            FROM songbooks sb\n            WHERE sb.is_public = true AND sb.is_visible = true\n            ORDER BY sb.name_ru\n            ",
   "describe": {
     "columns": [
       {
@@ -40,84 +40,87 @@
       },
       {
         "ordinal": 7,
+        "name": "songs_with_chords_count!",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 8,
         "name": "is_public",
         "type_info": "Bool"
       },
       {
-        "ordinal": 8,
+        "ordinal": 9,
         "name": "year_first_published",
         "type_info": "Int2"
       },
       {
-        "ordinal": 9,
+        "ordinal": 10,
         "name": "year_latest_edition",
         "type_info": "Int2"
       },
       {
-        "ordinal": 10,
+        "ordinal": 11,
         "name": "edition_name",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 11,
+        "ordinal": 12,
         "name": "total_songs_in_print",
         "type_info": "Int4"
       },
       {
-        "ordinal": 12,
+        "ordinal": 13,
         "name": "publisher",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 13,
+        "ordinal": 14,
         "name": "editor",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 14,
+        "ordinal": 15,
         "name": "isbn",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 15,
+        "ordinal": 16,
         "name": "language",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 16,
+        "ordinal": 17,
         "name": "country",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 17,
+        "ordinal": 18,
         "name": "denomination",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 18,
+        "ordinal": 19,
         "name": "website_url",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 19,
+        "ordinal": 20,
         "name": "purchase_url",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 20,
+        "ordinal": 21,
         "name": "history",
         "type_info": "Text"
       },
       {
-        "ordinal": 21,
+        "ordinal": 22,
         "name": "notes",
         "type_info": "Text"
       }
     ],
     "parameters": {
-      "Left": [
-        "Text"
-      ]
+      "Left": []
     },
     "nullable": [
       false,
@@ -127,6 +130,7 @@
       true,
       true,
       false,
+      null,
       false,
       true,
       true,
@@ -144,5 +148,5 @@
       true
     ]
   },
-  "hash": "175af4bf7c74e3e2d76813cff2d59ea0cc51cc52c2e232a7fe35e46208ec286f"
+  "hash": "92a5ed57d4df253212488c0cc347b7aa75a55547a96ede4682ae28c1aeea7294"
 }
