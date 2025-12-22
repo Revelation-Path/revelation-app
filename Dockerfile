@@ -86,9 +86,6 @@ COPY --from=builder /out/revelation-payments /usr/local/bin/
 EXPOSE 3001
 CMD ["revelation-payments"]
 
-FROM runtime AS bot
-COPY --from=builder /out/revelation-bot /usr/local/bin/
-CMD ["revelation-bot"]
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Web builder stage - build WASM frontend with trunk
