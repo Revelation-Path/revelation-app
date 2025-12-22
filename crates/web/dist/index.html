@@ -12,8 +12,8 @@
     <title>Revelation</title>
     
 <script type="module">
-import init, * as bindings from '/revelation-web-ca00a7d13fd06dfe.js';
-const wasm = await init({ module_or_path: '/revelation-web-ca00a7d13fd06dfe_bg.wasm' });
+import init, * as bindings from '/revelation-web-65d4e2ce1feac54f.js';
+const wasm = await init({ module_or_path: '/revelation-web-65d4e2ce1feac54f_bg.wasm' });
 
 
 window.wasmBindings = bindings;
@@ -28,7 +28,7 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
     
     
     
-<link rel="modulepreload" href="/revelation-web-ca00a7d13fd06dfe.js" crossorigin="anonymous" integrity="sha384-sf07Bry/RGH4ePH8VXq0bMKskFZTY+0ArK/reQ+krxPLepEA+pMBxxtY3HiCskG2"><link rel="preload" href="/revelation-web-ca00a7d13fd06dfe_bg.wasm" crossorigin="anonymous" integrity="sha384-T3VvoHjLCnbQidgedFL795/RB5gnwHI+Bmpl7VJwcz9GT87r+Rxeyrj8ufMWuOpK" as="fetch" type="application/wasm"></head>
+<link rel="modulepreload" href="/revelation-web-65d4e2ce1feac54f.js" crossorigin="anonymous" integrity="sha384-WzaSpKm+PvptRzTXPFY8RfaUUlRnvmfqtlOQoS4pNGlLfpvCKzk8u0GHOcw6kdyy"><link rel="modulepreload" href="/snippets/web-67aca56aae793faf/inline0.js" crossorigin="anonymous" integrity="sha384-9MzuO9N59i82Oh3sTWMCYMXwhJ0YV56q6c7KPwNf64YrSC0D0nPWezRC1Fi5nwf9"><link rel="preload" href="/revelation-web-65d4e2ce1feac54f_bg.wasm" crossorigin="anonymous" integrity="sha384-ngblKU4cbw6nus1KdTPrl+d6J9iU2SLy3ycvmtg3Deftz7p61chikNE+Rk7WsZ+J" as="fetch" type="application/wasm"></head>
 <body>
     <div id="loading" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#fefdfb;">
         <div style="text-align:center;">
@@ -78,20 +78,6 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
         window.isPwaInstallable = () => !!deferredPrompt;
         window.isPwaInstalled = () => isStandalone;
         window.isIOSDevice = () => isIOS;
-
-        // Theme color management for browser chrome
-        window.setThemeColor = (color) => {
-            const meta = document.querySelector('meta[name="theme-color"]');
-            if (meta) meta.content = color;
-        };
-
-        // Set theme-color from CSS variable (e.g. "--cat-torah")
-        window.setThemeColorFromVar = (varName) => {
-            const root = document.documentElement;
-            const style = getComputedStyle(root);
-            const color = style.getPropertyValue(varName).trim();
-            if (color) window.setThemeColor(color);
-        };
     </script>
 <script>"use strict";
 
