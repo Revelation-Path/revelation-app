@@ -19,7 +19,7 @@ spec:
         - name: craas-revelation-registry
       containers:
         - name: web
-          image: revelation-registry.registry.twcstorage.ru/revelation-web:latest
+          image: revelation-registry.registry.twcstorage.ru/revelation-web:0.1.0-7b88d77
           ports:
             - containerPort: 80
           resources:

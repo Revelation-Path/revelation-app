@@ -19,7 +19,7 @@ spec:
         - name: craas-revelation-registry
       containers:
         - name: server
-          image: revelation-registry.registry.twcstorage.ru/revelation-server:latest
+          image: revelation-registry.registry.twcstorage.ru/revelation-server:0.1.0-7b88d77
           ports:
             - containerPort: 3000
           envFrom:
