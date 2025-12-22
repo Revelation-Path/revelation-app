@@ -314,11 +314,11 @@ impl BibleProvider {
     /// Prefetch Bible data in background (call on app start)
     pub fn prefetch() {
         spawn_local(async {
-            if Self::load_from_storage().is_none() {
-                if let Ok(cache) = Self::fetch_from_s3().await {
-                    Self::save_to_storage(&cache);
-                    web_sys::console::log_1(&"Bible prefetched and cached".into());
-                }
+            if Self::load_from_storage().is_none()
+                && let Ok(cache) = Self::fetch_from_s3().await
+            {
+                Self::save_to_storage(&cache);
+                web_sys::console::log_1(&"Bible prefetched and cached".into());
             }
         });
     }
