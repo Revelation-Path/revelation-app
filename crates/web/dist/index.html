@@ -12,8 +12,8 @@
     <title>Revelation</title>
     
 <script type="module">
-import init, * as bindings from '/revelation-web-73f4036753357567.js';
-const wasm = await init({ module_or_path: '/revelation-web-73f4036753357567_bg.wasm' });
+import init, * as bindings from '/revelation-web-ca00a7d13fd06dfe.js';
+const wasm = await init({ module_or_path: '/revelation-web-ca00a7d13fd06dfe_bg.wasm' });
 
 
 window.wasmBindings = bindings;
@@ -23,12 +23,12 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
 
 </script>
     <link rel="stylesheet" href="/base-1a2dda586b35faae.css" integrity="sha384-sQr8qFJ+P3XBYsXKOXV+ZehScoX1Lt+wzwz2ipJCnVkN9ta7xF6t5EHX9PPnfrOU"/>
-    <link rel="stylesheet" href="/generated-b71fa7544b06faa8.css" integrity="sha384-RmuWOvu/mTi2xnHWoaeLNgdOf2YIHm1kih88k6eAjXYF0oGNOj9Jj5bozcMo+RRY"/>
+    <link rel="stylesheet" href="/generated-eaf3afb345e32077.css" integrity="sha384-T6b52G+0/Ukzm3I3Qwt5jgXqD59jVCiqbdcdoNvG2abvF5cNGm5vmhEaw0jc/GaY"/>
     
     
     
     
-<link rel="modulepreload" href="/revelation-web-73f4036753357567.js" crossorigin="anonymous" integrity="sha384-8yQpUkOEl4Mokj01c3M6D6A/ZNNkdLlpnSmbwWL4hXzFq2vDBTLGl4zWb6e9C9w6"><link rel="preload" href="/revelation-web-73f4036753357567_bg.wasm" crossorigin="anonymous" integrity="sha384-CtwfDSuQ2VL7K0VMeNQ2qo8Y1HqF3Xdmk9hoAu1/3GpHvk1iBV+v/3yL5l3zQCoA" as="fetch" type="application/wasm"></head>
+<link rel="modulepreload" href="/revelation-web-ca00a7d13fd06dfe.js" crossorigin="anonymous" integrity="sha384-sf07Bry/RGH4ePH8VXq0bMKskFZTY+0ArK/reQ+krxPLepEA+pMBxxtY3HiCskG2"><link rel="preload" href="/revelation-web-ca00a7d13fd06dfe_bg.wasm" crossorigin="anonymous" integrity="sha384-T3VvoHjLCnbQidgedFL795/RB5gnwHI+Bmpl7VJwcz9GT87r+Rxeyrj8ufMWuOpK" as="fetch" type="application/wasm"></head>
 <body>
     <div id="loading" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#fefdfb;">
         <div style="text-align:center;">
@@ -78,6 +78,20 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
         window.isPwaInstallable = () => !!deferredPrompt;
         window.isPwaInstalled = () => isStandalone;
         window.isIOSDevice = () => isIOS;
+
+        // Theme color management for browser chrome
+        window.setThemeColor = (color) => {
+            const meta = document.querySelector('meta[name="theme-color"]');
+            if (meta) meta.content = color;
+        };
+
+        // Set theme-color from CSS variable (e.g. "--cat-torah")
+        window.setThemeColorFromVar = (varName) => {
+            const root = document.documentElement;
+            const style = getComputedStyle(root);
+            const color = style.getPropertyValue(varName).trim();
+            if (color) window.setThemeColor(color);
+        };
     </script>
 <script>"use strict";
 

@@ -34,6 +34,15 @@ impl Theme {
             Theme::Sepia => "theme-sepia"
         }
     }
+
+    /// Returns background color for browser chrome (theme-color meta)
+    pub fn bg_color(&self) -> &'static str {
+        match self {
+            Theme::Light => "#fefdfb",
+            Theme::Dark => "#1a1a1a",
+            Theme::Sepia => "#f4ecd8"
+        }
+    }
 }
 
 /// Font family variants

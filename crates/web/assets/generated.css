@@ -1803,6 +1803,35 @@
   vertical-align: middle;
 }
 
+/* Toggle switch */
+.toggle-294f62b {
+  width: 3rem;
+  height: 1.75rem;
+  padding: 0.125rem;
+  background: var(--bg-secondary);
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.toggleOn-294f62b {
+  background: var(--accent);
+}
+
+.toggleThumb-294f62b {
+  display: block;
+  width: 1.5rem;
+  height: 1.5rem;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0.0625rem 0.25rem var(--shadow);
+  transition: transform 0.2s;
+}
+
+.toggleOn-294f62b .toggleThumb-294f62b {
+  transform: translateX(1.25rem);
+}
+
 
 .container-b251479 {
   min-height: calc(100dvh - var(--bottom-nav-height));

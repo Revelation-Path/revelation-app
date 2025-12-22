@@ -6,9 +6,20 @@ use leptos_router::{
     components::{Redirect, Route, Router, Routes},
     path
 };
-use ui::{THEME_CSS, ThemeProvider, ToastProvider};
+use ui::{BrowserChrome, THEME_CSS, ThemeProvider, ToastProvider};
 
 use crate::{components::Sidebar, pages::*, state::AppState};
+
+/// Syncs browser chrome color with current book
+#[component]
+fn ChromeSync() -> impl IntoView {
+    let state = expect_context::<AppState>();
+
+    Effect::new(move |_| {
+        let book_id = state.current_book.get();
+        BrowserChrome::set_book_category(book_id);
+    });
+}
 
 /// Main application component
 #[component]
@@ -28,6 +39,7 @@ pub fn App() -> impl IntoView {
         <Style>{THEME_CSS}</Style>
 
         <ThemeProvider>
+            <ChromeSync/>
             <ToastProvider>
                 <Router>
                     <div class="flex">
