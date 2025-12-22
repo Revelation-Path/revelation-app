@@ -18,10 +18,6 @@ pub fn Churches() -> impl IntoView {
             <Header title="Церкви"/>
 
             <div class=common::container>
-                <A href="/churches/create" attr:class=common::btnPrimary attr:style="width: 100%; text-align: center;">
-                    "Добавить церковь"
-                </A>
-
                 <div class=common::emptyState>
                     <div class=common::emptyIcon>
                         <ChurchIcon/>
@@ -31,6 +27,10 @@ pub fn Churches() -> impl IntoView {
                         "Добавьте свою церковь или найдите общину рядом с вами"
                     </p>
                 </div>
+
+                <A href="/churches/create" attr:class=common::btnPrimary attr:style="width: 100%; text-align: center;">
+                    "Добавить церковь"
+                </A>
             </div>
 
             <BottomNav/>

@@ -598,7 +598,7 @@ pub fn SongSearch() -> impl IntoView {
     let results = RwSignal::new(Vec::new());
     let is_searching = RwSignal::new(false);
 
-    let do_search = move |_: web_sys::MouseEvent| {
+    let do_search = move || {
         let q = query.get();
         if q.len() >= 2 {
             is_searching.set(true);
@@ -614,13 +614,20 @@ pub fn SongSearch() -> impl IntoView {
 
     view! {
         <div class=styles::container>
-            <header class=styles::header>
-                <button
-                    class=styles::iconBtn
-                    on:click=move |_| { navigate("/songs", Default::default()); }
-                >
-                    <Icon icon=IconType::ArrowLeft size=IconSize::Medium/>
-                </button>
+            <PageHeader
+                title=Signal::derive(|| "Поиск".to_string())
+                left=view! {
+                    <HeaderButton
+                        icon=IconType::ArrowLeft
+                        on_click=Callback::new(move |_| {
+                            navigate("/songs", Default::default());
+                        })
+                    />
+                }
+                right=view! { <div></div> }
+            />
+
+            <div class=styles::header style="position: static; padding: var(--space-md);">
                 <input
                     type="search"
                     class=styles::searchInput
@@ -629,24 +636,14 @@ pub fn SongSearch() -> impl IntoView {
                     on:input=move |ev| query.set(event_target_value(&ev))
                     on:keydown=move |ev| {
                         if ev.key() == "Enter" {
-                            let q = query.get();
-                            if q.len() >= 2 {
-                                is_searching.set(true);
-                                leptos::task::spawn_local(async move {
-                                    match api::search_songs(&q).await {
-                                        Ok(r) => results.set(r),
-                                        Err(_) => results.set(vec![])
-                                    }
-                                    is_searching.set(false);
-                                });
-                            }
+                            do_search();
                         }
                     }
                 />
-                <button class=styles::iconBtn on:click=do_search>
+                <button class=styles::iconBtn on:click=move |_| do_search()>
                     <Icon icon=IconType::Search size=IconSize::Medium/>
                 </button>
-            </header>
+            </div>
 
             <div class=styles::content>
                 <Show when=move || is_searching.get()>
