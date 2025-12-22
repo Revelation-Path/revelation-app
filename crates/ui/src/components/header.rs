@@ -8,7 +8,7 @@ stylance::import_crate_style!(styles, "src/styles/header.module.css");
 
 /// Page header with navigation and actions
 #[component]
-pub fn PageHeader(
+pub fn PageHeader<L, R>(
     /// Primary title (book name, songbook name, etc.)
     #[prop(into)]
     title: Signal<String>,
@@ -29,11 +29,15 @@ pub fn PageHeader(
     on_subtitle_click: Option<Callback<()>>,
     /// Left slot for back button etc.
     #[prop(optional)]
-    left: Option<Children>,
+    left: Option<L>,
     /// Right slot for action buttons
     #[prop(optional)]
-    right: Option<Children>
-) -> impl IntoView {
+    right: Option<R>
+) -> impl IntoView
+where
+    L: IntoView + 'static,
+    R: IntoView + 'static
+{
     let progress_style = move || {
         if let Some(p) = &progress {
             let value = p.get();
@@ -54,7 +58,7 @@ pub fn PageHeader(
             <div class=styles::progress style=progress_style></div>
 
             <div class=styles::left>
-                {left.map(|children| children())}
+                {left}
             </div>
 
             <div class=styles::title>
@@ -102,7 +106,7 @@ pub fn PageHeader(
             </div>
 
             <div class=styles::right>
-                {right.map(|children| children())}
+                {right}
             </div>
         </header>
     }

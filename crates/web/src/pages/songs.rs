@@ -7,6 +7,7 @@ use leptos_router::{
 };
 use shared::{Song, SongSummary, Songbook};
 use songbook::ChordProParser;
+use ui::{HeaderButton, IconType, PageHeader};
 use uuid::Uuid;
 
 use crate::api;
@@ -14,17 +15,26 @@ use crate::api;
 /// Main songs page - shows songbooks
 #[component]
 pub fn Songs() -> impl IntoView {
+    let navigate = use_navigate();
     let songbooks =
         LocalResource::new(|| async { api::get_songbooks().await.unwrap_or_default() });
 
     view! {
         <div class="page-container">
-            <header class="page-header">
-                <h1 class="page-title">"Песни"</h1>
-                <A href="/songs/search" attr:class="btn-icon">
-                    <SearchIcon/>
-                </A>
-            </header>
+            <PageHeader
+                title=Signal::derive(|| "Песни".to_string())
+                left=view! { <div></div> }
+                right=view! {
+                    <A href="/songs/search">
+                        <HeaderButton
+                            icon=IconType::Search
+                            on_click=Callback::new(move |_| {
+                                navigate("/songs/search", Default::default());
+                            })
+                        />
+                    </A>
+                }
+            />
 
             <div class="px-4">
                 <Suspense fallback=|| view! { <LoadingSpinner/> }>
@@ -104,6 +114,8 @@ fn SongbookCard(songbook: Songbook) -> impl IntoView {
 pub fn SongbookDetail() -> impl IntoView {
     let params = use_params_map();
     let navigate = use_navigate();
+    let nav1 = navigate.clone();
+    let nav2 = navigate.clone();
 
     let songbook_id = move || {
         params
@@ -128,20 +140,37 @@ pub fn SongbookDetail() -> impl IntoView {
         }
     });
 
+    let songbook_name = LocalResource::new(move || async move {
+        if let Some(id) = songbook_id() {
+            api::get_songbook(id).await.ok().map(|s| s.name_ru)
+        } else {
+            None
+        }
+    });
+
     view! {
         <div class="page-container">
-            <header class="page-header">
-                <button
-                    class="btn-icon"
-                    on:click=move |_| { navigate("/songs", Default::default()); }
-                >
-                    <BackIcon/>
-                </button>
-                <h1 class="page-title">"Сборник"</h1>
-                <A href="/songs/search" attr:class="btn-icon">
-                    <SearchIcon/>
-                </A>
-            </header>
+            <PageHeader
+                title=Signal::derive(move || {
+                    songbook_name.get().flatten().unwrap_or_else(|| "Сборник".to_string())
+                })
+                left=view! {
+                    <HeaderButton
+                        icon=IconType::ArrowLeft
+                        on_click=Callback::new(move |_| {
+                            nav1("/songs", Default::default());
+                        })
+                    />
+                }
+                right=view! {
+                    <HeaderButton
+                        icon=IconType::Search
+                        on_click=Callback::new(move |_| {
+                            nav2("/songs/search", Default::default());
+                        })
+                    />
+                }
+            />
 
             <div class="px-4">
                 <Suspense fallback=|| view! { <LoadingSpinner/> }>
@@ -252,6 +281,8 @@ pub fn SongbookDetail() -> impl IntoView {
 pub fn SongbookSongs() -> impl IntoView {
     let params = use_params_map();
     let navigate = use_navigate();
+    let nav1 = navigate.clone();
+    let nav2 = navigate.clone();
 
     let songbook_id = move || {
         params
@@ -278,33 +309,41 @@ pub fn SongbookSongs() -> impl IntoView {
         }
     });
 
+    let songbook_name = LocalResource::new(move || async move {
+        if let Some(id) = songbook_id() {
+            api::get_songbook(id).await.ok().map(|s| s.name_ru)
+        } else {
+            None
+        }
+    });
+
     view! {
         <div class="page-container">
-            <header class="page-header">
-                <button
-                    class="btn-icon"
-                    on:click=move |_| {
-                        if let Some(id) = songbook_id() {
-                            navigate(&format!("/songs/book/{}", id), Default::default());
-                        } else {
-                            navigate("/songs", Default::default());
-                        }
-                    }
-                >
-                    <BackIcon/>
-                </button>
-                <Suspense fallback=|| view! { <h1 class="page-title">"Песни"</h1> }>
-                    {move || Suspend::new(async move {
-                        let sb = songbook.await;
-                        view! {
-                            <h1 class="page-title">{sb.map(|s| s.name_ru).unwrap_or_else(|| "Песни".to_string())}</h1>
-                        }
-                    })}
-                </Suspense>
-                <A href="/songs/search" attr:class="btn-icon">
-                    <SearchIcon/>
-                </A>
-            </header>
+            <PageHeader
+                title=Signal::derive(move || {
+                    songbook_name.get().flatten().unwrap_or_else(|| "Песни".to_string())
+                })
+                left=view! {
+                    <HeaderButton
+                        icon=IconType::ArrowLeft
+                        on_click=Callback::new(move |_| {
+                            if let Some(id) = songbook_id() {
+                                nav1(&format!("/songs/book/{}", id), Default::default());
+                            } else {
+                                nav1("/songs", Default::default());
+                            }
+                        })
+                    />
+                }
+                right=view! {
+                    <HeaderButton
+                        icon=IconType::Search
+                        on_click=Callback::new(move |_| {
+                            nav2("/songs/search", Default::default());
+                        })
+                    />
+                }
+            />
 
             <div class="px-4">
                 <Suspense fallback=|| view! { <LoadingSpinner/> }>
@@ -391,42 +430,53 @@ pub fn SongDetail() -> impl IntoView {
         }
     });
 
-    let go_back = move |_: web_sys::MouseEvent| {
-        navigate("/songs", Default::default());
-    };
-
-    let transpose_up = move |_: web_sys::MouseEvent| {
-        transpose.update(|t| *t = (*t + 1) % 12);
-    };
-
-    let transpose_down = move |_: web_sys::MouseEvent| {
-        transpose.update(|t| *t = (*t - 1 + 12) % 12);
-    };
+    let song_title = LocalResource::new(move || async move {
+        if let Some(id) = song_id() {
+            api::get_song(id).await.ok().map(|s| s.title)
+        } else {
+            None
+        }
+    });
 
     view! {
         <div class="page-container">
-            <header class="page-header">
-                <button class="btn-icon" on:click=go_back>
-                    <BackIcon/>
-                </button>
-                <div class="flex-1"/>
-                <div class="flex items-center gap-2">
-                    <button class="btn-icon" on:click=transpose_down>
-                        <MinusIcon/>
-                    </button>
-                    <span class="text-sm font-medium min-w-[3rem] text-center">
-                        {move || {
-                            let t = transpose.get();
-                            if t == 0 { "0".to_string() }
-                            else if t > 6 { format!("-{}", 12 - t) }
-                            else { format!("+{}", t) }
-                        }}
-                    </span>
-                    <button class="btn-icon" on:click=transpose_up>
-                        <PlusIcon/>
-                    </button>
-                </div>
-            </header>
+            <PageHeader
+                title=Signal::derive(move || {
+                    song_title.get().flatten().unwrap_or_else(|| "Песня".to_string())
+                })
+                left=view! {
+                    <HeaderButton
+                        icon=IconType::ArrowLeft
+                        on_click=Callback::new(move |_| {
+                            navigate("/songs", Default::default());
+                        })
+                    />
+                }
+                right=view! {
+                    <div class="flex items-center gap-1">
+                        <HeaderButton
+                            icon=IconType::Minus
+                            on_click=Callback::new(move |_| {
+                                transpose.update(|t| *t = (*t - 1 + 12) % 12);
+                            })
+                        />
+                        <span class="text-sm font-medium min-w-[2.5rem] text-center">
+                            {move || {
+                                let t = transpose.get();
+                                if t == 0 { "0".to_string() }
+                                else if t > 6 { format!("-{}", 12 - t) }
+                                else { format!("+{}", t) }
+                            }}
+                        </span>
+                        <HeaderButton
+                            icon=IconType::Plus
+                            on_click=Callback::new(move |_| {
+                                transpose.update(|t| *t = (*t + 1) % 12);
+                            })
+                        />
+                    </div>
+                }
+            />
 
             <div class="px-4 pb-safe">
                 <Suspense fallback=|| view! { <LoadingSpinner/> }>
