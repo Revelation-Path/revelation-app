@@ -99,7 +99,7 @@ fn BibleReader(initial_book: i16, initial_chapter: i16) -> impl IntoView {
     let (scroll_progress, set_scroll_progress) = signal::<Option<f64>>(None);
     let content_ref: NodeRef<leptos::html::Main> = NodeRef::new();
 
-    let all_books = LocalResource::new(|| async { api::get_books().await.ok() });
+    let all_books = LocalResource::new(|| async { api::get_books_cached().await.ok() });
 
     let pericopes = LocalResource::new(move || {
         let b = current_book.get();
@@ -114,7 +114,7 @@ fn BibleReader(initial_book: i16, initial_chapter: i16) -> impl IntoView {
     let verses = LocalResource::new(move || {
         let b = current_book.get();
         let c = current_chapter.get();
-        async move { api::get_chapter(b, c).await.ok() }
+        async move { api::get_chapter_cached(b, c).await.ok() }
     });
 
     // Reset scroll progress when book/chapter changes
