@@ -9,6 +9,7 @@ mod input;
 mod skeleton;
 mod tabs;
 mod toast;
+mod toggle;
 
 pub use button::*;
 pub use card::*;
@@ -19,3 +20,4 @@ pub use input::*;
 pub use skeleton::*;
 pub use tabs::*;
 pub use toast::*;
+pub use toggle::*;

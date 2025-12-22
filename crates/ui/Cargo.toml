@@ -3,6 +3,9 @@ name = "ui"
 version.workspace = true
 edition.workspace = true
 
+[package.metadata.stylance]
+# CSS modules output handled by web crate's trunk build
+
 [dependencies]
 leptos = { workspace = true, features = ["csr"] }
 leptos_router = { workspace = true }

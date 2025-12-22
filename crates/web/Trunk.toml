@@ -8,8 +8,8 @@ ignore = ["dist", "assets/generated.css", "assets/bible"]
 
 [[hooks]]
 stage = "pre_build"
-command = "stylance"
-command_arguments = [".", "--output-file", "assets/generated.css"]
+command = "sh"
+command_arguments = ["-c", "stylance ../ui --output-file /tmp/ui.css && stylance . --output-file /tmp/web.css && cat /tmp/ui.css /tmp/web.css > assets/generated.css"]
 
 [serve]
 addresses = ["127.0.0.1"]

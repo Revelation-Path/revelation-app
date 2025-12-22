@@ -1,42 +1,51 @@
 //! Songs/Songbook pages
 
+use gloo_storage::{LocalStorage, Storage};
 use leptos::prelude::*;
-use leptos_router::{
-    components::A,
-    hooks::{use_navigate, use_params_map}
-};
+use leptos_router::{components::A, hooks::use_params_map};
 use shared::{Song, SongSummary, Songbook};
 use songbook::ChordProParser;
-use ui::{HeaderButton, Icon, IconSize, IconType, PageHeader};
+use ui::{Icon, IconSize, IconType, Toggle};
 use uuid::Uuid;
 
-use crate::{api, components::BottomNav};
+use crate::{
+    api,
+    components::{BottomNav, Header}
+};
 
 stylance::import_crate_style!(styles, "src/styles/songs.module.css");
+
+const ONLY_WITH_CHORDS_KEY: &str = "songs_only_with_chords";
 
 /// Main songs page - shows songbooks
 #[component]
 pub fn Songs() -> impl IntoView {
-    let navigate = use_navigate();
     let songbooks =
         LocalResource::new(|| async { api::get_songbooks().await.unwrap_or_default() });
 
+    let only_with_chords =
+        RwSignal::new(LocalStorage::get::<bool>(ONLY_WITH_CHORDS_KEY).unwrap_or(false));
+
     view! {
         <div class=styles::container>
-            <PageHeader
-                title=Signal::derive(|| "Песни".to_string())
-                left=view! { <div></div> }
-                right=view! {
-                    <A href="/songs/search">
-                        <HeaderButton
-                            icon=IconType::Search
-                            on_click=Callback::new(move |_| {
-                                navigate("/songs/search", Default::default());
-                            })
-                        />
-                    </A>
-                }
-            />
+            <Header title="Песни">
+                <A href="/songs/search" attr:class=styles::iconBtn>
+                    <Icon icon=IconType::Search size=IconSize::Medium/>
+                </A>
+            </Header>
+
+            <div class=styles::filterBar>
+                <Toggle
+                    active=only_with_chords
+                    label_off="С аккордами и без"
+                    label_on="Только с аккордами"
+                    icon=IconType::Music
+                    on_toggle=Callback::new(move |v| {
+                        only_with_chords.set(v);
+                        let _ = LocalStorage::set(ONLY_WITH_CHORDS_KEY, v);
+                    })
+                />
+            </div>
 
             <div class=styles::content>
                 <Suspense fallback=|| view! { <LoadingSpinner/> }>
@@ -102,9 +111,6 @@ fn SongbookCard(songbook: Songbook) -> impl IntoView {
 #[component]
 pub fn SongbookDetail() -> impl IntoView {
     let params = use_params_map();
-    let navigate = use_navigate();
-    let nav1 = navigate.clone();
-    let nav2 = navigate.clone();
 
     let songbook_id = move || {
         params
@@ -139,27 +145,16 @@ pub fn SongbookDetail() -> impl IntoView {
 
     view! {
         <div class=styles::container>
-            <PageHeader
+            <Header
                 title=Signal::derive(move || {
                     songbook_name.get().flatten().unwrap_or_else(|| "Сборник".to_string())
                 })
-                left=view! {
-                    <HeaderButton
-                        icon=IconType::ArrowLeft
-                        on_click=Callback::new(move |_| {
-                            nav1("/songs", Default::default());
-                        })
-                    />
-                }
-                right=view! {
-                    <HeaderButton
-                        icon=IconType::Search
-                        on_click=Callback::new(move |_| {
-                            nav2("/songs/search", Default::default());
-                        })
-                    />
-                }
-            />
+                back=true
+            >
+                <A href="/songs/search" attr:class=styles::iconBtn>
+                    <Icon icon=IconType::Search size=IconSize::Medium/>
+                </A>
+            </Header>
 
             <div class=styles::content>
                 <Suspense fallback=|| view! { <LoadingSpinner/> }>
@@ -297,9 +292,7 @@ fn EditionsList(editions: Vec<shared::SongbookEdition>, songbook_id: Uuid) -> im
 #[component]
 pub fn SongbookSongs() -> impl IntoView {
     let params = use_params_map();
-    let navigate = use_navigate();
-    let nav1 = navigate.clone();
-    let nav2 = navigate.clone();
+    let only_with_chords = LocalStorage::get::<bool>(ONLY_WITH_CHORDS_KEY).unwrap_or(false);
 
     let songbook_id = move || {
         params
@@ -328,40 +321,30 @@ pub fn SongbookSongs() -> impl IntoView {
 
     view! {
         <div class=styles::container>
-            <PageHeader
+            <Header
                 title=Signal::derive(move || {
                     songbook_name.get().flatten().unwrap_or_else(|| "Песни".to_string())
                 })
-                left=view! {
-                    <HeaderButton
-                        icon=IconType::ArrowLeft
-                        on_click=Callback::new(move |_| {
-                            if let Some(id) = songbook_id() {
-                                nav1(&format!("/songs/book/{}", id), Default::default());
-                            } else {
-                                nav1("/songs", Default::default());
-                            }
-                        })
-                    />
-                }
-                right=view! {
-                    <HeaderButton
-                        icon=IconType::Search
-                        on_click=Callback::new(move |_| {
-                            nav2("/songs/search", Default::default());
-                        })
-                    />
-                }
-            />
+                back=true
+            >
+                <A href="/songs/search" attr:class=styles::iconBtn>
+                    <Icon icon=IconType::Search size=IconSize::Medium/>
+                </A>
+            </Header>
 
             <div class=styles::content>
                 <Suspense fallback=|| view! { <LoadingSpinner/> }>
                     {move || Suspend::new(async move {
                         let song_list = songs.await;
+                        let filtered: Vec<_> = if only_with_chords {
+                            song_list.into_iter().filter(|s| s.has_chords).collect()
+                        } else {
+                            song_list
+                        };
                         view! {
                             <div class=styles::songList>
                                 <For
-                                    each=move || song_list.clone()
+                                    each=move || filtered.clone()
                                     key=|s| s.id
                                     children=|song| view! { <SongListItem song=song/> }
                                 />
@@ -407,7 +390,6 @@ fn SongListItem(song: SongSummary) -> impl IntoView {
 #[component]
 pub fn SongDetail() -> impl IntoView {
     let params = use_params_map();
-    let navigate = use_navigate();
 
     let song_id = move || {
         params
@@ -441,43 +423,35 @@ pub fn SongDetail() -> impl IntoView {
 
     view! {
         <div class=styles::container>
-            <PageHeader
+            <Header
                 title=Signal::derive(move || {
                     song_title.get().flatten().unwrap_or_else(|| "Песня".to_string())
                 })
-                left=view! {
-                    <HeaderButton
-                        icon=IconType::ArrowLeft
-                        on_click=Callback::new(move |_| {
-                            navigate("/songs", Default::default());
-                        })
-                    />
-                }
-                right=view! {
-                    <div class=styles::transposeControls>
-                        <button
-                            class=styles::transposeBtn
-                            on:click=move |_| transpose.update(|t| *t = (*t - 1 + 12) % 12)
-                        >
-                            <Icon icon=IconType::Minus size=IconSize::Small/>
-                        </button>
-                        <span class=styles::transposeValue>
-                            {move || {
-                                let t = transpose.get();
-                                if t == 0 { "0".to_string() }
-                                else if t > 6 { format!("-{}", 12 - t) }
-                                else { format!("+{}", t) }
-                            }}
-                        </span>
-                        <button
-                            class=styles::transposeBtn
-                            on:click=move |_| transpose.update(|t| *t = (*t + 1) % 12)
-                        >
-                            <Icon icon=IconType::Plus size=IconSize::Small/>
-                        </button>
-                    </div>
-                }
-            />
+                back=true
+            >
+                <div class=styles::transposeControls>
+                    <button
+                        class=styles::transposeBtn
+                        on:click=move |_| transpose.update(|t| *t = (*t - 1 + 12) % 12)
+                    >
+                        <Icon icon=IconType::Minus size=IconSize::Small/>
+                    </button>
+                    <span class=styles::transposeValue>
+                        {move || {
+                            let t = transpose.get();
+                            if t == 0 { "0".to_string() }
+                            else if t > 6 { format!("-{}", 12 - t) }
+                            else { format!("+{}", t) }
+                        }}
+                    </span>
+                    <button
+                        class=styles::transposeBtn
+                        on:click=move |_| transpose.update(|t| *t = (*t + 1) % 12)
+                    >
+                        <Icon icon=IconType::Plus size=IconSize::Small/>
+                    </button>
+                </div>
+            </Header>
 
             <div class=styles::songDetail>
                 <Suspense fallback=|| view! { <LoadingSpinner/> }>
@@ -593,10 +567,10 @@ fn render_chords_line(text: &str, chords: &[shared::PositionedChord]) -> String 
 /// Song search page
 #[component]
 pub fn SongSearch() -> impl IntoView {
-    let navigate = use_navigate();
     let query = RwSignal::new(String::new());
     let results = RwSignal::new(Vec::new());
     let is_searching = RwSignal::new(false);
+    let only_with_chords = LocalStorage::get::<bool>(ONLY_WITH_CHORDS_KEY).unwrap_or(false);
 
     let do_search = move || {
         let q = query.get();
@@ -612,20 +586,20 @@ pub fn SongSearch() -> impl IntoView {
         }
     };
 
+    let filtered_results = move || {
+        let all = results.get();
+        if only_with_chords {
+            all.into_iter()
+                .filter(|r| r.song.has_chords)
+                .collect::<Vec<_>>()
+        } else {
+            all
+        }
+    };
+
     view! {
         <div class=styles::container>
-            <PageHeader
-                title=Signal::derive(|| "Поиск".to_string())
-                left=view! {
-                    <HeaderButton
-                        icon=IconType::ArrowLeft
-                        on_click=Callback::new(move |_| {
-                            navigate("/songs", Default::default());
-                        })
-                    />
-                }
-                right=view! { <div></div> }
-            />
+            <Header title="Поиск" back=true/>
 
             <div class=styles::header style="position: static; padding: var(--space-md);">
                 <input
@@ -650,10 +624,10 @@ pub fn SongSearch() -> impl IntoView {
                     <LoadingSpinner/>
                 </Show>
 
-                <Show when=move || !results.get().is_empty()>
+                <Show when=move || !filtered_results().is_empty()>
                     <div class=styles::songList>
                         <For
-                            each=move || results.get()
+                            each=filtered_results
                             key=|s| s.song.id
                             children=|result| {
                                 view! {
@@ -671,7 +645,7 @@ pub fn SongSearch() -> impl IntoView {
                     </div>
                 </Show>
 
-                <Show when=move || !is_searching.get() && results.get().is_empty() && (query.get().len() >= 2)>
+                <Show when=move || !is_searching.get() && filtered_results().is_empty() && (query.get().len() >= 2)>
                     <div class=styles::empty>
                         <span class=styles::emptyText>"Ничего не найдено"</span>
                     </div>

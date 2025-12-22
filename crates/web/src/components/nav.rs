@@ -132,7 +132,11 @@ fn SidebarItem(
 
 /// Header component - responsive
 #[component]
-pub fn Header(#[prop(into)] title: String, #[prop(optional)] back: bool) -> impl IntoView {
+pub fn Header(
+    #[prop(into)] title: Signal<String>,
+    #[prop(optional)] back: bool,
+    #[prop(optional)] children: Option<Children>
+) -> impl IntoView {
     view! {
         <header class=nav::header>
             <div class=nav::headerInner>
@@ -148,8 +152,11 @@ pub fn Header(#[prop(into)] title: String, #[prop(optional)] back: bool) -> impl
                 } else {
                     view! { <div class=nav::headerSpacer></div> }.into_any()
                 }}
-                <h1 class=nav::headerTitle>{title}</h1>
-                <div class=nav::headerSpacer></div>
+                <h1 class=nav::headerTitle>{move || title.get()}</h1>
+                {match children {
+                    Some(c) => view! { <div class=nav::headerRight>{c()}</div> }.into_any(),
+                    None => view! { <div class=nav::headerSpacer></div> }.into_any()
+                }}
             </div>
         </header>
     }
