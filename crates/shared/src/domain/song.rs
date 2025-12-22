@@ -104,7 +104,36 @@ pub struct Songbook {
     pub description: Option<String>,
     pub cover_url:   Option<String>,
     pub songs_count: i32,
-    pub is_public:   bool
+    pub is_public:   bool,
+
+    // Extended metadata
+    pub year_first_published: Option<i16>,
+    pub year_latest_edition:  Option<i16>,
+    pub edition_name:         Option<String>,
+    pub total_songs_in_print: Option<i32>,
+    pub publisher:            Option<String>,
+    pub editor:               Option<String>,
+    pub isbn:                 Option<String>,
+    pub language:             Option<String>,
+    pub country:              Option<String>,
+    pub denomination:         Option<String>,
+    pub website_url:          Option<String>,
+    pub purchase_url:         Option<String>,
+    pub history:              Option<String>,
+    pub notes:                Option<String>
+}
+
+/// Songbook edition (for historical tracking)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SongbookEdition {
+    pub id:             Uuid,
+    pub songbook_id:    Uuid,
+    pub edition_name:   String,
+    pub year_published: i16,
+    pub songs_count:    i32,
+    pub publisher:      Option<String>,
+    pub isbn:           Option<String>,
+    pub notes:          Option<String>
 }
 
 /// Full song with all details

@@ -6,7 +6,11 @@ use serde::{Deserialize, Serialize};
 use shared::{Book, Testament, Verse};
 use wasm_bindgen_futures::spawn_local;
 
-const S3_BASE: &str = "https://s3.twcstorage.ru/7f594bdf-revelation";
+#[cfg(debug_assertions)]
+const BIBLE_URL: &str = "/bible/synodal.json";
+
+#[cfg(not(debug_assertions))]
+const BIBLE_URL: &str = "https://s3.twcstorage.ru/7f594bdf-revelation/synodal.json";
 const CACHE_KEY: &str = "bible_synodal";
 const CACHE_VERSION_KEY: &str = "bible_version";
 const CURRENT_VERSION: &str = "1.0.0";
@@ -269,11 +273,14 @@ impl BibleProvider {
         let _ = LocalStorage::set(CACHE_VERSION_KEY, CURRENT_VERSION);
     }
 
-    /// Fetch from S3
-    pub async fn fetch_from_s3() -> Result<BibleCache, String> {
-        let url = format!("{}/synodal.json", S3_BASE);
+    /// Fetch Bible data (local in dev, S3 in prod)
+    pub async fn fetch_bible() -> Result<BibleCache, String> {
+        Self::fetch_from_url(BIBLE_URL).await
+    }
 
-        let response = Request::get(&url)
+    /// Fetch from a specific URL
+    async fn fetch_from_url(url: &str) -> Result<BibleCache, String> {
+        let response = Request::get(url)
             .send()
             .await
             .map_err(|e| format!("Network error: {}", e))?;
@@ -304,8 +311,8 @@ impl BibleProvider {
             return Ok(cache);
         }
 
-        // Fetch from S3
-        let cache = Self::fetch_from_s3().await?;
+        // Fetch Bible
+        let cache = Self::fetch_bible().await?;
         Self::save_to_storage(&cache);
 
         Ok(cache)
@@ -315,7 +322,7 @@ impl BibleProvider {
     pub fn prefetch() {
         spawn_local(async {
             if Self::load_from_storage().is_none()
-                && let Ok(cache) = Self::fetch_from_s3().await
+                && let Ok(cache) = Self::fetch_bible().await
             {
                 Self::save_to_storage(&cache);
                 web_sys::console::log_1(&"Bible prefetched and cached".into());

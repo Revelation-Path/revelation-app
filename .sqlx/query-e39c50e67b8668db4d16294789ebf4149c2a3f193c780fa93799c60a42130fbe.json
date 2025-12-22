@@ -1,0 +1,146 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                id, code, name, name_ru, description, cover_url, songs_count, is_public,\n                year_first_published, year_latest_edition, edition_name, total_songs_in_print,\n                publisher, editor, isbn, language, country, denomination,\n                website_url, purchase_url, history, notes\n            FROM songbooks\n            WHERE is_public = true\n            ORDER BY name_ru\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "code",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "name_ru",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "description",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "cover_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "songs_count",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 7,
+        "name": "is_public",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 8,
+        "name": "year_first_published",
+        "type_info": "Int2"
+      },
+      {
+        "ordinal": 9,
+        "name": "year_latest_edition",
+        "type_info": "Int2"
+      },
+      {
+        "ordinal": 10,
+        "name": "edition_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 11,
+        "name": "total_songs_in_print",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 12,
+        "name": "publisher",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 13,
+        "name": "editor",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 14,
+        "name": "isbn",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 15,
+        "name": "language",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 16,
+        "name": "country",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 17,
+        "name": "denomination",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 18,
+        "name": "website_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 19,
+        "name": "purchase_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 20,
+        "name": "history",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 21,
+        "name": "notes",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "e39c50e67b8668db4d16294789ebf4149c2a3f193c780fa93799c60a42130fbe"
+}

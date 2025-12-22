@@ -258,6 +258,18 @@ pub fn SongDetail() -> impl IntoView {
 fn SongContent(song: Song) -> impl IntoView {
     let parsed = ChordProParser::parse(&song.content);
 
+    // Debug: log parsed data
+    for section in &parsed.sections {
+        for line in &section.lines {
+            let debug = format!(
+                "Line: '{}', Chords: {:?}",
+                line.text,
+                line.chords.iter().map(|c| (c.position, c.chord.to_string())).collect::<Vec<_>>()
+            );
+            web_sys::console::log_1(&debug.into());
+        }
+    }
+
     view! {
         <div class="song-content">
             // Title and metadata
@@ -314,12 +326,11 @@ fn SongContent(song: Song) -> impl IntoView {
                                     } else {
                                         // Text with chords above
                                         let chord_line = render_chords_line(&line.text, &line.chords);
+                                        let text = line.text.clone();
                                         view! {
-                                            <div class="song-line">
-                                                <div class="song-chords text-[var(--color-gold-600)] font-bold">
-                                                    {chord_line}
-                                                </div>
-                                                <div class="song-text">{line.text}</div>
+                                            <div class="song-line" style="font-family: monospace; white-space: pre;">
+                                                <div style="color: var(--accent); font-weight: bold;">{chord_line}</div>
+                                                <div>{text}</div>
                                             </div>
                                         }.into_any()
                                     }

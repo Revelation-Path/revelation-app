@@ -4,7 +4,7 @@ use masterror::prelude::*;
 use shared::{
     AddToPlaylist, CreatePlaylist, CreateSong, PlaylistItem, Song, SongCategory, SongFilters,
     SongHistoryEntry, SongPlaylist, SongSearchResult, SongSortBy, SongSummary, SongTag, Songbook,
-    UpdateSong
+    SongbookEdition, UpdateSong
 };
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -34,7 +34,11 @@ impl SongRepository {
         let songbooks = sqlx::query_as!(
             Songbook,
             r#"
-            SELECT id, code, name, name_ru, description, cover_url, songs_count, is_public
+            SELECT
+                id, code, name, name_ru, description, cover_url, songs_count, is_public,
+                year_first_published, year_latest_edition, edition_name, total_songs_in_print,
+                publisher, editor, isbn, language, country, denomination,
+                website_url, purchase_url, history, notes
             FROM songbooks
             WHERE is_public = true
             ORDER BY name_ru
@@ -51,7 +55,11 @@ impl SongRepository {
         let songbook = sqlx::query_as!(
             Songbook,
             r#"
-            SELECT id, code, name, name_ru, description, cover_url, songs_count, is_public
+            SELECT
+                id, code, name, name_ru, description, cover_url, songs_count, is_public,
+                year_first_published, year_latest_edition, edition_name, total_songs_in_print,
+                publisher, editor, isbn, language, country, denomination,
+                website_url, purchase_url, history, notes
             FROM songbooks
             WHERE id = $1
             "#,
@@ -68,7 +76,11 @@ impl SongRepository {
         let songbook = sqlx::query_as!(
             Songbook,
             r#"
-            SELECT id, code, name, name_ru, description, cover_url, songs_count, is_public
+            SELECT
+                id, code, name, name_ru, description, cover_url, songs_count, is_public,
+                year_first_published, year_latest_edition, edition_name, total_songs_in_print,
+                publisher, editor, isbn, language, country, denomination,
+                website_url, purchase_url, history, notes
             FROM songbooks
             WHERE code = $1
             "#,
@@ -78,6 +90,24 @@ impl SongRepository {
         .await?;
 
         Ok(songbook)
+    }
+
+    /// Get songbook editions
+    pub async fn get_songbook_editions(&self, songbook_id: Uuid) -> AppResult<Vec<SongbookEdition>> {
+        let editions = sqlx::query_as!(
+            SongbookEdition,
+            r#"
+            SELECT id, songbook_id, edition_name, year_published, songs_count, publisher, isbn, notes
+            FROM songbook_editions
+            WHERE songbook_id = $1
+            ORDER BY year_published DESC
+            "#,
+            songbook_id
+        )
+        .fetch_all(&self.pool)
+        .await?;
+
+        Ok(editions)
     }
 
     // ========================================================================
@@ -136,7 +166,7 @@ impl SongRepository {
         ))
         .bind(user_id)
         .bind(filters.songbook_id)
-        .bind(filters.category.map(|c| c as i32))
+        .bind(filters.category)
         .bind(filters.tag_id)
         .bind(&filters.key)
         .bind(limit)
@@ -205,10 +235,13 @@ impl SongRepository {
         let row = sqlx::query_as::<_, SongRow>(
             r#"
             SELECT
-                s.*,
+                s.id, s.songbook_id, s.number, s.title, s.title_alt,
+                s.author_lyrics, s.author_music, s.translator, s.year_written,
+                s.copyright, s.original_key, s.tempo, s.time_signature,
+                s.content, s.first_line, s.views_count, s.favorites_count,
                 sb.code as songbook_code,
                 CASE WHEN uf.user_id IS NOT NULL THEN true ELSE false END as is_favorite,
-                COALESCE(uh.transpose_semitones, 0) as user_transpose
+                COALESCE(uh.transpose_semitones, 0)::smallint as user_transpose
             FROM songs s
             LEFT JOIN songbooks sb ON s.songbook_id = sb.id
             LEFT JOIN user_favorite_songs uf ON s.id = uf.song_id AND uf.user_id = $2

@@ -159,7 +159,7 @@ pub async fn get_today_reading() -> Result<Option<DailyReading>, String> {
 
 /// Get all songbooks
 pub async fn get_songbooks() -> Result<Vec<Songbook>, String> {
-    let response = Request::get(&format!("{}/songbooks", api_base()))
+    let response = Request::get(&format!("{}/songs/songbooks", api_base()))
         .send()
         .await
         .map_err(|e| e.to_string())?;
@@ -173,15 +173,15 @@ pub async fn get_songs_by_songbook(
     page: Option<u32>,
     limit: Option<u32>
 ) -> Result<Vec<SongSummary>, String> {
-    let page = page.unwrap_or(1);
-    let limit = limit.unwrap_or(50);
+    let limit = limit.unwrap_or(50) as i64;
+    let offset = page.map(|p| ((p.max(1) - 1) as i64) * limit).unwrap_or(0);
 
     let response = Request::get(&format!(
-        "{}/songs?songbook_id={}&page={}&limit={}",
+        "{}/songs?songbook_id={}&limit={}&offset={}",
         api_base(),
         songbook_id,
-        page,
-        limit
+        limit,
+        offset
     ))
     .send()
     .await

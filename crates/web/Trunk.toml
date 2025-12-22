@@ -1,9 +1,10 @@
 [build]
 target = "index.html"
 dist = "dist"
+public_url = "/"
 
 [watch]
-ignore = ["dist", "assets/generated.css"]
+ignore = ["dist", "assets/generated.css", "assets/bible"]
 
 [[hooks]]
 stage = "pre_build"

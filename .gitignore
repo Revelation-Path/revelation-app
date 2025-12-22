@@ -21,6 +21,7 @@ Thumbs.db
 # Build artifacts
 /dist/
 /pkg/
+crates/web/assets/bible/
 
 API_KEYS
 .claude
