@@ -84,6 +84,9 @@ leptos_axum = { version = "0.8" }
 leptos_router = { version = "0.8" }
 leptos_meta = { version = "0.8" }
 
+# CSS Modules
+stylance = "0.5"
+
 # gRPC (for inter-service communication)
 tonic = "0.14"
 prost = "0.14"

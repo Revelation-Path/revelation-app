@@ -3787,11 +3787,33 @@ checksum = "7da8b5736845d9f2fcb837ea5d9e2628564b3b043a70948a3f0b778838c5fb4f"
 
 [[package]]
 name = "stylance"
+version = "0.5.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fcda08e77bb732a73a207ce4f080670ff5f6933a7dd4c567cf5c038e2c950dfb"
+dependencies = [
+ "stylance-macros 0.5.5",
+]
+
+[[package]]
+name = "stylance"
 version = "0.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "479a1d9e3f0411bdffb9d4cedcd732f5e70eac7dd4710e6ee585b969a9127f27"
 dependencies = [
- "stylance-macros",
+ "stylance-macros 0.7.4",
+]
+
+[[package]]
+name = "stylance-core"
+version = "0.5.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c0cb8a158cacd104c770228a25173facdcf85f26c97730660ad62a905c4fc6f0"
+dependencies = [
+ "anyhow",
+ "serde",
+ "siphasher",
+ "toml 0.8.23",
+ "winnow 0.5.40",
 ]
 
 [[package]]
@@ -3809,6 +3831,19 @@ dependencies = [
 
 [[package]]
 name = "stylance-macros"
+version = "0.5.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0024020d03c9ea479ffbc7d4b85863648b9ffc8151b59d6bd6cdcf0dec27bf42"
+dependencies = [
+ "anyhow",
+ "proc-macro2",
+ "quote",
+ "stylance-core 0.5.5",
+ "syn",
+]
+
+[[package]]
+name = "stylance-macros"
 version = "0.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9bfb85482de6162dae517408102671bd434459798a62bb9f3d5fb9d5863868c0"
@@ -3816,7 +3851,7 @@ dependencies = [
  "anyhow",
  "proc-macro2",
  "quote",
- "stylance-core",
+ "stylance-core 0.7.4",
  "syn",
 ]
 
@@ -4452,6 +4487,7 @@ dependencies = [
  "gloo-timers",
  "leptos",
  "leptos_router",
+ "stylance 0.5.5",
  "wasm-bindgen",
  "web-sys",
 ]
@@ -4739,7 +4775,7 @@ dependencies = [
  "serde_json",
  "shared",
  "songbook",
- "stylance",
+ "stylance 0.7.4",
  "ui",
  "uuid",
  "wasm-bindgen",

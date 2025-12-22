@@ -75,7 +75,10 @@ pub enum IconType {
 
     // Social
     Telegram,
-    Share2
+    Share2,
+
+    // Media
+    Music
 }
 
 /// Icon component
@@ -178,6 +181,9 @@ pub fn Icon(
         IconType::Share2 => {
             "M18 8a3 3 0 100-6 3 3 0 000 6zM6 15a3 3 0 100-6 3 3 0 000 6zM18 22a3 3 0 100-6 3 3 0 000 6zM8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"
         }
+
+        // Media
+        IconType::Music => "M9 18V5l12-2v13M9 18a3 3 0 11-6 0 3 3 0 016 0zM21 16a3 3 0 11-6 0 3 3 0 016 0z"
     };
 
     let filled = matches!(
