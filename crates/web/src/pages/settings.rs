@@ -21,6 +21,14 @@ pub fn Settings() -> impl IntoView {
                         enabled=true
                     />
                 </div>
+
+                // Version info
+                <div class="mt-8 pt-4 border-t border-[var(--color-border)]">
+                    <div class="text-center text-sm text-[var(--color-text-muted)]">
+                        <p class="font-medium">"Revelation"</p>
+                        <p>"Версия " {env!("CARGO_PKG_VERSION")}</p>
+                    </div>
+                </div>
             </div>
         </div>
     }

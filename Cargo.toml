@@ -3,6 +3,7 @@ resolver = "3"
 members = [
   "crates/shared",
   "crates/bible",
+  "crates/songbook",
   "crates/server",
   "crates/gateway",
   "crates/payments",
@@ -89,6 +90,9 @@ prost = "0.14"
 
 # Testing
 tokio-test = "0.4"
+
+# Regex
+regex = "1"
 
 [workspace.lints.rust]
 unsafe_code = "deny"

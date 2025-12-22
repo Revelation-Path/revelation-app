@@ -1,0 +1,24 @@
+[package]
+name = "songbook"
+version.workspace = true
+edition.workspace = true
+
+[features]
+default = []
+db = ["dep:sqlx", "dep:masterror", "dep:tracing", "dep:chrono", "shared/db"]
+
+[dependencies]
+shared = { path = "../shared" }
+regex = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+uuid = { workspace = true }
+
+# Optional DB dependencies
+sqlx = { workspace = true, optional = true }
+chrono = { workspace = true, optional = true }
+masterror = { workspace = true, optional = true }
+tracing = { workspace = true, optional = true }
+
+[dev-dependencies]
+tokio-test = { workspace = true }

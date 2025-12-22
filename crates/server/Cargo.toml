@@ -10,6 +10,7 @@ path = "src/main.rs"
 [dependencies]
 shared = { path = "../shared", features = ["db", "backend"] }
 bible = { path = "../bible" }
+songbook = { path = "../songbook", features = ["db"] }
 
 axum = { workspace = true }
 tower = { workspace = true }

@@ -1,10 +1,12 @@
 use bible::{BibleRepository, BibleSearch, ReadingPlan};
+use songbook::SongRepository;
 use sqlx::PgPool;
 
 #[derive(Clone)]
 pub struct AppState {
     pub pool:  PgPool,
-    pub bible: BibleService
+    pub bible: BibleService,
+    pub songs: SongRepository
 }
 
 #[derive(Clone)]
@@ -32,6 +34,7 @@ impl AppState {
             bible: BibleService {
                 pool: pool.clone()
             },
+            songs: SongRepository::new(pool.clone()),
             pool
         }
     }

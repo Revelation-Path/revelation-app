@@ -10,6 +10,7 @@ mod onboarding;
 mod profile;
 mod search;
 mod settings;
+mod songs;
 
 pub use bible::*;
 pub use churches::*;
@@ -21,3 +22,4 @@ pub use onboarding::*;
 pub use profile::*;
 pub use search::*;
 pub use settings::*;
+pub use songs::*;

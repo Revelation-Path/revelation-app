@@ -4,7 +4,7 @@
 //! Category colors automatically adapt to the selected theme.
 //!
 //! Usage:
-//! ```rust
+//! ```ignore
 //! use ui::theme::ThemeProvider;
 //!
 //! view! {

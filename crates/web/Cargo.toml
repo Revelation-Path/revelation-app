@@ -12,6 +12,7 @@ path = "src/main.rs"
 
 [dependencies]
 shared = { path = "../shared" }
+songbook = { path = "../songbook" }
 ui = { path = "../ui" }
 
 leptos = { workspace = true, features = ["csr"] }

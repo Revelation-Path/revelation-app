@@ -1,5 +1,8 @@
 use gloo_net::http::Request;
-use shared::{Book, ChapterInfo, DailyReading, Pericope, SearchResult, Testament, User, Verse};
+use shared::{
+    Book, ChapterInfo, DailyReading, Pericope, SearchResult, Song, SongSearchResult, SongSummary,
+    Songbook, Testament, User, Verse
+};
 use uuid::Uuid;
 
 use crate::bible::BibleProvider;
@@ -148,6 +151,76 @@ pub async fn get_today_reading() -> Result<Option<DailyReading>, String> {
         .send()
         .await
         .map_err(|e| e.to_string())?;
+
+    response.json().await.map_err(|e| e.to_string())
+}
+
+// ========== Songs API ==========
+
+/// Get all songbooks
+pub async fn get_songbooks() -> Result<Vec<Songbook>, String> {
+    let response = Request::get(&format!("{}/songbooks", api_base()))
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+
+    response.json().await.map_err(|e| e.to_string())
+}
+
+/// Get songs from a specific songbook
+pub async fn get_songs_by_songbook(
+    songbook_id: Uuid,
+    page: Option<u32>,
+    limit: Option<u32>
+) -> Result<Vec<SongSummary>, String> {
+    let page = page.unwrap_or(1);
+    let limit = limit.unwrap_or(50);
+
+    let response = Request::get(&format!(
+        "{}/songs?songbook_id={}&page={}&limit={}",
+        api_base(),
+        songbook_id,
+        page,
+        limit
+    ))
+    .send()
+    .await
+    .map_err(|e| e.to_string())?;
+
+    response.json().await.map_err(|e| e.to_string())
+}
+
+/// Get a single song by ID
+pub async fn get_song(song_id: Uuid) -> Result<Song, String> {
+    let response = Request::get(&format!("{}/songs/{}", api_base(), song_id))
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+
+    response.json().await.map_err(|e| e.to_string())
+}
+
+/// Search songs
+pub async fn search_songs(query: &str) -> Result<Vec<SongSearchResult>, String> {
+    let response = Request::get(&format!("{}/songs/search?q={}", api_base(), query))
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+
+    response.json().await.map_err(|e| e.to_string())
+}
+
+/// Get transposed song content
+pub async fn transpose_song(song_id: Uuid, semitones: i32) -> Result<Song, String> {
+    let response = Request::get(&format!(
+        "{}/songs/{}/transpose/{}",
+        api_base(),
+        song_id,
+        semitones
+    ))
+    .send()
+    .await
+    .map_err(|e| e.to_string())?;
 
     response.json().await.map_err(|e| e.to_string())
 }
