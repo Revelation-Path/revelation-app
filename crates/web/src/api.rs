@@ -2,6 +2,8 @@ use gloo_net::http::Request;
 use shared::{Book, ChapterInfo, DailyReading, Pericope, SearchResult, Testament, User, Verse};
 use uuid::Uuid;
 
+use crate::bible::BibleProvider;
+
 fn api_base() -> String {
     let host = web_sys::window()
         .and_then(|w| w.location().host().ok())
@@ -11,6 +13,24 @@ fn api_base() -> String {
         "https://api.revelation-path.ru/api".to_string()
     } else {
         "/api".to_string()
+    }
+}
+
+/// Get books - from S3 cache, fallback to API
+pub async fn get_books_cached() -> Result<Vec<Book>, String> {
+    match BibleProvider::init().await {
+        Ok(cache) => Ok(cache.get_books()),
+        Err(_) => get_books().await
+    }
+}
+
+/// Get chapter - from S3 cache, fallback to API
+pub async fn get_chapter_cached(book_id: i16, chapter: i16) -> Result<Vec<Verse>, String> {
+    match BibleProvider::init().await {
+        Ok(cache) => cache
+            .get_chapter(book_id, chapter)
+            .ok_or_else(|| "Chapter not found".to_string()),
+        Err(_) => get_chapter(book_id, chapter).await
     }
 }
 
