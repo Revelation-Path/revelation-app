@@ -1,6 +1,6 @@
 use gloo_storage::{LocalStorage, Storage};
 use leptos::prelude::*;
-use shared::User;
+use revelation_shared::User;
 use uuid::Uuid;
 use wasm_bindgen_futures::spawn_local;
 
@@ -86,12 +86,16 @@ impl AppState {
     }
 
     /// Get chapter from cached Bible
-    pub fn get_chapter(&self, book_id: i16, chapter: i16) -> Option<Vec<shared::Verse>> {
+    pub fn get_chapter(
+        &self,
+        book_id: i16,
+        chapter: i16
+    ) -> Option<Vec<revelation_shared::Verse>> {
         self.bible.get()?.get_chapter(book_id, chapter)
     }
 
     /// Get all books from cached Bible
-    pub fn get_books(&self) -> Option<Vec<shared::Book>> {
+    pub fn get_books(&self) -> Option<Vec<revelation_shared::Book>> {
         Some(self.bible.get()?.get_books())
     }
 }

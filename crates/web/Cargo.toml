@@ -1,5 +1,5 @@
 [package]
-name = "web"
+name = "revelation-web"
 version.workspace = true
 edition.workspace = true
 
@@ -11,9 +11,9 @@ name = "revelation-web"
 path = "src/main.rs"
 
 [dependencies]
-shared = { path = "../shared" }
-songbook = { path = "../songbook" }
-ui = { path = "../ui" }
+revelation-shared = { workspace = true }
+revelation-songbook = { workspace = true }
+revelation-ui = { workspace = true }
 
 leptos = { workspace = true, features = ["csr"] }
 leptos_router = { workspace = true }

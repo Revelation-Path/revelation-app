@@ -2,8 +2,8 @@
 
 use leptos::{prelude::*, reactive::computed::Memo, tachys::dom::window};
 use leptos_router::hooks::use_params_map;
-use shared::{Book, Testament};
-use ui::use_theme;
+use revelation_shared::{Book, Testament};
+use revelation_ui::use_theme;
 use wasm_bindgen::{closure::Closure, prelude::*};
 
 fn request_animation_frame(f: impl FnOnce() + 'static) {

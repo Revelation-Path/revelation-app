@@ -6,7 +6,7 @@ use leptos_router::{
     components::{Redirect, Route, Router, Routes},
     path
 };
-use ui::{BrowserChrome, THEME_CSS, ThemeProvider, ToastProvider};
+use revelation_ui::{BrowserChrome, THEME_CSS, ThemeProvider, ToastProvider};
 
 use crate::{components::Sidebar, pages::*, state::AppState};
 

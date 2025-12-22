@@ -1,7 +1,7 @@
 //! Settings page - unified app settings
 
 use leptos::prelude::*;
-use ui::theme::{FontFamily, Theme, use_theme};
+use revelation_ui::theme::{FontFamily, Theme, use_theme};
 use wasm_bindgen::prelude::*;
 
 use crate::{components::Header, haptic};

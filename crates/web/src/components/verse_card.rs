@@ -1,7 +1,7 @@
 //! Verse display components
 
 use leptos::prelude::*;
-use shared::Verse;
+use revelation_shared::Verse;
 
 /// Verse card for search results
 #[component]

@@ -1,5 +1,5 @@
 use gloo_net::http::Request;
-use shared::{
+use revelation_shared::{
     Book, ChapterInfo, DailyReading, Pericope, SearchResult, Song, SongSearchResult, SongSummary,
     Songbook, SongbookEdition, Testament, User, Verse
 };
