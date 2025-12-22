@@ -49,33 +49,57 @@ pub fn Songs() -> impl IntoView {
 /// Songbook card component
 #[component]
 fn SongbookCard(songbook: Songbook) -> impl IntoView {
+    let year_info = match (songbook.year_first_published, songbook.edition_name.clone()) {
+        (Some(year), Some(edition)) => Some(format!("с {} г. • {}", year, edition)),
+        (Some(year), None) => Some(format!("с {} г.", year)),
+        (None, Some(edition)) => Some(edition),
+        (None, None) => None
+    };
+
+    let publisher = songbook.publisher.clone();
+    let denomination = songbook.denomination.clone();
+
     view! {
         <A href=format!("/songs/book/{}", songbook.id) attr:class="block">
             <div class="card hover:bg-[var(--color-surface-secondary)] transition-colors">
                 <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-lg flex items-center justify-center"
+                    <div class="w-14 h-14 rounded-lg flex items-center justify-center shrink-0"
                          style="background: linear-gradient(135deg, var(--color-gold-500), var(--color-gold-600))">
-                        <MusicIcon class="w-6 h-6 text-white"/>
+                        <MusicIcon class="w-7 h-7 text-white"/>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <h3 class="font-medium text-[var(--color-text-primary)] truncate">
-                            {songbook.name}
+                        <h3 class="font-semibold text-[var(--color-text-primary)]">
+                            {songbook.name_ru.clone()}
                         </h3>
-                        <p class="text-sm text-[var(--color-text-secondary)]">
-                            {songbook.description.unwrap_or_default()}
-                        </p>
-                        <p class="text-xs text-[var(--color-text-muted)] mt-1">
-                            {format!("{} песен", songbook.songs_count)}
-                        </p>
+                        {year_info.map(|info| view! {
+                            <p class="text-sm text-[var(--color-text-secondary)]">
+                                {info}
+                            </p>
+                        })}
+                        <div class="flex items-center gap-2 mt-1 flex-wrap">
+                            <span class="text-xs text-[var(--color-text-muted)]">
+                                {format!("{} песен", songbook.songs_count)}
+                            </span>
+                            {denomination.map(|d| view! {
+                                <span class="text-xs px-2 py-0.5 rounded-full bg-[var(--color-surface-secondary)] text-[var(--color-text-muted)]">
+                                    {d}
+                                </span>
+                            })}
+                        </div>
+                        {publisher.map(|p| view! {
+                            <p class="text-xs text-[var(--color-text-muted)] mt-1">
+                                {p}
+                            </p>
+                        })}
                     </div>
-                    <ChevronRightIcon class="w-5 h-5 text-[var(--color-text-muted)]"/>
+                    <ChevronRightIcon class="w-5 h-5 text-[var(--color-text-muted)] shrink-0"/>
                 </div>
             </div>
         </A>
     }
 }
 
-/// Songbook detail page - list of songs
+/// Songbook detail page - shows info and editions
 #[component]
 pub fn SongbookDetail() -> impl IntoView {
     let params = use_params_map();
@@ -88,11 +112,17 @@ pub fn SongbookDetail() -> impl IntoView {
             .and_then(|s| Uuid::parse_str(&s).ok())
     };
 
-    let songs = LocalResource::new(move || async move {
+    let songbook = LocalResource::new(move || async move {
         if let Some(id) = songbook_id() {
-            api::get_songs_by_songbook(id, None, None)
-                .await
-                .unwrap_or_default()
+            api::get_songbook(id).await.ok()
+        } else {
+            None
+        }
+    });
+
+    let editions = LocalResource::new(move || async move {
+        if let Some(id) = songbook_id() {
+            api::get_songbook_editions(id).await.unwrap_or_default()
         } else {
             vec![]
         }
@@ -108,6 +138,169 @@ pub fn SongbookDetail() -> impl IntoView {
                     <BackIcon/>
                 </button>
                 <h1 class="page-title">"Сборник"</h1>
+                <A href="/songs/search" attr:class="btn-icon">
+                    <SearchIcon/>
+                </A>
+            </header>
+
+            <div class="px-4">
+                <Suspense fallback=|| view! { <LoadingSpinner/> }>
+                    {move || Suspend::new(async move {
+                        let sb = songbook.await;
+                        let eds = editions.await;
+
+                        match sb {
+                            Some(sb) => {
+                                let sb_id = sb.id;
+                                let has_editions = !eds.is_empty();
+
+                                view! {
+                                    <div class="space-y-6">
+                                        // Songbook header
+                                        <div class="text-center py-4">
+                                            <div class="w-20 h-20 mx-auto rounded-xl flex items-center justify-center mb-4"
+                                                 style="background: linear-gradient(135deg, var(--color-gold-500), var(--color-gold-600))">
+                                                <MusicIcon class="w-10 h-10 text-white"/>
+                                            </div>
+                                            <h1 class="text-2xl font-bold text-[var(--color-text-primary)]">
+                                                {sb.name_ru.clone()}
+                                            </h1>
+                                            {sb.year_first_published.map(|y| view! {
+                                                <p class="text-sm text-[var(--color-text-secondary)] mt-1">
+                                                    {format!("с {} года", y)}
+                                                </p>
+                                            })}
+                                            <p class="text-sm text-[var(--color-text-muted)] mt-2">
+                                                {format!("{} песен в базе", sb.songs_count)}
+                                            </p>
+                                        </div>
+
+                                        // History
+                                        {sb.history.clone().map(|h| view! {
+                                            <div class="card">
+                                                <h3 class="font-medium text-[var(--color-text-primary)] mb-2">"История"</h3>
+                                                <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+                                                    {h}
+                                                </p>
+                                            </div>
+                                        })}
+
+                                        // Editions
+                                        {has_editions.then(|| view! {
+                                            <div>
+                                                <h3 class="font-medium text-[var(--color-text-primary)] mb-3">"Издания"</h3>
+                                                <div class="space-y-2">
+                                                    <For
+                                                        each=move || eds.clone()
+                                                        key=|e| e.id
+                                                        children=move |edition| {
+                                                            let ed_name = edition.edition_name.clone();
+                                                            let ed_year = edition.year_published;
+                                                            let ed_count = edition.songs_count;
+                                                            let ed_publisher = edition.publisher.clone();
+
+                                                            view! {
+                                                                <A href=format!("/songs/book/{}/songs", sb_id) attr:class="block">
+                                                                    <div class="card hover:bg-[var(--color-surface-secondary)] transition-colors">
+                                                                        <div class="flex items-center justify-between">
+                                                                            <div>
+                                                                                <h4 class="font-medium text-[var(--color-text-primary)]">
+                                                                                    {ed_name}
+                                                                                </h4>
+                                                                                <p class="text-sm text-[var(--color-text-secondary)]">
+                                                                                    {format!("{} год • {} песен", ed_year, ed_count)}
+                                                                                </p>
+                                                                                {ed_publisher.map(|p| view! {
+                                                                                    <p class="text-xs text-[var(--color-text-muted)]">{p}</p>
+                                                                                })}
+                                                                            </div>
+                                                                            <ChevronRightIcon class="w-5 h-5 text-[var(--color-text-muted)]"/>
+                                                                        </div>
+                                                                    </div>
+                                                                </A>
+                                                            }
+                                                        }
+                                                    />
+                                                </div>
+                                            </div>
+                                        })}
+
+                                        // Direct link to all songs
+                                        <A href=format!("/songs/book/{}/songs", sb_id) attr:class="block">
+                                            <div class="btn-primary text-center">
+                                                {format!("Все песни ({})", sb.songs_count)}
+                                            </div>
+                                        </A>
+                                    </div>
+                                }.into_any()
+                            },
+                            None => view! {
+                                <div class="text-center py-8 text-[var(--color-text-muted)]">
+                                    "Сборник не найден"
+                                </div>
+                            }.into_any()
+                        }
+                    })}
+                </Suspense>
+            </div>
+        </div>
+    }
+}
+
+/// Songbook songs list page
+#[component]
+pub fn SongbookSongs() -> impl IntoView {
+    let params = use_params_map();
+    let navigate = use_navigate();
+
+    let songbook_id = move || {
+        params
+            .read()
+            .get("id")
+            .and_then(|s| Uuid::parse_str(&s).ok())
+    };
+
+    let songbook = LocalResource::new(move || async move {
+        if let Some(id) = songbook_id() {
+            api::get_songbook(id).await.ok()
+        } else {
+            None
+        }
+    });
+
+    let songs = LocalResource::new(move || async move {
+        if let Some(id) = songbook_id() {
+            api::get_songs_by_songbook(id, None, Some(1000))
+                .await
+                .unwrap_or_default()
+        } else {
+            vec![]
+        }
+    });
+
+    view! {
+        <div class="page-container">
+            <header class="page-header">
+                <button
+                    class="btn-icon"
+                    on:click=move |_| {
+                        if let Some(id) = songbook_id() {
+                            navigate(&format!("/songs/book/{}", id), Default::default());
+                        } else {
+                            navigate("/songs", Default::default());
+                        }
+                    }
+                >
+                    <BackIcon/>
+                </button>
+                <Suspense fallback=|| view! { <h1 class="page-title">"Песни"</h1> }>
+                    {move || Suspend::new(async move {
+                        let sb = songbook.await;
+                        view! {
+                            <h1 class="page-title">{sb.map(|s| s.name_ru).unwrap_or_else(|| "Песни".to_string())}</h1>
+                        }
+                    })}
+                </Suspense>
                 <A href="/songs/search" attr:class="btn-icon">
                     <SearchIcon/>
                 </A>

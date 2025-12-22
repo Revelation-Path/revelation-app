@@ -1,7 +1,7 @@
 use gloo_net::http::Request;
 use shared::{
     Book, ChapterInfo, DailyReading, Pericope, SearchResult, Song, SongSearchResult, SongSummary,
-    Songbook, Testament, User, Verse
+    Songbook, SongbookEdition, Testament, User, Verse
 };
 use uuid::Uuid;
 
@@ -163,6 +163,30 @@ pub async fn get_songbooks() -> Result<Vec<Songbook>, String> {
         .send()
         .await
         .map_err(|e| e.to_string())?;
+
+    response.json().await.map_err(|e| e.to_string())
+}
+
+/// Get a single songbook by ID
+pub async fn get_songbook(id: Uuid) -> Result<Songbook, String> {
+    let response = Request::get(&format!("{}/songs/songbooks/{}", api_base(), id))
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+
+    response.json().await.map_err(|e| e.to_string())
+}
+
+/// Get songbook editions
+pub async fn get_songbook_editions(songbook_id: Uuid) -> Result<Vec<SongbookEdition>, String> {
+    let response = Request::get(&format!(
+        "{}/songs/songbooks/{}/editions",
+        api_base(),
+        songbook_id
+    ))
+    .send()
+    .await
+    .map_err(|e| e.to_string())?;
 
     response.json().await.map_err(|e| e.to_string())
 }

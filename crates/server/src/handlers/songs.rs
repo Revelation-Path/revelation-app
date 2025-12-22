@@ -10,7 +10,7 @@ use serde::Deserialize;
 use shared::{
     AddToPlaylist, CreatePlaylist, CreateSong, PlaylistItem, Song, SongCategory, SongFilters,
     SongHistoryEntry, SongPlaylist, SongSearchResult, SongSortBy, SongSummary, SongTag, Songbook,
-    UpdateSong
+    SongbookEdition, UpdateSong
 };
 use songbook::transpose_content;
 use uuid::Uuid;
@@ -23,6 +23,7 @@ pub fn routes() -> Router<AppState> {
         // Songbooks
         .route("/songbooks", get(list_songbooks))
         .route("/songbooks/{id}", get(get_songbook))
+        .route("/songbooks/{id}/editions", get(get_songbook_editions))
         .route("/songbooks/{id}/songs", get(list_songbook_songs))
         // Songs
         .route("/", get(list_songs).post(create_song))
@@ -70,6 +71,15 @@ async fn get_songbook(
 ) -> AppResult<Json<Songbook>> {
     let songbook = state.songs.get_songbook(id).await?;
     Ok(Json(songbook))
+}
+
+/// Get songbook editions
+async fn get_songbook_editions(
+    State(state): State<AppState>,
+    Path(id): Path<Uuid>
+) -> AppResult<Json<Vec<SongbookEdition>>> {
+    let editions = state.songs.get_songbook_editions(id).await?;
+    Ok(Json(editions))
 }
 
 /// List songs in a songbook
