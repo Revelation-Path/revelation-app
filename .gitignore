@@ -25,3 +25,4 @@ crates/web/assets/bible/
 
 API_KEYS
 .claude
+node_modules/
