@@ -14,7 +14,13 @@
 //! }
 //! ```
 
+use gloo_storage::{LocalStorage, Storage};
 use leptos::prelude::*;
+
+const THEME_KEY: &str = "revelation_theme";
+const FONT_FAMILY_KEY: &str = "revelation_font_family";
+const FONT_SIZE_KEY: &str = "revelation_font_size";
+const VERSE_PER_LINE_KEY: &str = "revelation_verse_per_line";
 
 /// Theme variants
 #[derive(Clone, Copy, PartialEq, Eq, Default, Debug)]
@@ -73,13 +79,66 @@ pub struct ThemeState {
 }
 
 impl ThemeState {
-    /// Creates new theme state with defaults
+    /// Creates new theme state, loading from localStorage
     pub fn new() -> Self {
+        let saved_theme = LocalStorage::get::<String>(THEME_KEY)
+            .ok()
+            .map(|s| match s.as_str() {
+                "dark" => Theme::Dark,
+                "sepia" => Theme::Sepia,
+                _ => Theme::Light
+            })
+            .unwrap_or(Theme::Light);
+
+        let saved_font = LocalStorage::get::<String>(FONT_FAMILY_KEY)
+            .ok()
+            .map(|s| match s.as_str() {
+                "sans" => FontFamily::Sans,
+                _ => FontFamily::Serif
+            })
+            .unwrap_or(FontFamily::Serif);
+
+        let saved_size = LocalStorage::get::<u8>(FONT_SIZE_KEY).unwrap_or(18);
+        let saved_verse = LocalStorage::get::<bool>(VERSE_PER_LINE_KEY).unwrap_or(false);
+
+        let theme = RwSignal::new(saved_theme);
+        let font_family = RwSignal::new(saved_font);
+        let font_size = RwSignal::new(saved_size);
+        let verse_per_line = RwSignal::new(saved_verse);
+
+        // Save to localStorage when changed
+        Effect::new(move |_| {
+            let t = theme.get();
+            let key = match t {
+                Theme::Light => "light",
+                Theme::Dark => "dark",
+                Theme::Sepia => "sepia"
+            };
+            let _ = LocalStorage::set(THEME_KEY, key);
+        });
+
+        Effect::new(move |_| {
+            let f = font_family.get();
+            let key = match f {
+                FontFamily::Serif => "serif",
+                FontFamily::Sans => "sans"
+            };
+            let _ = LocalStorage::set(FONT_FAMILY_KEY, key);
+        });
+
+        Effect::new(move |_| {
+            let _ = LocalStorage::set(FONT_SIZE_KEY, font_size.get());
+        });
+
+        Effect::new(move |_| {
+            let _ = LocalStorage::set(VERSE_PER_LINE_KEY, verse_per_line.get());
+        });
+
         Self {
-            theme:          RwSignal::new(Theme::Light),
-            font_family:    RwSignal::new(FontFamily::Serif),
-            font_size:      RwSignal::new(18),
-            verse_per_line: RwSignal::new(false)
+            theme,
+            font_family,
+            font_size,
+            verse_per_line
         }
     }
 
