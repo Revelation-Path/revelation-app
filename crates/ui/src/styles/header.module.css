@@ -5,11 +5,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  min-height: 3.5rem;
   padding: var(--space-sm, 0.5rem) var(--space-md, 1rem);
-  background: transparent;
+  padding-top: calc(var(--space-sm, 0.5rem) + env(safe-area-inset-top));
+  background: var(--bg);
   border-bottom: 0.0625rem solid var(--border, rgba(0, 0, 0, 0.1));
   overflow: hidden;
-  min-height: 3.5rem;
 }
 
 .progress {

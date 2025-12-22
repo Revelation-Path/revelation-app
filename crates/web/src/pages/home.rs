@@ -5,6 +5,12 @@ use leptos_router::components::A;
 
 use crate::state::AppState;
 
+#[allow(dead_code)]
+mod styles {
+    stylance::import_crate_style!(pub common, "src/styles/common.module.css");
+}
+use styles::common;
+
 /// Landing page component
 #[component]
 pub fn Home() -> impl IntoView {
@@ -12,35 +18,34 @@ pub fn Home() -> impl IntoView {
     let has_profile = move || state.user.get().map(|u| u.name.is_some()).unwrap_or(false);
 
     view! {
-        <div class="min-h-screen flex flex-col">
+        <div class=common::page style="display: flex; flex-direction: column;">
             // Header with logo
-            <header class="safe-top px-6 py-4 flex items-center justify-between">
-                <div class="flex items-center gap-2">
+            <header style="padding: var(--space-md); padding-top: env(safe-area-inset-top); display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: var(--space-xs);">
                     <CrossIcon/>
-                    <span class="font-semibold text-lg">"Revelation"</span>
+                    <span class=common::fontSemibold style="font-size: var(--text-lg);">"Revelation"</span>
                 </div>
             </header>
 
             // Main content
-            <main class="flex-1 flex flex-col items-center justify-center px-6 pb-12">
+            <main style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: var(--space-md); padding-bottom: var(--space-xl);">
                 // Hero icon
-                <div class="w-24 h-24 mb-8 rounded-3xl flex items-center justify-center shadow-glow-gold"
-                     style="background: linear-gradient(135deg, var(--color-gold-500), var(--color-gold-600))">
-                    <CrossIcon class="w-12 h-12 text-white"/>
+                <div class=common::heroIcon>
+                    <CrossIconLarge/>
                 </div>
 
                 // Title
-                <h1 class="text-3xl font-bold mb-3 text-center text-gradient-gold">
+                <h1 class=common::heroTitle>
                     "Слово Божие"
                 </h1>
 
                 // Subtitle
-                <p class="text-center mb-10 max-w-sm" style="color: var(--color-text-secondary)">
+                <p class=common::heroSubtitle>
                     "Читайте Библию и общайтесь с братьями и сёстрами во Христе"
                 </p>
 
                 // Features grid
-                <div class="grid grid-cols-2 gap-3 mb-10 w-full max-w-sm">
+                <div class=common::grid2 style="max-width: 20rem; width: 100%; margin-bottom: var(--space-xl);">
                     <FeatureCard
                         icon=FeatureIcon::Book
                         title="Библия"
@@ -64,39 +69,33 @@ pub fn Home() -> impl IntoView {
                 </div>
 
                 // Action buttons
-                <div class="w-full max-w-sm space-y-3">
+                <div style="width: 100%; max-width: 20rem; display: flex; flex-direction: column; gap: var(--space-sm);">
                     <Show
                         when=has_profile
                         fallback=|| view! {
-                            <A href="/bible" attr:class="block w-full">
-                                <button class="btn-primary w-full">
-                                    "Читать Библию"
-                                </button>
+                            <A href="/bible" attr:class=common::btnPrimary attr:style="width: 100%; text-align: center;">
+                                "Читать Библию"
                             </A>
-                            <A href="/onboarding" attr:class="block w-full">
-                                <button class="btn-secondary w-full">
-                                    "Создать профиль"
-                                </button>
+                            <A href="/onboarding" attr:class=common::btnSecondary attr:style="width: 100%; text-align: center;">
+                                "Создать профиль"
                             </A>
                         }
                     >
-                        <A href="/bible" attr:class="block w-full">
-                            <button class="btn-primary w-full">
-                                "Читать Библию"
-                            </button>
+                        <A href="/bible" attr:class=common::btnPrimary attr:style="width: 100%; text-align: center;">
+                            "Читать Библию"
                         </A>
-                        <A href="/feed" attr:class="block w-full">
-                            <button class="btn-secondary w-full">
-                                "Открыть ленту"
-                            </button>
+                        <A href="/feed" attr:class=common::btnSecondary attr:style="width: 100%; text-align: center;">
+                            "Открыть ленту"
                         </A>
                     </Show>
                 </div>
             </main>
 
             // Footer
-            <footer class="py-6 text-center text-sm" style="color: var(--color-text-muted)">
-                <p>"С любовью для церкви Христовой"</p>
+            <footer style="padding: var(--space-lg); text-align: center;">
+                <p class=common::textMuted style="font-size: var(--text-sm);">
+                    "С любовью для церкви Христовой"
+                </p>
             </footer>
         </div>
     }
@@ -113,8 +112,8 @@ enum FeatureIcon {
 #[component]
 fn FeatureCard(icon: FeatureIcon, title: &'static str, desc: &'static str) -> impl IntoView {
     view! {
-        <div class="feature-card">
-            <div class="feature-card-icon">
+        <div class=common::featureCard>
+            <div class=common::featureIcon>
                 {match icon {
                     FeatureIcon::Book => view! { <BookIcon/> }.into_any(),
                     FeatureIcon::Search => view! { <SearchIcon/> }.into_any(),
@@ -122,17 +121,26 @@ fn FeatureCard(icon: FeatureIcon, title: &'static str, desc: &'static str) -> im
                     FeatureIcon::Heart => view! { <HeartIcon/> }.into_any(),
                 }}
             </div>
-            <h3 class="feature-card-title">{title}</h3>
-            <p class="feature-card-desc">{desc}</p>
+            <h3 class=common::featureTitle>{title}</h3>
+            <p class=common::featureDesc>{desc}</p>
         </div>
     }
 }
 
-// SVG Icons - inline for simplicity and performance
+// SVG Icons
 #[component]
-fn CrossIcon(#[prop(optional)] class: &'static str) -> impl IntoView {
+fn CrossIcon() -> impl IntoView {
     view! {
-        <svg class=class xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24" style="color: var(--accent);">
+            <path d="M11 2v7H4v4h7v9h2v-9h7V9h-7V2z"/>
+        </svg>
+    }
+}
+
+#[component]
+fn CrossIconLarge() -> impl IntoView {
+    view! {
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="48" height="48">
             <path d="M11 2v7H4v4h7v9h2v-9h7V9h-7V2z"/>
         </svg>
     }

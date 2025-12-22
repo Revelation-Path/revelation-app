@@ -21,7 +21,6 @@ pub fn BottomNav() -> impl IntoView {
                 <NavItem href="/feed" icon=NavIcon::Feed label="Лента" current=current_path/>
                 <NavItem href="/bible" icon=NavIcon::Bible label="Библия" current=current_path/>
                 <NavItem href="/songs" icon=NavIcon::Songs label="Песни" current=current_path/>
-                <NavItem href="/search" icon=NavIcon::Search label="Поиск" current=current_path/>
                 <NavItem href="/churches" icon=NavIcon::Church label="Церкви" current=current_path/>
                 <NavItem href="/profile" icon=NavIcon::Profile label="Профиль" current=current_path/>
             </div>
@@ -56,7 +55,6 @@ pub fn Sidebar() -> impl IntoView {
             <nav class=nav::sidebarNav>
                 <SidebarItem href="/bible" icon=NavIcon::Bible label="Библия" current=Signal::derive(current_path) collapsed=collapsed/>
                 <SidebarItem href="/songs" icon=NavIcon::Songs label="Песни" current=Signal::derive(current_path) collapsed=collapsed/>
-                <SidebarItem href="/search" icon=NavIcon::Search label="Поиск" current=Signal::derive(current_path) collapsed=collapsed/>
                 <SidebarItem href="/feed" icon=NavIcon::Feed label="Лента" current=Signal::derive(current_path) collapsed=collapsed/>
                 <SidebarItem href="/churches" icon=NavIcon::Church label="Церкви" current=Signal::derive(current_path) collapsed=collapsed/>
             </nav>
@@ -72,7 +70,6 @@ enum NavIcon {
     Feed,
     Bible,
     Songs,
-    Search,
     Church,
     Profile
 }
@@ -92,7 +89,6 @@ fn NavItem(
                 NavIcon::Feed => view! { <FeedIcon/> }.into_any(),
                 NavIcon::Bible => view! { <BibleIcon/> }.into_any(),
                 NavIcon::Songs => view! { <SongsIcon/> }.into_any(),
-                NavIcon::Search => view! { <SearchIcon/> }.into_any(),
                 NavIcon::Church => view! { <ChurchIcon/> }.into_any(),
                 NavIcon::Profile => view! { <ProfileIcon/> }.into_any(),
             }}
@@ -124,7 +120,6 @@ fn SidebarItem(
                 NavIcon::Feed => view! { <FeedIcon/> }.into_any(),
                 NavIcon::Bible => view! { <BibleIcon/> }.into_any(),
                 NavIcon::Songs => view! { <SongsIcon/> }.into_any(),
-                NavIcon::Search => view! { <SearchIcon/> }.into_any(),
                 NavIcon::Church => view! { <ChurchIcon/> }.into_any(),
                 NavIcon::Profile => view! { <ProfileIcon/> }.into_any(),
             }}
@@ -139,17 +134,22 @@ fn SidebarItem(
 #[component]
 pub fn Header(#[prop(into)] title: String, #[prop(optional)] back: bool) -> impl IntoView {
     view! {
-        <header class="header safe-top">
-            <div class="flex items-center gap-4 px-4 py-3 max-w-4xl mx-auto">
-                {back.then(|| view! {
-                    <button
-                        onclick="history.back()"
-                        class="btn-ghost p-2 -ml-2"
-                    >
-                        <BackIcon/>
-                    </button>
-                })}
-                <h1 class="header-title">{title}</h1>
+        <header class=nav::header>
+            <div class=nav::headerInner>
+                {if back {
+                    view! {
+                        <button
+                            onclick="history.back()"
+                            class=nav::backBtn
+                        >
+                            <BackIcon/>
+                        </button>
+                    }.into_any()
+                } else {
+                    view! { <div class=nav::headerSpacer></div> }.into_any()
+                }}
+                <h1 class=nav::headerTitle>{title}</h1>
+                <div class=nav::headerSpacer></div>
             </div>
         </header>
     }
@@ -212,18 +212,6 @@ fn SongsIcon() -> impl IntoView {
             <path d="M9 18V5l12-2v13"/>
             <circle cx="6" cy="18" r="3"/>
             <circle cx="18" cy="16" r="3"/>
-        </svg>
-    }
-}
-
-#[component]
-fn SearchIcon() -> impl IntoView {
-    view! {
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2" stroke-linecap="round"
-             stroke-linejoin="round" width="24" height="24">
-            <circle cx="11" cy="11" r="8"/>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
     }
 }

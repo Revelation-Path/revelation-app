@@ -29,7 +29,7 @@ impl SongRepository {
     // Songbooks
     // ========================================================================
 
-    /// List all public songbooks
+    /// List all visible public songbooks
     pub async fn list_songbooks(&self) -> AppResult<Vec<Songbook>> {
         let songbooks = sqlx::query_as!(
             Songbook,
@@ -40,7 +40,7 @@ impl SongRepository {
                 publisher, editor, isbn, language, country, denomination,
                 website_url, purchase_url, history, notes
             FROM songbooks
-            WHERE is_public = true
+            WHERE is_public = true AND is_visible = true
             ORDER BY name_ru
             "#
         )
@@ -93,7 +93,10 @@ impl SongRepository {
     }
 
     /// Get songbook editions
-    pub async fn get_songbook_editions(&self, songbook_id: Uuid) -> AppResult<Vec<SongbookEdition>> {
+    pub async fn get_songbook_editions(
+        &self,
+        songbook_id: Uuid
+    ) -> AppResult<Vec<SongbookEdition>> {
         let editions = sqlx::query_as!(
             SongbookEdition,
             r#"
@@ -128,7 +131,9 @@ impl SongRepository {
             SongSortBy::Number => "s.number ASC NULLS LAST, s.title ASC",
             SongSortBy::ViewsDesc => "s.views_count DESC, s.title ASC",
             SongSortBy::FavoritesDesc => "s.favorites_count DESC, s.title ASC",
-            SongSortBy::RecentlyAdded => "s.created_at DESC"
+            SongSortBy::RecentlyAdded => "s.created_at DESC",
+            SongSortBy::HasChordsFirst => "s.has_chords DESC, s.title ASC",
+            SongSortBy::NoChordsFirst => "s.has_chords ASC, s.title ASC"
         };
 
         // Build dynamic query
@@ -143,6 +148,7 @@ impl SongRepository {
                 s.author_lyrics,
                 s.first_line,
                 s.original_key,
+                s.has_chords,
                 s.views_count,
                 s.favorites_count,
                 CASE WHEN uf.user_id IS NOT NULL THEN true ELSE false END as is_favorite,
@@ -198,6 +204,7 @@ impl SongRepository {
                 s.author_lyrics,
                 s.first_line,
                 s.original_key,
+                s.has_chords,
                 s.views_count,
                 s.favorites_count,
                 CASE WHEN uf.user_id IS NOT NULL THEN true ELSE false END as is_favorite,
@@ -471,6 +478,7 @@ impl SongRepository {
                 s.author_lyrics,
                 s.first_line,
                 s.original_key,
+                s.has_chords,
                 s.views_count,
                 s.favorites_count,
                 true as is_favorite,
@@ -540,6 +548,7 @@ impl SongRepository {
                 s.author_lyrics,
                 s.first_line,
                 s.original_key,
+                s.has_chords,
                 s.views_count,
                 s.favorites_count,
                 CASE WHEN uf.user_id IS NOT NULL THEN true ELSE false END as is_favorite,
@@ -670,6 +679,7 @@ impl SongRepository {
                 s.author_lyrics,
                 s.first_line,
                 s.original_key,
+                s.has_chords,
                 s.views_count,
                 s.favorites_count,
                 CASE WHEN uf.user_id IS NOT NULL THEN true ELSE false END as is_favorite,
@@ -783,6 +793,7 @@ impl SongRepository {
                 s.author_lyrics,
                 s.first_line,
                 s.original_key,
+                s.has_chords,
                 s.views_count,
                 s.favorites_count,
                 CASE WHEN uf.user_id IS NOT NULL THEN true ELSE false END as is_favorite,
@@ -821,6 +832,7 @@ struct SongSummaryRow {
     author_lyrics:   Option<String>,
     first_line:      String,
     original_key:    Option<String>,
+    has_chords:      bool,
     views_count:     i32,
     favorites_count: i32,
     is_favorite:     bool,
@@ -838,6 +850,7 @@ impl From<SongSummaryRow> for SongSummary {
             author_lyrics:   row.author_lyrics,
             first_line:      row.first_line,
             original_key:    row.original_key,
+            has_chords:      row.has_chords,
             categories:      row.categories.unwrap_or_default(),
             is_favorite:     row.is_favorite,
             views_count:     row.views_count,
@@ -857,6 +870,7 @@ struct SongSearchRow {
     author_lyrics:   Option<String>,
     first_line:      String,
     original_key:    Option<String>,
+    has_chords:      bool,
     views_count:     i32,
     favorites_count: i32,
     is_favorite:     bool,
@@ -877,6 +891,7 @@ impl From<SongSearchRow> for SongSearchResult {
                 author_lyrics:   row.author_lyrics,
                 first_line:      row.first_line,
                 original_key:    row.original_key,
+                has_chords:      row.has_chords,
                 categories:      row.categories.unwrap_or_default(),
                 is_favorite:     row.is_favorite,
                 views_count:     row.views_count,
@@ -952,6 +967,7 @@ struct SongHistoryRow {
     author_lyrics:       Option<String>,
     first_line:          String,
     original_key:        Option<String>,
+    has_chords:          bool,
     views_count:         i32,
     favorites_count:     i32,
     is_favorite:         bool,
@@ -972,6 +988,7 @@ impl From<SongHistoryRow> for SongHistoryEntry {
                 author_lyrics:   row.author_lyrics,
                 first_line:      row.first_line,
                 original_key:    row.original_key,
+                has_chords:      row.has_chords,
                 categories:      row.categories.unwrap_or_default(),
                 is_favorite:     row.is_favorite,
                 views_count:     row.views_count,
@@ -997,6 +1014,7 @@ struct PlaylistItemRow {
     author_lyrics:       Option<String>,
     first_line:          String,
     original_key:        Option<String>,
+    has_chords:          bool,
     views_count:         i32,
     favorites_count:     i32,
     is_favorite:         bool,
@@ -1016,6 +1034,7 @@ impl From<PlaylistItemRow> for PlaylistItem {
                 author_lyrics:   row.author_lyrics,
                 first_line:      row.first_line,
                 original_key:    row.original_key,
+                has_chords:      row.has_chords,
                 categories:      row.categories.unwrap_or_default(),
                 is_favorite:     row.is_favorite,
                 views_count:     row.views_count,

@@ -64,8 +64,7 @@ where
             <div class=styles::title>
                 {move || {
                     let title_text = title.get();
-                    if let Some(ref on_click) = on_title_click {
-                        let on_click = on_click.clone();
+                    if let Some(on_click) = on_title_click {
                         view! {
                             <button
                                 class=styles::titleBtn
@@ -85,8 +84,7 @@ where
                 {move || {
                     subtitle.as_ref().map(|s| {
                         let subtitle_text = s.get();
-                        if let Some(ref on_click) = on_subtitle_click {
-                            let on_click = on_click.clone();
+                        if let Some(on_click) = on_subtitle_click {
                             view! {
                                 <button
                                     class=styles::subtitleBtn

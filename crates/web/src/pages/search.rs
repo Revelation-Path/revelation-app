@@ -7,6 +7,12 @@ use crate::{
     components::{Header, Loading, VerseCard}
 };
 
+#[allow(dead_code)]
+mod styles {
+    stylance::import_crate_style!(pub common, "src/styles/common.module.css");
+}
+use styles::common;
+
 /// Search page
 #[component]
 pub fn Search() -> impl IntoView {
@@ -28,36 +34,46 @@ pub fn Search() -> impl IntoView {
     });
 
     view! {
-        <div class="min-h-screen pb-20">
+        <div class=common::page>
             <Header title="Поиск" back=true/>
 
-            <main class="p-4 max-w-lg mx-auto">
+            <div class=common::container>
                 // Search input with icon
-                <div class="relative mb-4">
-                    <div class="absolute left-4 top-1/2 -translate-y-1/2">
+                <div class=common::searchWrapper>
+                    <div class=common::searchIcon>
                         <SearchIcon/>
                     </div>
                     <input
                         type="search"
                         placeholder="Введите слово или фразу..."
-                        class="search-input"
+                        class=common::searchInput
                         prop:value=query
                         on:input=move |ev| query.set(event_target_value(&ev))
                     />
                 </div>
 
                 // Search type tabs
-                <div class="flex gap-2 mb-6">
-                    <SearchTypeTab
-                        label="Поиск"
-                        value=SearchType::FullText
-                        selected=search_type
-                    />
-                    <SearchTypeTab
-                        label="Симфония"
-                        value=SearchType::Symphony
-                        selected=search_type
-                    />
+                <div class=common::tabs>
+                    <button
+                        class=move || if search_type.get() == SearchType::FullText {
+                            format!("{} {}", common::tab, common::tabActive)
+                        } else {
+                            common::tab.to_string()
+                        }
+                        on:click=move |_| search_type.set(SearchType::FullText)
+                    >
+                        "Поиск"
+                    </button>
+                    <button
+                        class=move || if search_type.get() == SearchType::Symphony {
+                            format!("{} {}", common::tab, common::tabActive)
+                        } else {
+                            common::tab.to_string()
+                        }
+                        on:click=move |_| search_type.set(SearchType::Symphony)
+                    >
+                        "Симфония"
+                    </button>
                 </div>
 
                 // Results
@@ -66,12 +82,12 @@ pub fn Search() -> impl IntoView {
                         let q = query.get();
                         if q.trim().is_empty() {
                             Some(view! {
-                                <div class="empty-state">
-                                    <div class="empty-state-icon">
+                                <div class=common::emptyState>
+                                    <div class=common::emptyIcon>
                                         <SearchBigIcon/>
                                     </div>
-                                    <h2 class="empty-state-title">"Поиск по Библии"</h2>
-                                    <p class="empty-state-desc">
+                                    <h2 class=common::emptyTitle>"Поиск по Библии"</h2>
+                                    <p class=common::emptyDesc>
                                         "Введите слово или фразу для поиска"
                                     </p>
                                 </div>
@@ -80,25 +96,27 @@ pub fn Search() -> impl IntoView {
                             results.get().flatten().map(|results| {
                                 if results.is_empty() {
                                     view! {
-                                        <div class="empty-state">
-                                            <div class="empty-state-icon">
+                                        <div class=common::emptyState>
+                                            <div class=common::emptyIcon>
                                                 <NoResultsIcon/>
                                             </div>
-                                            <h2 class="empty-state-title">"Ничего не найдено"</h2>
-                                            <p class="empty-state-desc">
+                                            <h2 class=common::emptyTitle>"Ничего не найдено"</h2>
+                                            <p class=common::emptyDesc>
                                                 "Попробуйте изменить запрос"
                                             </p>
                                         </div>
                                     }.into_any()
                                 } else {
                                     view! {
-                                        <div class="space-y-2">
-                                            <p class="text-sm mb-4" style="color: var(--color-text-muted)">
+                                        <div>
+                                            <p class=common::resultCount>
                                                 "Найдено: " {results.len()} " стихов"
                                             </p>
-                                            {results.into_iter().map(|r| view! {
-                                                <VerseCard verse=r.verse book_name=r.book_name/>
-                                            }).collect::<Vec<_>>()}
+                                            <div style="display: flex; flex-direction: column; gap: var(--space-xs);">
+                                                {results.into_iter().map(|r| view! {
+                                                    <VerseCard verse=r.verse book_name=r.book_name/>
+                                                }).collect::<Vec<_>>()}
+                                            </div>
                                         </div>
                                     }.into_any()
                                 }
@@ -106,7 +124,7 @@ pub fn Search() -> impl IntoView {
                         }
                     }}
                 </Suspense>
-            </main>
+            </div>
         </div>
     }
 }
@@ -118,33 +136,11 @@ enum SearchType {
 }
 
 #[component]
-fn SearchTypeTab(
-    label: &'static str,
-    value: SearchType,
-    selected: RwSignal<SearchType>
-) -> impl IntoView {
-    let is_selected = move || selected.get() == value;
-
-    view! {
-        <button
-            class=move || if is_selected() {
-                "btn-primary px-4 py-2"
-            } else {
-                "btn-ghost px-4 py-2"
-            }
-            on:click=move |_| selected.set(value)
-        >
-            {label}
-        </button>
-    }
-}
-
-#[component]
 fn SearchIcon() -> impl IntoView {
     view! {
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
              stroke="currentColor" stroke-width="2" stroke-linecap="round"
-             stroke-linejoin="round" width="20" height="20" style="color: var(--color-text-light)">
+             stroke-linejoin="round" width="20" height="20">
             <circle cx="11" cy="11" r="8"/>
             <line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
@@ -156,7 +152,7 @@ fn SearchBigIcon() -> impl IntoView {
     view! {
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
              stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-             stroke-linejoin="round" width="32" height="32">
+             stroke-linejoin="round" width="48" height="48">
             <circle cx="11" cy="11" r="8"/>
             <line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
@@ -168,7 +164,7 @@ fn NoResultsIcon() -> impl IntoView {
     view! {
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
              stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-             stroke-linejoin="round" width="32" height="32">
+             stroke-linejoin="round" width="48" height="48">
             <circle cx="11" cy="11" r="8"/>
             <line x1="21" y1="21" x2="16.65" y2="16.65"/>
             <line x1="8" y1="8" x2="14" y2="14"/>

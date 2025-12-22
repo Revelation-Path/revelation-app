@@ -1,3 +1,5 @@
+//! Daily reading page
+
 use leptos::prelude::*;
 
 use crate::{
@@ -5,39 +7,46 @@ use crate::{
     components::{BottomNav, Header, Loading, VerseList}
 };
 
+#[allow(dead_code)]
+mod styles {
+    stylance::import_crate_style!(pub common, "src/styles/common.module.css");
+}
+use styles::common;
+
 #[component]
 pub fn DailyReading() -> impl IntoView {
     let reading = LocalResource::new(|| async { api::get_today_reading().await.ok().flatten() });
     let response = RwSignal::new(String::new());
 
     view! {
-        <div class="pb-20">
+        <div class=common::page>
             <Header title="Чтение на сегодня"/>
 
-            <div class="p-4 max-w-lg mx-auto">
+            <div class=common::container>
                 <Suspense fallback=|| view! { <Loading/> }>
                     {move || reading.get().flatten().map(|reading| view! {
-                        <div class="bg-gray-800 rounded-lg p-4 mb-4">
-                            <p class="text-sm text-gray-500 mb-2">
+                        <div class=common::card>
+                            <p class=common::textMuted style="margin-bottom: var(--space-sm);">
                                 "День " {reading.day_of_year}
                             </p>
                             <VerseList verses=reading.verses/>
                         </div>
 
-                        <div class="mb-4">
-                            <label class="block text-sm text-gray-400 mb-2">
+                        <div>
+                            <label class=common::label>
                                 "Что Господь говорит вам через этот отрывок?"
                             </label>
                             <textarea
                                 placeholder="Поделитесь своими мыслями..."
-                                class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 min-h-32 focus:border-blue-600 focus:outline-none resize-none"
+                                class=common::textarea
                                 prop:value=response
                                 on:input=move |ev| response.set(event_target_value(&ev))
                             />
                         </div>
 
                         <button
-                            class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white py-3 rounded-lg font-medium transition-colors"
+                            class=common::btnPrimary
+                            style="width: 100%;"
                             disabled=move || response.get().trim().is_empty()
                         >
                             "Отправить"

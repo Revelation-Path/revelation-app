@@ -4,8 +4,10 @@
   z-index: var(--z-header);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  min-height: 3.5rem;
   padding: var(--space-sm) var(--space-md);
+  padding-top: calc(var(--space-sm) + env(safe-area-inset-top));
   background: transparent;
   border-bottom: 0.0625rem solid var(--border);
   overflow: hidden;

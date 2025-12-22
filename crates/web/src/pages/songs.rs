@@ -7,10 +7,12 @@ use leptos_router::{
 };
 use shared::{Song, SongSummary, Songbook};
 use songbook::ChordProParser;
-use ui::{HeaderButton, IconType, PageHeader};
+use ui::{HeaderButton, Icon, IconSize, IconType, PageHeader};
 use uuid::Uuid;
 
-use crate::api;
+use crate::{api, components::BottomNav};
+
+stylance::import_crate_style!(styles, "src/styles/songs.module.css");
 
 /// Main songs page - shows songbooks
 #[component]
@@ -20,7 +22,7 @@ pub fn Songs() -> impl IntoView {
         LocalResource::new(|| async { api::get_songbooks().await.unwrap_or_default() });
 
     view! {
-        <div class="page-container">
+        <div class=styles::container>
             <PageHeader
                 title=Signal::derive(|| "Песни".to_string())
                 left=view! { <div></div> }
@@ -36,12 +38,12 @@ pub fn Songs() -> impl IntoView {
                 }
             />
 
-            <div class="px-4">
+            <div class=styles::content>
                 <Suspense fallback=|| view! { <LoadingSpinner/> }>
                     {move || Suspend::new(async move {
                         let books = songbooks.await;
                         view! {
-                            <div class="space-y-3">
+                            <div class=styles::grid>
                                 <For
                                     each=move || books.clone()
                                     key=|s| s.id
@@ -52,6 +54,8 @@ pub fn Songs() -> impl IntoView {
                     })}
                 </Suspense>
             </div>
+
+            <BottomNav/>
         </div>
     }
 }
@@ -67,44 +71,29 @@ fn SongbookCard(songbook: Songbook) -> impl IntoView {
     };
 
     let publisher = songbook.publisher.clone();
-    let denomination = songbook.denomination.clone();
 
     view! {
-        <A href=format!("/songs/book/{}", songbook.id) attr:class="block">
-            <div class="card hover:bg-[var(--color-surface-secondary)] transition-colors">
-                <div class="flex items-center gap-4">
-                    <div class="w-14 h-14 rounded-lg flex items-center justify-center shrink-0"
-                         style="background: linear-gradient(135deg, var(--color-gold-500), var(--color-gold-600))">
-                        <MusicIcon class="w-7 h-7 text-white"/>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <h3 class="font-semibold text-[var(--color-text-primary)]">
-                            {songbook.name_ru.clone()}
-                        </h3>
-                        {year_info.map(|info| view! {
-                            <p class="text-sm text-[var(--color-text-secondary)]">
-                                {info}
-                            </p>
-                        })}
-                        <div class="flex items-center gap-2 mt-1 flex-wrap">
-                            <span class="text-xs text-[var(--color-text-muted)]">
-                                {format!("{} песен", songbook.songs_count)}
-                            </span>
-                            {denomination.map(|d| view! {
-                                <span class="text-xs px-2 py-0.5 rounded-full bg-[var(--color-surface-secondary)] text-[var(--color-text-muted)]">
-                                    {d}
-                                </span>
-                            })}
-                        </div>
-                        {publisher.map(|p| view! {
-                            <p class="text-xs text-[var(--color-text-muted)] mt-1">
-                                {p}
-                            </p>
-                        })}
-                    </div>
-                    <ChevronRightIcon class="w-5 h-5 text-[var(--color-text-muted)] shrink-0"/>
-                </div>
+        <A href=format!("/songs/book/{}", songbook.id) attr:class=styles::songbookCard>
+            <div class=styles::songbookIcon>
+                <Icon icon=IconType::Music size=IconSize::Large/>
             </div>
+            <div class=styles::songbookInfo>
+                <h3 class=styles::songbookName>
+                    {songbook.name_ru.clone()}
+                </h3>
+                {year_info.map(|info| view! {
+                    <p class=styles::songbookDesc>{info}</p>
+                })}
+                <span class=styles::songbookCount>
+                    {format!("{} песен", songbook.songs_count)}
+                </span>
+                {publisher.map(|p| view! {
+                    <p class=styles::songbookCount>{p}</p>
+                })}
+            </div>
+            <span class=styles::chevron>
+                <Icon icon=IconType::ChevronRight size=IconSize::Medium/>
+            </span>
         </A>
     }
 }
@@ -149,7 +138,7 @@ pub fn SongbookDetail() -> impl IntoView {
     });
 
     view! {
-        <div class="page-container">
+        <div class=styles::container>
             <PageHeader
                 title=Signal::derive(move || {
                     songbook_name.get().flatten().unwrap_or_else(|| "Сборник".to_string())
@@ -172,7 +161,7 @@ pub fn SongbookDetail() -> impl IntoView {
                 }
             />
 
-            <div class="px-4">
+            <div class=styles::content>
                 <Suspense fallback=|| view! { <LoadingSpinner/> }>
                     {move || Suspend::new(async move {
                         let sb = songbook.await;
@@ -184,93 +173,121 @@ pub fn SongbookDetail() -> impl IntoView {
                                 let has_editions = !eds.is_empty();
 
                                 view! {
-                                    <div class="space-y-6">
-                                        // Songbook header
-                                        <div class="text-center py-4">
-                                            <div class="w-20 h-20 mx-auto rounded-xl flex items-center justify-center mb-4"
-                                                 style="background: linear-gradient(135deg, var(--color-gold-500), var(--color-gold-600))">
-                                                <MusicIcon class="w-10 h-10 text-white"/>
-                                            </div>
-                                            <h1 class="text-2xl font-bold text-[var(--color-text-primary)]">
-                                                {sb.name_ru.clone()}
-                                            </h1>
-                                            {sb.year_first_published.map(|y| view! {
-                                                <p class="text-sm text-[var(--color-text-secondary)] mt-1">
-                                                    {format!("с {} года", y)}
-                                                </p>
-                                            })}
-                                            <p class="text-sm text-[var(--color-text-muted)] mt-2">
-                                                {format!("{} песен в базе", sb.songs_count)}
-                                            </p>
-                                        </div>
+                                    <div class=styles::grid>
+                                        <SongbookHeader
+                                            name=sb.name_ru.clone()
+                                            year=sb.year_first_published
+                                            songs_count=sb.songs_count
+                                        />
 
-                                        // History
                                         {sb.history.clone().map(|h| view! {
-                                            <div class="card">
-                                                <h3 class="font-medium text-[var(--color-text-primary)] mb-2">"История"</h3>
-                                                <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed">
-                                                    {h}
-                                                </p>
-                                            </div>
+                                            <SongbookHistory history=h/>
                                         })}
 
-                                        // Editions
                                         {has_editions.then(|| view! {
-                                            <div>
-                                                <h3 class="font-medium text-[var(--color-text-primary)] mb-3">"Издания"</h3>
-                                                <div class="space-y-2">
-                                                    <For
-                                                        each=move || eds.clone()
-                                                        key=|e| e.id
-                                                        children=move |edition| {
-                                                            let ed_name = edition.edition_name.clone();
-                                                            let ed_year = edition.year_published;
-                                                            let ed_count = edition.songs_count;
-                                                            let ed_publisher = edition.publisher.clone();
-
-                                                            view! {
-                                                                <A href=format!("/songs/book/{}/songs", sb_id) attr:class="block">
-                                                                    <div class="card hover:bg-[var(--color-surface-secondary)] transition-colors">
-                                                                        <div class="flex items-center justify-between">
-                                                                            <div>
-                                                                                <h4 class="font-medium text-[var(--color-text-primary)]">
-                                                                                    {ed_name}
-                                                                                </h4>
-                                                                                <p class="text-sm text-[var(--color-text-secondary)]">
-                                                                                    {format!("{} год • {} песен", ed_year, ed_count)}
-                                                                                </p>
-                                                                                {ed_publisher.map(|p| view! {
-                                                                                    <p class="text-xs text-[var(--color-text-muted)]">{p}</p>
-                                                                                })}
-                                                                            </div>
-                                                                            <ChevronRightIcon class="w-5 h-5 text-[var(--color-text-muted)]"/>
-                                                                        </div>
-                                                                    </div>
-                                                                </A>
-                                                            }
-                                                        }
-                                                    />
-                                                </div>
-                                            </div>
+                                            <EditionsList editions=eds.clone() songbook_id=sb_id/>
                                         })}
 
-                                        // Direct link to all songs
-                                        <A href=format!("/songs/book/{}/songs", sb_id) attr:class="block">
-                                            <div class="btn-primary text-center">
-                                                {format!("Все песни ({})", sb.songs_count)}
+                                        <A href=format!("/songs/book/{}/songs", sb_id) attr:class=styles::songbookCard>
+                                            <div class=styles::songbookIcon>
+                                                <Icon icon=IconType::Music size=IconSize::Large/>
                                             </div>
+                                            <div class=styles::songbookInfo>
+                                                <span class=styles::songbookName>
+                                                    {format!("Все песни ({})", sb.songs_count)}
+                                                </span>
+                                            </div>
+                                            <span class=styles::chevron>
+                                                <Icon icon=IconType::ChevronRight size=IconSize::Medium/>
+                                            </span>
                                         </A>
                                     </div>
                                 }.into_any()
                             },
                             None => view! {
-                                <div class="text-center py-8 text-[var(--color-text-muted)]">
-                                    "Сборник не найден"
+                                <div class=styles::empty>
+                                    <span class=styles::emptyText>"Сборник не найден"</span>
                                 </div>
                             }.into_any()
                         }
                     })}
                 </Suspense>
+            </div>
+
+            <BottomNav/>
+        </div>
+    }
+}
+
+/// Songbook header with icon
+#[component]
+fn SongbookHeader(name: String, year: Option<i16>, songs_count: i32) -> impl IntoView {
+    view! {
+        <div class=styles::songHeader>
+            <div class=styles::songbookIcon style="width: 5rem; height: 5rem; margin: 0 auto var(--space-md);">
+                <Icon icon=IconType::Music size=IconSize::Large/>
+            </div>
+            <h1 class=styles::songDetailTitle style="text-align: center;">{name}</h1>
+            {year.map(|y| view! {
+                <p class=styles::songbookDesc style="text-align: center;">
+                    {format!("с {} года", y)}
+                </p>
+            })}
+            <p class=styles::songbookCount style="text-align: center;">
+                {format!("{} песен в базе", songs_count)}
+            </p>
+        </div>
+    }
+}
+
+/// Songbook history section with expand/collapse
+#[component]
+fn SongbookHistory(history: String) -> impl IntoView {
+    let expanded = RwSignal::new(false);
+    let history_clone = history.clone();
+
+    view! {
+        <div class=styles::songSection>
+            <div class=styles::sectionLabel>"История"</div>
+            <p class={move || if expanded.get() { styles::historyExpanded } else { styles::historyCollapsed }}>
+                {history_clone.clone()}
+            </p>
+            <button
+                class=styles::expandBtn
+                on:click=move |_| expanded.update(|v| *v = !*v)
+            >
+                {move || if expanded.get() { "Свернуть" } else { "Читать полностью" }}
+            </button>
+        </div>
+    }
+}
+
+/// Editions list
+#[component]
+fn EditionsList(editions: Vec<shared::SongbookEdition>, songbook_id: Uuid) -> impl IntoView {
+    view! {
+        <div class=styles::songSection>
+            <div class=styles::sectionLabel>"Издания"</div>
+            <div class=styles::songList>
+                <For
+                    each=move || editions.clone()
+                    key=|e| e.id
+                    children=move |edition| {
+                        view! {
+                            <A href=format!("/songs/book/{}/songs", songbook_id) attr:class=styles::songItem>
+                                <div class=styles::songInfo>
+                                    <span class=styles::songTitle>{edition.edition_name.clone()}</span>
+                                    <span class=styles::songFirstLine>
+                                        {format!("{} год • {} песен", edition.year_published, edition.songs_count)}
+                                    </span>
+                                </div>
+                                <span class=styles::chevron>
+                                    <Icon icon=IconType::ChevronRight size=IconSize::Small/>
+                                </span>
+                            </A>
+                        }
+                    }
+                />
             </div>
         </div>
     }
@@ -291,14 +308,6 @@ pub fn SongbookSongs() -> impl IntoView {
             .and_then(|s| Uuid::parse_str(&s).ok())
     };
 
-    let songbook = LocalResource::new(move || async move {
-        if let Some(id) = songbook_id() {
-            api::get_songbook(id).await.ok()
-        } else {
-            None
-        }
-    });
-
     let songs = LocalResource::new(move || async move {
         if let Some(id) = songbook_id() {
             api::get_songs_by_songbook(id, None, Some(1000))
@@ -318,7 +327,7 @@ pub fn SongbookSongs() -> impl IntoView {
     });
 
     view! {
-        <div class="page-container">
+        <div class=styles::container>
             <PageHeader
                 title=Signal::derive(move || {
                     songbook_name.get().flatten().unwrap_or_else(|| "Песни".to_string())
@@ -345,12 +354,12 @@ pub fn SongbookSongs() -> impl IntoView {
                 }
             />
 
-            <div class="px-4">
+            <div class=styles::content>
                 <Suspense fallback=|| view! { <LoadingSpinner/> }>
                     {move || Suspend::new(async move {
                         let song_list = songs.await;
                         view! {
-                            <div class="space-y-1">
+                            <div class=styles::songList>
                                 <For
                                     each=move || song_list.clone()
                                     key=|s| s.id
@@ -361,6 +370,8 @@ pub fn SongbookSongs() -> impl IntoView {
                     })}
                 </Suspense>
             </div>
+
+            <BottomNav/>
         </div>
     }
 }
@@ -375,29 +386,19 @@ fn SongListItem(song: SongSummary) -> impl IntoView {
     };
 
     view! {
-        <A href=format!("/songs/{}", song.id) attr:class="block">
-            <div class="py-3 px-4 hover:bg-[var(--color-surface-secondary)] rounded-lg transition-colors">
-                <div class="flex items-center gap-3">
-                    <span class="text-sm font-medium text-[var(--color-text-muted)] w-8">
-                        {song.number.map(|n| format!("#{}", n)).unwrap_or_default()}
-                    </span>
-                    <div class="flex-1 min-w-0">
-                        <h3 class="font-medium text-[var(--color-text-primary)] truncate">
-                            {song.title}
-                        </h3>
-                        {first_line.map(|line| view! {
-                            <p class="text-sm text-[var(--color-text-secondary)] truncate">
-                                {line}
-                            </p>
-                        })}
-                    </div>
-                    {song.original_key.map(|k| view! {
-                        <span class="text-xs font-medium px-2 py-1 rounded bg-[var(--color-surface-secondary)] text-[var(--color-text-secondary)]">
-                            {k}
-                        </span>
-                    })}
-                </div>
+        <A href=format!("/songs/{}", song.id) attr:class=styles::songItem>
+            <span class=styles::songNumber>
+                {song.number.map(|n| format!("#{}", n)).unwrap_or_default()}
+            </span>
+            <div class=styles::songInfo>
+                <span class=styles::songTitle>{song.title}</span>
+                {first_line.map(|line| view! {
+                    <span class=styles::songFirstLine>{line}</span>
+                })}
             </div>
+            {song.original_key.map(|k| view! {
+                <span class=styles::songKey>{k}</span>
+            })}
         </A>
     }
 }
@@ -439,7 +440,7 @@ pub fn SongDetail() -> impl IntoView {
     });
 
     view! {
-        <div class="page-container">
+        <div class=styles::container>
             <PageHeader
                 title=Signal::derive(move || {
                     song_title.get().flatten().unwrap_or_else(|| "Песня".to_string())
@@ -453,14 +454,14 @@ pub fn SongDetail() -> impl IntoView {
                     />
                 }
                 right=view! {
-                    <div class="flex items-center gap-1">
-                        <HeaderButton
-                            icon=IconType::Minus
-                            on_click=Callback::new(move |_| {
-                                transpose.update(|t| *t = (*t - 1 + 12) % 12);
-                            })
-                        />
-                        <span class="text-sm font-medium min-w-[2.5rem] text-center">
+                    <div class=styles::transposeControls>
+                        <button
+                            class=styles::transposeBtn
+                            on:click=move |_| transpose.update(|t| *t = (*t - 1 + 12) % 12)
+                        >
+                            <Icon icon=IconType::Minus size=IconSize::Small/>
+                        </button>
+                        <span class=styles::transposeValue>
                             {move || {
                                 let t = transpose.get();
                                 if t == 0 { "0".to_string() }
@@ -468,30 +469,32 @@ pub fn SongDetail() -> impl IntoView {
                                 else { format!("+{}", t) }
                             }}
                         </span>
-                        <HeaderButton
-                            icon=IconType::Plus
-                            on_click=Callback::new(move |_| {
-                                transpose.update(|t| *t = (*t + 1) % 12);
-                            })
-                        />
+                        <button
+                            class=styles::transposeBtn
+                            on:click=move |_| transpose.update(|t| *t = (*t + 1) % 12)
+                        >
+                            <Icon icon=IconType::Plus size=IconSize::Small/>
+                        </button>
                     </div>
                 }
             />
 
-            <div class="px-4 pb-safe">
+            <div class=styles::songDetail>
                 <Suspense fallback=|| view! { <LoadingSpinner/> }>
                     {move || Suspend::new(async move {
                         match song.await {
                             Some(s) => view! { <SongContent song=s/> }.into_any(),
                             None => view! {
-                                <div class="text-center py-8 text-[var(--color-text-muted)]">
-                                    "Песня не найдена"
+                                <div class=styles::empty>
+                                    <span class=styles::emptyText>"Песня не найдена"</span>
                                 </div>
                             }.into_any()
                         }
                     })}
                 </Suspense>
             </div>
+
+            <BottomNav/>
         </div>
     }
 }
@@ -501,88 +504,62 @@ pub fn SongDetail() -> impl IntoView {
 fn SongContent(song: Song) -> impl IntoView {
     let parsed = ChordProParser::parse(&song.content);
 
-    // Debug: log parsed data
-    for section in &parsed.sections {
-        for line in &section.lines {
-            let debug = format!(
-                "Line: '{}', Chords: {:?}",
-                line.text,
-                line.chords.iter().map(|c| (c.position, c.chord.to_string())).collect::<Vec<_>>()
-            );
-            web_sys::console::log_1(&debug.into());
-        }
-    }
-
     view! {
-        <div class="song-content">
-            // Title and metadata
-            <div class="mb-6">
-                <h1 class="text-2xl font-bold text-[var(--color-text-primary)]">
+        <div>
+            <div class=styles::songHeader>
+                <h1 class=styles::songDetailTitle>
                     {song.number.map(|n| format!("№{}. ", n)).unwrap_or_default()}
                     {song.title}
                 </h1>
-                <div class="flex items-center gap-4 mt-2 text-sm text-[var(--color-text-secondary)]">
-                    {song.author_lyrics.map(|a| view! {
-                        <span>{a}</span>
-                    })}
+                <div class=styles::songMeta>
+                    {song.author_lyrics.map(|a| view! { <span>{a}</span> })}
                     {parsed.key.map(|k| view! {
-                        <span class="font-medium">"Тональность: " {k}</span>
+                        <span class=styles::songKey>"Тональность: " {k}</span>
                     })}
                 </div>
             </div>
 
-            // Song sections
-            <div class="space-y-6 font-mono text-base leading-relaxed">
-                {parsed.sections.into_iter().map(|section| {
-                    let section_label: Option<&str> = match section.section_type {
-                        shared::SongSectionType::Chorus => Some("Припев"),
-                        shared::SongSectionType::Verse => section.label.as_ref().map(|_| "Куплет"),
-                        shared::SongSectionType::Bridge => Some("Бридж"),
-                        shared::SongSectionType::PreChorus => Some("Предприпев"),
-                        _ => None
-                    };
+            {parsed.sections.into_iter().map(|section| {
+                let section_label: Option<&str> = match section.section_type {
+                    shared::SongSectionType::Chorus => Some("Припев"),
+                    shared::SongSectionType::Verse => section.label.as_ref().map(|_| "Куплет"),
+                    shared::SongSectionType::Bridge => Some("Бридж"),
+                    shared::SongSectionType::PreChorus => Some("Предприпев"),
+                    _ => None
+                };
 
-                    view! {
-                        <div class="song-section">
-                            // Section label
-                            {section_label.map(|label| {
-                                let label_with_number = section.label.as_ref()
-                                    .map(|n| format!("{} {}", label, n))
-                                    .unwrap_or_else(|| label.to_string());
+                view! {
+                    <div class=styles::songSection>
+                        {section_label.map(|label| {
+                            let label_with_number = section.label.as_ref()
+                                .map(|n| format!("{} {}", label, n))
+                                .unwrap_or_else(|| label.to_string());
+                            view! {
+                                <div class=styles::sectionLabel>{label_with_number}</div>
+                            }
+                        })}
+
+                        {section.lines.into_iter().map(|line| {
+                            if line.chords.is_empty() {
                                 view! {
-                                    <div class="text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
-                                        {label_with_number}
+                                    <div class=styles::songLine>
+                                        <div class=styles::textLine>{line.text}</div>
                                     </div>
-                                }
-                            })}
-
-                            // Lines with chords
-                            <div class="space-y-1">
-                                {section.lines.into_iter().map(|line| {
-                                    if line.chords.is_empty() {
-                                        // Just text
-                                        view! {
-                                            <div class="song-line">
-                                                <div class="song-text">{line.text}</div>
-                                            </div>
-                                        }.into_any()
-                                    } else {
-                                        // Text with chords above
-                                        let chord_line = render_chords_line(&line.text, &line.chords);
-                                        let text = line.text.clone();
-                                        view! {
-                                            <div class="song-line" style="font-family: monospace; white-space: pre;">
-                                                <div style="color: var(--accent); font-weight: bold;">{chord_line}</div>
-                                                <div>{text}</div>
-                                            </div>
-                                        }.into_any()
-                                    }
-                                }).collect_view()}
-                            </div>
-                        </div>
-                    }
-                }).collect_view()}
-            </div>
+                                }.into_any()
+                            } else {
+                                let chord_line = render_chords_line(&line.text, &line.chords);
+                                let text = line.text.clone();
+                                view! {
+                                    <div class=styles::songLine>
+                                        <div class=styles::chordLine>{chord_line}</div>
+                                        <div class=styles::textLine>{text}</div>
+                                    </div>
+                                }.into_any()
+                            }
+                        }).collect_view()}
+                    </div>
+                }
+            }).collect_view()}
         </div>
     }
 }
@@ -636,63 +613,59 @@ pub fn SongSearch() -> impl IntoView {
     };
 
     view! {
-        <div class="page-container">
-            <header class="page-header">
+        <div class=styles::container>
+            <header class=styles::header>
                 <button
-                    class="btn-icon"
+                    class=styles::iconBtn
                     on:click=move |_| { navigate("/songs", Default::default()); }
                 >
-                    <BackIcon/>
+                    <Icon icon=IconType::ArrowLeft size=IconSize::Medium/>
                 </button>
-                <div class="flex-1">
-                    <input
-                        type="search"
-                        class="input-field w-full"
-                        placeholder="Поиск песен..."
-                        prop:value=query
-                        on:input=move |ev| query.set(event_target_value(&ev))
-                        on:keydown=move |ev| {
-                            if ev.key() == "Enter" {
-                                let q = query.get();
-                                if q.len() >= 2 {
-                                    is_searching.set(true);
-                                    leptos::task::spawn_local(async move {
-                                        match api::search_songs(&q).await {
-                                            Ok(r) => results.set(r),
-                                            Err(_) => results.set(vec![])
-                                        }
-                                        is_searching.set(false);
-                                    });
-                                }
+                <input
+                    type="search"
+                    class=styles::searchInput
+                    placeholder="Поиск песен..."
+                    prop:value=query
+                    on:input=move |ev| query.set(event_target_value(&ev))
+                    on:keydown=move |ev| {
+                        if ev.key() == "Enter" {
+                            let q = query.get();
+                            if q.len() >= 2 {
+                                is_searching.set(true);
+                                leptos::task::spawn_local(async move {
+                                    match api::search_songs(&q).await {
+                                        Ok(r) => results.set(r),
+                                        Err(_) => results.set(vec![])
+                                    }
+                                    is_searching.set(false);
+                                });
                             }
                         }
-                    />
-                </div>
-                <button class="btn-icon" on:click=do_search>
-                    <SearchIcon/>
+                    }
+                />
+                <button class=styles::iconBtn on:click=do_search>
+                    <Icon icon=IconType::Search size=IconSize::Medium/>
                 </button>
             </header>
 
-            <div class="px-4">
+            <div class=styles::content>
                 <Show when=move || is_searching.get()>
                     <LoadingSpinner/>
                 </Show>
 
                 <Show when=move || !results.get().is_empty()>
-                    <div class="space-y-1">
+                    <div class=styles::songList>
                         <For
                             each=move || results.get()
                             key=|s| s.song.id
                             children=|result| {
                                 view! {
-                                    <A href=format!("/songs/{}", result.song.id) attr:class="block">
-                                        <div class="py-3 px-4 hover:bg-[var(--color-surface-secondary)] rounded-lg transition-colors">
-                                            <h3 class="font-medium text-[var(--color-text-primary)]">
-                                                {result.song.title}
-                                            </h3>
-                                            <p class="text-sm text-[var(--color-text-muted)]">
+                                    <A href=format!("/songs/{}", result.song.id) attr:class=styles::songItem>
+                                        <div class=styles::songInfo>
+                                            <span class=styles::songTitle>{result.song.title}</span>
+                                            <span class=styles::songFirstLine>
                                                 {result.songbook_name.unwrap_or_default()}
-                                            </p>
+                                            </span>
                                         </div>
                                     </A>
                                 }
@@ -702,93 +675,23 @@ pub fn SongSearch() -> impl IntoView {
                 </Show>
 
                 <Show when=move || !is_searching.get() && results.get().is_empty() && (query.get().len() >= 2)>
-                    <div class="text-center py-8 text-[var(--color-text-muted)]">
-                        "Ничего не найдено"
+                    <div class=styles::empty>
+                        <span class=styles::emptyText>"Ничего не найдено"</span>
                     </div>
                 </Show>
             </div>
+
+            <BottomNav/>
         </div>
     }
 }
 
-// ========== Icons ==========
-
+/// Loading spinner component
 #[component]
 fn LoadingSpinner() -> impl IntoView {
     view! {
-        <div class="flex justify-center py-8">
-            <div class="w-8 h-8 border-2 border-[var(--color-gold-500)] border-t-transparent rounded-full animate-spin"/>
+        <div class=styles::empty>
+            <div class=styles::skeleton style="width: 2rem; height: 2rem; border-radius: 50%;"></div>
         </div>
-    }
-}
-
-#[component]
-fn MusicIcon(#[prop(optional)] class: &'static str) -> impl IntoView {
-    view! {
-        <svg class=class xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-             width="24" height="24">
-            <path d="M9 18V5l12-2v13"/>
-            <circle cx="6" cy="18" r="3"/>
-            <circle cx="18" cy="16" r="3"/>
-        </svg>
-    }
-}
-
-#[component]
-fn SearchIcon() -> impl IntoView {
-    view! {
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-             width="24" height="24">
-            <circle cx="11" cy="11" r="8"/>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-        </svg>
-    }
-}
-
-#[component]
-fn BackIcon() -> impl IntoView {
-    view! {
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-             width="24" height="24">
-            <path d="M19 12H5"/>
-            <path d="M12 19l-7-7 7-7"/>
-        </svg>
-    }
-}
-
-#[component]
-fn ChevronRightIcon(#[prop(optional)] class: &'static str) -> impl IntoView {
-    view! {
-        <svg class=class xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-             width="24" height="24">
-            <path d="M9 18l6-6-6-6"/>
-        </svg>
-    }
-}
-
-#[component]
-fn PlusIcon() -> impl IntoView {
-    view! {
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-             width="24" height="24">
-            <line x1="12" y1="5" x2="12" y2="19"/>
-            <line x1="5" y1="12" x2="19" y2="12"/>
-        </svg>
-    }
-}
-
-#[component]
-fn MinusIcon() -> impl IntoView {
-    view! {
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-             width="24" height="24">
-            <line x1="5" y1="12" x2="19" y2="12"/>
-        </svg>
     }
 }

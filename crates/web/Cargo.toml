@@ -33,3 +33,6 @@ stylance = "0.7"
 [features]
 hydrate = ["leptos/hydrate"]
 csr = ["leptos/csr"]
+
+[lints.rust]
+dead_code = { level = "allow", priority = -1 }

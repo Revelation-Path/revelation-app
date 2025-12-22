@@ -184,6 +184,7 @@ pub struct SongSummary {
     pub author_lyrics:   Option<String>,
     pub first_line:      String,
     pub original_key:    Option<String>,
+    pub has_chords:      bool,
     pub categories:      Vec<SongCategory>,
     pub is_favorite:     bool,
     pub views_count:     i32,
@@ -639,5 +640,7 @@ pub enum SongSortBy {
     Number,
     ViewsDesc,
     FavoritesDesc,
-    RecentlyAdded
+    RecentlyAdded,
+    HasChordsFirst,
+    NoChordsFirst
 }
