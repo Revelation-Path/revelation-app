@@ -7,6 +7,9 @@ use wasm_bindgen_futures::spawn_local;
 use crate::bible::{BibleCache, BibleProvider};
 
 const USER_ID_KEY: &str = "revelation_user_id";
+const BIBLE_BOOK_KEY: &str = "bible_current_book";
+const BIBLE_CHAPTER_KEY: &str = "bible_current_chapter";
+const ONLY_WITH_CHORDS_KEY: &str = "songs_only_with_chords";
 
 #[derive(Clone)]
 pub struct AppState {
@@ -16,7 +19,8 @@ pub struct AppState {
     pub sidebar_collapsed: RwSignal<bool>,
     pub current_book:      RwSignal<i16>,
     pub current_chapter:   RwSignal<i16>,
-    pub bible:             RwSignal<Option<BibleCache>>
+    pub bible:             RwSignal<Option<BibleCache>>,
+    pub only_with_chords:  RwSignal<bool>
 }
 
 impl AppState {
@@ -31,6 +35,11 @@ impl AppState {
                 id
             });
 
+        // Load saved Bible position from localStorage
+        let saved_book = LocalStorage::get::<i16>(BIBLE_BOOK_KEY).unwrap_or(1);
+        let saved_chapter = LocalStorage::get::<i16>(BIBLE_CHAPTER_KEY).unwrap_or(1);
+        let saved_chords_filter = LocalStorage::get::<bool>(ONLY_WITH_CHORDS_KEY).unwrap_or(false);
+
         let bible = RwSignal::new(None);
 
         // Load Bible from S3/cache asynchronously
@@ -42,14 +51,33 @@ impl AppState {
             }
         });
 
+        let current_book = RwSignal::new(saved_book);
+        let current_chapter = RwSignal::new(saved_chapter);
+        let only_with_chords = RwSignal::new(saved_chords_filter);
+
+        // Save Bible position to localStorage when changed
+        Effect::new(move |_| {
+            let book = current_book.get();
+            let chapter = current_chapter.get();
+            let _ = LocalStorage::set(BIBLE_BOOK_KEY, book);
+            let _ = LocalStorage::set(BIBLE_CHAPTER_KEY, chapter);
+        });
+
+        // Save chords filter to localStorage when changed
+        Effect::new(move |_| {
+            let filter = only_with_chords.get();
+            let _ = LocalStorage::set(ONLY_WITH_CHORDS_KEY, filter);
+        });
+
         Self {
             user_id: RwSignal::new(user_id),
             user: RwSignal::new(None),
             is_loading: RwSignal::new(true),
             sidebar_collapsed: RwSignal::new(false),
-            current_book: RwSignal::new(1),
-            current_chapter: RwSignal::new(1),
-            bible
+            current_book,
+            current_chapter,
+            bible,
+            only_with_chords
         }
     }
 

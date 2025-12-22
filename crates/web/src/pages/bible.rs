@@ -27,9 +27,12 @@ use styles::*;
 /// Bible reader with book-style navigation
 #[component]
 pub fn Bible() -> impl IntoView {
-    // Default to Genesis 1
+    let app_state = expect_context::<crate::state::AppState>();
+    let saved_book = app_state.current_book.get_untracked();
+    let saved_chapter = app_state.current_chapter.get_untracked();
+
     view! {
-        <BibleReader initial_book=1 initial_chapter=1/>
+        <BibleReader initial_book=saved_book initial_chapter=saved_chapter/>
     }
 }
 

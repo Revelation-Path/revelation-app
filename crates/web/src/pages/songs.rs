@@ -1,6 +1,5 @@
 //! Songs/Songbook pages
 
-use gloo_storage::{LocalStorage, Storage};
 use leptos::prelude::*;
 use leptos_router::{components::A, hooks::use_params_map};
 use shared::{Song, SongSummary, Songbook};
@@ -10,25 +9,32 @@ use uuid::Uuid;
 
 use crate::{
     api,
-    components::{BottomNav, Header}
+    components::{BottomNav, Header},
+    state::AppState
 };
 
 stylance::import_crate_style!(styles, "src/styles/songs.module.css");
 
-const ONLY_WITH_CHORDS_KEY: &str = "songs_only_with_chords";
-
 /// Main songs page - shows songbooks
 #[component]
 pub fn Songs() -> impl IntoView {
+    let app_state = expect_context::<AppState>();
+    let only_with_chords = app_state.only_with_chords;
+
     let songbooks =
         LocalResource::new(|| async { api::get_songbooks().await.unwrap_or_default() });
 
-    let only_with_chords =
-        RwSignal::new(LocalStorage::get::<bool>(ONLY_WITH_CHORDS_KEY).unwrap_or(false));
+    let title = Signal::derive(move || {
+        if only_with_chords.get() {
+            "Песни с аккордами"
+        } else {
+            "Песни"
+        }
+    });
 
     view! {
         <div class=styles::container>
-            <Header title="Песни">
+            <Header title=title>
                 <A href="/songs/search" attr:class=styles::iconBtn>
                     <Icon icon=IconType::Search size=IconSize::Medium/>
                 </A>
@@ -42,7 +48,6 @@ pub fn Songs() -> impl IntoView {
                     icon=IconType::Music
                     on_toggle=Callback::new(move |v| {
                         only_with_chords.set(v);
-                        let _ = LocalStorage::set(ONLY_WITH_CHORDS_KEY, v);
                     })
                 />
             </div>
@@ -79,7 +84,10 @@ pub fn Songs() -> impl IntoView {
 
 /// Songbook card component
 #[component]
-fn SongbookCard(songbook: Songbook, #[prop(default = false)] filter_chords: bool) -> impl IntoView {
+fn SongbookCard(
+    songbook: Songbook,
+    #[prop(default = false)] filter_chords: bool
+) -> impl IntoView {
     let year_info = match (songbook.year_first_published, songbook.edition_name.clone()) {
         (Some(year), Some(edition)) => Some(format!("с {} г. • {}", year, edition)),
         (Some(year), None) => Some(format!("с {} г.", year)),
@@ -123,6 +131,8 @@ fn SongbookCard(songbook: Songbook, #[prop(default = false)] filter_chords: bool
 /// Songbook detail page - shows info and editions
 #[component]
 pub fn SongbookDetail() -> impl IntoView {
+    let app_state = expect_context::<AppState>();
+    let only_with_chords = app_state.only_with_chords;
     let params = use_params_map();
 
     let songbook_id = move || {
@@ -156,14 +166,21 @@ pub fn SongbookDetail() -> impl IntoView {
         }
     });
 
+    let title = Signal::derive(move || {
+        let name = songbook_name
+            .get()
+            .flatten()
+            .unwrap_or_else(|| "Сборник".to_string());
+        if only_with_chords.get() {
+            format!("{} (с аккордами)", name)
+        } else {
+            name
+        }
+    });
+
     view! {
         <div class=styles::container>
-            <Header
-                title=Signal::derive(move || {
-                    songbook_name.get().flatten().unwrap_or_else(|| "Сборник".to_string())
-                })
-                back=true
-            >
+            <Header title=title back=true>
                 <A href="/songs/search" attr:class=styles::iconBtn>
                     <Icon icon=IconType::Search size=IconSize::Medium/>
                 </A>
@@ -179,13 +196,16 @@ pub fn SongbookDetail() -> impl IntoView {
                             Some(sb) => {
                                 let sb_id = sb.id;
                                 let has_editions = !eds.is_empty();
+                                let filter = only_with_chords.get();
+                                let count = if filter { sb.songs_with_chords_count } else { sb.songs_count };
+                                let label = if filter { "Песни с аккордами" } else { "Все песни" };
 
                                 view! {
                                     <div class=styles::grid>
                                         <SongbookHeader
                                             name=sb.name_ru.clone()
                                             year=sb.year_first_published
-                                            songs_count=sb.songs_count
+                                            songs_count=count
                                         />
 
                                         {sb.history.clone().map(|h| view! {
@@ -202,7 +222,7 @@ pub fn SongbookDetail() -> impl IntoView {
                                             </div>
                                             <div class=styles::songbookInfo>
                                                 <span class=styles::songbookName>
-                                                    {format!("Все песни ({})", sb.songs_count)}
+                                                    {format!("{} ({})", label, count)}
                                                 </span>
                                             </div>
                                             <span class=styles::chevron>
@@ -304,8 +324,9 @@ fn EditionsList(editions: Vec<shared::SongbookEdition>, songbook_id: Uuid) -> im
 /// Songbook songs list page
 #[component]
 pub fn SongbookSongs() -> impl IntoView {
+    let app_state = expect_context::<AppState>();
+    let only_with_chords = app_state.only_with_chords;
     let params = use_params_map();
-    let only_with_chords = LocalStorage::get::<bool>(ONLY_WITH_CHORDS_KEY).unwrap_or(false);
 
     let songbook_id = move || {
         params
@@ -332,14 +353,21 @@ pub fn SongbookSongs() -> impl IntoView {
         }
     });
 
+    let title = Signal::derive(move || {
+        let name = songbook_name
+            .get()
+            .flatten()
+            .unwrap_or_else(|| "Песни".to_string());
+        if only_with_chords.get() {
+            format!("{} (с аккордами)", name)
+        } else {
+            name
+        }
+    });
+
     view! {
         <div class=styles::container>
-            <Header
-                title=Signal::derive(move || {
-                    songbook_name.get().flatten().unwrap_or_else(|| "Песни".to_string())
-                })
-                back=true
-            >
+            <Header title=title back=true>
                 <A href="/songs/search" attr:class=styles::iconBtn>
                     <Icon icon=IconType::Search size=IconSize::Medium/>
                 </A>
@@ -349,7 +377,8 @@ pub fn SongbookSongs() -> impl IntoView {
                 <Suspense fallback=|| view! { <LoadingSpinner/> }>
                     {move || Suspend::new(async move {
                         let song_list = songs.await;
-                        let filtered: Vec<_> = if only_with_chords {
+                        let filter = only_with_chords.get();
+                        let filtered: Vec<_> = if filter {
                             song_list.into_iter().filter(|s| s.has_chords).collect()
                         } else {
                             song_list
@@ -580,10 +609,11 @@ fn render_chords_line(text: &str, chords: &[shared::PositionedChord]) -> String 
 /// Song search page
 #[component]
 pub fn SongSearch() -> impl IntoView {
+    let app_state = expect_context::<AppState>();
+    let only_with_chords = app_state.only_with_chords;
     let query = RwSignal::new(String::new());
     let results = RwSignal::new(Vec::new());
     let is_searching = RwSignal::new(false);
-    let only_with_chords = LocalStorage::get::<bool>(ONLY_WITH_CHORDS_KEY).unwrap_or(false);
 
     let do_search = move || {
         let q = query.get();
@@ -601,7 +631,7 @@ pub fn SongSearch() -> impl IntoView {
 
     let filtered_results = move || {
         let all = results.get();
-        if only_with_chords {
+        if only_with_chords.get() {
             all.into_iter()
                 .filter(|r| r.song.has_chords)
                 .collect::<Vec<_>>()
@@ -610,9 +640,17 @@ pub fn SongSearch() -> impl IntoView {
         }
     };
 
+    let title = Signal::derive(move || {
+        if only_with_chords.get() {
+            "Поиск (с аккордами)"
+        } else {
+            "Поиск"
+        }
+    });
+
     view! {
         <div class=styles::container>
-            <Header title="Поиск" back=true/>
+            <Header title=title back=true/>
 
             <div class=styles::header style="position: static; padding: var(--space-md);">
                 <input
