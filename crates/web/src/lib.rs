@@ -4,6 +4,7 @@ pub mod api;
 pub mod app;
 pub mod bible;
 pub mod components;
+pub mod haptic;
 pub mod pages;
 pub mod state;
 

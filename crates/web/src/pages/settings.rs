@@ -4,7 +4,7 @@ use leptos::prelude::*;
 use ui::theme::{FontFamily, Theme, use_theme};
 use wasm_bindgen::prelude::*;
 
-use crate::components::Header;
+use crate::{components::Header, haptic};
 
 stylance::import_crate_style!(styles, "src/styles/settings.module.css");
 
@@ -60,7 +60,10 @@ pub fn Settings() -> impl IntoView {
                             <div class=styles::sizeControls>
                                 <button
                                     class=styles::sizeBtn
-                                    on:click=move |_| font_size.update(|s| *s = (*s).saturating_sub(2).max(12))
+                                    on:click=move |_| {
+                                    haptic::tap();
+                                    font_size.update(|s| *s = (*s).saturating_sub(2).max(12));
+                                }
                                 >
                                     "A-"
                                 </button>
@@ -69,7 +72,10 @@ pub fn Settings() -> impl IntoView {
                                 </span>
                                 <button
                                     class=styles::sizeBtn
-                                    on:click=move |_| font_size.update(|s| *s = (*s + 2).min(32))
+                                    on:click=move |_| {
+                                    haptic::tap();
+                                    font_size.update(|s| *s = (*s + 2).min(32));
+                                }
                                 >
                                     "A+"
                                 </button>
@@ -88,7 +94,10 @@ pub fn Settings() -> impl IntoView {
                                             base
                                         }
                                     }
-                                    on:click=move |_| font_family.set(FontFamily::Serif)
+                                    on:click=move |_| {
+                                        haptic::tap();
+                                        font_family.set(FontFamily::Serif);
+                                    }
                                 >
                                     "Serif"
                                 </button>
@@ -101,7 +110,10 @@ pub fn Settings() -> impl IntoView {
                                             base
                                         }
                                     }
-                                    on:click=move |_| font_family.set(FontFamily::Sans)
+                                    on:click=move |_| {
+                                        haptic::tap();
+                                        font_family.set(FontFamily::Sans);
+                                    }
                                 >
                                     "Sans"
                                 </button>
@@ -118,7 +130,10 @@ pub fn Settings() -> impl IntoView {
                                         styles::toggle.to_string()
                                     }
                                 }
-                                on:click=move |_| verse_per_line.update(|v| *v = !*v)
+                                on:click=move |_| {
+                                    haptic::tap();
+                                    verse_per_line.update(|v| *v = !*v);
+                                }
                             >
                                 <span class=styles::toggleThumb/>
                             </button>
@@ -142,7 +157,10 @@ pub fn Settings() -> impl IntoView {
                                             base
                                         }
                                     }
-                                    on:click=move |_| theme.set(Theme::Light)
+                                    on:click=move |_| {
+                                        haptic::tap();
+                                        theme.set(Theme::Light);
+                                    }
                                 />
                                 <button
                                     class=move || {
@@ -153,7 +171,10 @@ pub fn Settings() -> impl IntoView {
                                             base
                                         }
                                     }
-                                    on:click=move |_| theme.set(Theme::Sepia)
+                                    on:click=move |_| {
+                                        haptic::tap();
+                                        theme.set(Theme::Sepia);
+                                    }
                                 />
                                 <button
                                     class=move || {
@@ -164,7 +185,10 @@ pub fn Settings() -> impl IntoView {
                                             base
                                         }
                                     }
-                                    on:click=move |_| theme.set(Theme::Dark)
+                                    on:click=move |_| {
+                                        haptic::tap();
+                                        theme.set(Theme::Dark);
+                                    }
                                 />
                             </div>
                         </div>
