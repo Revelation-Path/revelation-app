@@ -51,12 +51,20 @@ pub fn Songs() -> impl IntoView {
                 <Suspense fallback=|| view! { <LoadingSpinner/> }>
                     {move || Suspend::new(async move {
                         let books = songbooks.await;
+                        let filter_active = only_with_chords.get();
+                        let filtered_books: Vec<_> = if filter_active {
+                            books.into_iter().filter(|b| b.songs_with_chords_count > 0).collect()
+                        } else {
+                            books
+                        };
                         view! {
                             <div class=styles::grid>
                                 <For
-                                    each=move || books.clone()
+                                    each=move || filtered_books.clone()
                                     key=|s| s.id
-                                    children=|songbook| view! { <SongbookCard songbook=songbook/> }
+                                    children=move |songbook| view! {
+                                        <SongbookCard songbook=songbook filter_chords=filter_active/>
+                                    }
                                 />
                             </div>
                         }
@@ -71,7 +79,7 @@ pub fn Songs() -> impl IntoView {
 
 /// Songbook card component
 #[component]
-fn SongbookCard(songbook: Songbook) -> impl IntoView {
+fn SongbookCard(songbook: Songbook, #[prop(default = false)] filter_chords: bool) -> impl IntoView {
     let year_info = match (songbook.year_first_published, songbook.edition_name.clone()) {
         (Some(year), Some(edition)) => Some(format!("с {} г. • {}", year, edition)),
         (Some(year), None) => Some(format!("с {} г.", year)),
@@ -80,6 +88,11 @@ fn SongbookCard(songbook: Songbook) -> impl IntoView {
     };
 
     let publisher = songbook.publisher.clone();
+    let count = if filter_chords {
+        songbook.songs_with_chords_count
+    } else {
+        songbook.songs_count
+    };
 
     view! {
         <A href=format!("/songs/book/{}", songbook.id) attr:class=styles::songbookCard>
@@ -94,7 +107,7 @@ fn SongbookCard(songbook: Songbook) -> impl IntoView {
                     <p class=styles::songbookDesc>{info}</p>
                 })}
                 <span class=styles::songbookCount>
-                    {format!("{} песен", songbook.songs_count)}
+                    {format!("{} песен", count)}
                 </span>
                 {publisher.map(|p| view! {
                     <p class=styles::songbookCount>{p}</p>

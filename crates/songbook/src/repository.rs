@@ -35,13 +35,16 @@ impl SongRepository {
             Songbook,
             r#"
             SELECT
-                id, code, name, name_ru, description, cover_url, songs_count, is_public,
-                year_first_published, year_latest_edition, edition_name, total_songs_in_print,
-                publisher, editor, isbn, language, country, denomination,
-                website_url, purchase_url, history, notes
-            FROM songbooks
-            WHERE is_public = true AND is_visible = true
-            ORDER BY name_ru
+                sb.id, sb.code, sb.name, sb.name_ru, sb.description, sb.cover_url,
+                sb.songs_count,
+                COALESCE((SELECT COUNT(*) FROM songs s WHERE s.songbook_id = sb.id AND s.has_chords = true), 0)::int as "songs_with_chords_count!",
+                sb.is_public,
+                sb.year_first_published, sb.year_latest_edition, sb.edition_name, sb.total_songs_in_print,
+                sb.publisher, sb.editor, sb.isbn, sb.language, sb.country, sb.denomination,
+                sb.website_url, sb.purchase_url, sb.history, sb.notes
+            FROM songbooks sb
+            WHERE sb.is_public = true AND sb.is_visible = true
+            ORDER BY sb.name_ru
             "#
         )
         .fetch_all(&self.pool)
@@ -56,12 +59,15 @@ impl SongRepository {
             Songbook,
             r#"
             SELECT
-                id, code, name, name_ru, description, cover_url, songs_count, is_public,
-                year_first_published, year_latest_edition, edition_name, total_songs_in_print,
-                publisher, editor, isbn, language, country, denomination,
-                website_url, purchase_url, history, notes
-            FROM songbooks
-            WHERE id = $1
+                sb.id, sb.code, sb.name, sb.name_ru, sb.description, sb.cover_url,
+                sb.songs_count,
+                COALESCE((SELECT COUNT(*) FROM songs s WHERE s.songbook_id = sb.id AND s.has_chords = true), 0)::int as "songs_with_chords_count!",
+                sb.is_public,
+                sb.year_first_published, sb.year_latest_edition, sb.edition_name, sb.total_songs_in_print,
+                sb.publisher, sb.editor, sb.isbn, sb.language, sb.country, sb.denomination,
+                sb.website_url, sb.purchase_url, sb.history, sb.notes
+            FROM songbooks sb
+            WHERE sb.id = $1
             "#,
             id
         )
@@ -77,12 +83,15 @@ impl SongRepository {
             Songbook,
             r#"
             SELECT
-                id, code, name, name_ru, description, cover_url, songs_count, is_public,
-                year_first_published, year_latest_edition, edition_name, total_songs_in_print,
-                publisher, editor, isbn, language, country, denomination,
-                website_url, purchase_url, history, notes
-            FROM songbooks
-            WHERE code = $1
+                sb.id, sb.code, sb.name, sb.name_ru, sb.description, sb.cover_url,
+                sb.songs_count,
+                COALESCE((SELECT COUNT(*) FROM songs s WHERE s.songbook_id = sb.id AND s.has_chords = true), 0)::int as "songs_with_chords_count!",
+                sb.is_public,
+                sb.year_first_published, sb.year_latest_edition, sb.edition_name, sb.total_songs_in_print,
+                sb.publisher, sb.editor, sb.isbn, sb.language, sb.country, sb.denomination,
+                sb.website_url, sb.purchase_url, sb.history, sb.notes
+            FROM songbooks sb
+            WHERE sb.code = $1
             "#,
             code
         )

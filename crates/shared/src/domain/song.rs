@@ -97,14 +97,15 @@ impl SongCategory {
 /// Songbook (collection of songs)
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Songbook {
-    pub id:          Uuid,
-    pub code:        String,
-    pub name:        String,
-    pub name_ru:     String,
-    pub description: Option<String>,
-    pub cover_url:   Option<String>,
-    pub songs_count: i32,
-    pub is_public:   bool,
+    pub id:                      Uuid,
+    pub code:                    String,
+    pub name:                    String,
+    pub name_ru:                 String,
+    pub description:             Option<String>,
+    pub cover_url:               Option<String>,
+    pub songs_count:             i32,
+    pub songs_with_chords_count: i32,
+    pub is_public:               bool,
 
     // Extended metadata
     pub year_first_published: Option<i16>,
