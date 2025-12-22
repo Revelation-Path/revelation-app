@@ -117,6 +117,7 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
 FROM nginx:alpine AS web
 
 COPY --from=web-builder /app/crates/web/dist /usr/share/nginx/html
+RUN rm -rf /usr/share/nginx/html/bible
 COPY <<EOF /etc/nginx/conf.d/default.conf
 server {
     listen 80;
