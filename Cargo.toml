@@ -1,41 +1,47 @@
-[workspace]
-resolver = "3"
-members = ["crates/web"]
-
-[workspace.package]
+[package]
+name = "revelation-app"
 version = "0.1.0"
 edition = "2024"
 authors = ["Revelation Team"]
 license = "MIT"
 repository = "https://github.com/Revelation-Path/revelation-app"
 
-[workspace.dependencies]
-# External crates
-revelation-shared = { git = "https://github.com/Revelation-Path/revelation-shared.git" }
-revelation-songbook = { git = "https://github.com/Revelation-Path/revelation-songbook.git" }
-revelation-ui = { git = "https://github.com/Revelation-Path/revelation-ui.git" }
+[lib]
+crate-type = ["cdylib", "rlib"]
 
-# Leptos
-leptos = { version = "0.8" }
-leptos_router = { version = "0.8" }
-leptos_meta = { version = "0.8" }
+[[bin]]
+name = "revelation-app"
+path = "src/main.rs"
 
-# Serialization
+[dependencies]
+revelation-shared = { path = "../revelation-shared" }
+revelation-songbook = { path = "../revelation-songbook" }
+revelation-ui = { path = "../revelation-ui" }
+
+leptos = { version = "0.8", features = ["csr"] }
+leptos_router = "0.8"
+leptos_meta = "0.8"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-
-# Utils
-uuid = { version = "1", features = ["v4", "v7", "serde"] }
+uuid = { version = "1", features = ["v4", "v7", "serde", "js"] }
 chrono = { version = "0.4", features = ["serde"] }
+gloo-storage = "0.3"
+gloo-net = "0.6"
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+web-sys = { version = "0.3", features = ["Window", "Storage", "console", "Navigator"] }
+console_error_panic_hook = "0.1"
+stylance = "0.7"
 
-# CSS Modules
-stylance = "0.5"
+[features]
+default = ["csr"]
+csr = ["leptos/csr"]
 
-[workspace.lints.rust]
+[lints.rust]
 unsafe_code = "deny"
-missing_docs = "warn"
+dead_code = { level = "allow", priority = -1 }
 
-[workspace.lints.clippy]
+[lints.clippy]
 all = "warn"
 pedantic = "warn"
 nursery = "warn"
