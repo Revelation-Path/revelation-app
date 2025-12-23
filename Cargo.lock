@@ -1459,9 +1459,10 @@ dependencies = [
  "leptos",
  "leptos_meta",
  "leptos_router",
- "revelation-shared",
+ "revelation-bible",
  "revelation-songbook",
  "revelation-ui",
+ "revelation-user",
  "serde",
  "serde_json",
  "stylance 0.7.4",
@@ -1472,12 +1473,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "revelation-shared"
+name = "revelation-bible"
 version = "0.1.0"
 dependencies = [
  "chrono",
- "regex",
  "serde",
+ "serde_json",
  "uuid",
  "validator",
 ]
@@ -1486,7 +1487,11 @@ dependencies = [
 name = "revelation-songbook"
 version = "0.1.0"
 dependencies = [
- "revelation-shared",
+ "chrono",
+ "regex",
+ "serde",
+ "uuid",
+ "validator",
 ]
 
 [[package]]
@@ -1500,6 +1505,16 @@ dependencies = [
  "stylance 0.5.5",
  "wasm-bindgen",
  "web-sys",
+]
+
+[[package]]
+name = "revelation-user"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "serde",
+ "uuid",
+ "validator",
 ]
 
 [[package]]

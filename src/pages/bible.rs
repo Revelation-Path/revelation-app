@@ -2,7 +2,7 @@
 
 use leptos::{prelude::*, reactive::computed::Memo, tachys::dom::window};
 use leptos_router::hooks::use_params_map;
-use revelation_shared::{Book, ChapterInfo, Pericope, Testament};
+use revelation_bible::{Book, ChapterInfo, Pericope, Testament};
 use revelation_ui::use_theme;
 use wasm_bindgen::{closure::Closure, prelude::*};
 

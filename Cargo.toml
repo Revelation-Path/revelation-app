@@ -14,9 +14,10 @@ name = "revelation-app"
 path = "src/main.rs"
 
 [dependencies]
-revelation-shared = { path = "../revelation-shared" }
+revelation-bible = { path = "../revelation-bible" }
 revelation-songbook = { path = "../revelation-songbook" }
-revelation-ui = { path = "../revelation-ui" }
+revelation-user = { path = "../revelation-user" }
+revelation-ui = { path = "../revelation-ui", features = ["leptos"] }
 
 leptos = { version = "0.8", features = ["csr"] }
 leptos_router = "0.8"

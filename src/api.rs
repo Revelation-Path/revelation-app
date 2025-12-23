@@ -1,8 +1,7 @@
 use gloo_net::http::Request;
-use revelation_shared::{
-    Book, ChapterInfo, DailyReading, Pericope, SearchResult, Song, SongSearchResult, SongSummary,
-    Songbook, SongbookEdition, Testament, User, Verse
-};
+use revelation_bible::{Book, ChapterInfo, DailyReading, Pericope, SearchResult, Testament, Verse};
+use revelation_songbook::{Song, SongSearchResult, SongSummary, Songbook, SongbookEdition};
+use revelation_user::User;
 use uuid::Uuid;
 
 use crate::bible::BibleProvider;

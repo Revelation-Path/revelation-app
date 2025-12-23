@@ -2,7 +2,7 @@
 
 use leptos::prelude::*;
 use leptos_router::hooks::use_navigate;
-use revelation_shared::Gender;
+use revelation_user::Gender;
 
 #[allow(dead_code)]
 mod styles {

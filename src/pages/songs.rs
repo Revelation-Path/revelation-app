@@ -2,10 +2,9 @@
 
 use leptos::prelude::*;
 use leptos_router::{components::A, hooks::use_params_map};
-use revelation_shared::{
-    PositionedChord, Song, SongSectionType, SongSummary, Songbook, SongbookEdition
+use revelation_songbook::{
+    ChordProParser, PositionedChord, Song, SongSectionType, SongSummary, Songbook, SongbookEdition
 };
-use revelation_songbook::ChordProParser;
 use revelation_ui::{Icon, IconSize, IconType, Toggle};
 use uuid::Uuid;
 

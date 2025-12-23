@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use gloo_net::http::Request;
 use gloo_storage::{LocalStorage, Storage};
-use revelation_shared::{Book, Testament, Verse};
+use revelation_bible::{Book, Testament, Verse};
 use serde::{Deserialize, Serialize};
 use wasm_bindgen_futures::spawn_local;
 
