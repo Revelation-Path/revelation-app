@@ -9,25 +9,25 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl pkg-config libssl-dev ca-certificates nodejs npm \
     && rm -rf /var/lib/apt/lists/* \
     && rustup target add wasm32-unknown-unknown \
-    && cargo install trunk stylance-cli --locked
+    && cargo install trunk --locked
 
 WORKDIR /app
-COPY Cargo.toml Cargo.lock ./
-COPY crates ./crates
-
-RUN mkdir -p crates/web/assets/bible
+COPY Cargo.toml Cargo.lock index.html build.rs ./
+COPY Trunk.docker.toml ./Trunk.toml
+COPY src ./src
+COPY assets ./assets
+COPY icons ./icons
 
 RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
     --mount=type=cache,target=/usr/local/cargo/git,sharing=locked \
-    cd crates/web && trunk build --release
+    trunk build --release
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Runtime - nginx serving static files
 # ─────────────────────────────────────────────────────────────────────────────
 FROM nginx:alpine
 
-COPY --from=builder /app/crates/web/dist /usr/share/nginx/html
-RUN rm -rf /usr/share/nginx/html/bible
+COPY --from=builder /app/dist /usr/share/nginx/html
 COPY <<EOF /etc/nginx/conf.d/default.conf
 server {
     listen 80;
