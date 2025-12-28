@@ -1,17 +1,21 @@
 //! Main application.
 
 use leptos::prelude::*;
-use leptos_meta::{provide_meta_context, Meta, Style, Title};
-use leptos_router::components::{Redirect, Route, Router, Routes};
-use leptos_router::path;
-use revelation_ui::{BrowserChrome, ThemeProvider, ToastProvider, THEME_CSS};
-
-use crate::components::Sidebar;
-use crate::pages::{
-    Bible, BibleChapter, ChurchDetail, Churches, DailyReading, Feed, NotFound, Onboarding,
-    Profile, Search, Settings, SongDetail, SongSearch, SongbookDetail, SongbookSongs, Songs,
+use leptos_meta::{Meta, Style, Title, provide_meta_context};
+use leptos_router::{
+    components::{Redirect, Route, Router, Routes},
+    path
 };
-use crate::state::AppState;
+use revelation_ui::{BrowserChrome, THEME_CSS, ThemeProvider, ToastProvider};
+
+use crate::{
+    components::Sidebar,
+    pages::{
+        Bible, BibleChapter, ChurchDetail, Churches, DailyReading, Feed, NotFound, Onboarding,
+        Profile, Search, Settings, SongDetail, SongSearch, SongbookDetail, SongbookSongs, Songs
+    },
+    state::AppState
+};
 
 /// Syncs browser chrome color with current book
 #[component]

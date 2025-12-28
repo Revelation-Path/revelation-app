@@ -2,7 +2,7 @@
 
 use gloo_net::http::Request;
 use revelation_bible::{
-    Book, ChapterInfo, DailyReading, Pericope, SearchResult, Testament, Verse,
+    Book, ChapterInfo, DailyReading, Pericope, SearchResult, Testament, Verse
 };
 use revelation_songbook::{Song, SongSearchResult, SongSummary, Songbook, SongbookEdition};
 use revelation_user::RUser;
@@ -30,7 +30,7 @@ fn api_base() -> String {
 pub async fn get_books_cached() -> Result<Vec<Book>, String> {
     match BibleProvider::init().await {
         Ok(cache) => Ok(cache.get_books()),
-        Err(_) => get_books().await,
+        Err(_) => get_books().await
     }
 }
 
@@ -44,7 +44,7 @@ pub async fn get_chapter_cached(book_id: i16, chapter: i16) -> Result<Vec<Verse>
         Ok(cache) => cache
             .get_chapter(book_id, chapter)
             .ok_or_else(|| "Chapter not found".to_string()),
-        Err(_) => get_chapter(book_id, chapter).await,
+        Err(_) => get_chapter(book_id, chapter).await
     }
 }
 
@@ -92,7 +92,7 @@ pub async fn get_books() -> Result<Vec<Book>, String> {
 pub async fn get_books_by_testament(testament: Testament) -> Result<Vec<Book>, String> {
     let testament_str = match testament {
         Testament::Old => "old",
-        Testament::New => "new",
+        Testament::New => "new"
     };
     let url = format!("{}/bible/books?testament={testament_str}", api_base());
     let response = Request::get(&url).send().await.map_err(|e| e.to_string())?;
@@ -164,11 +164,11 @@ pub async fn get_symphony(word: &str) -> Result<SymphonyResponse, String> {
 #[derive(serde::Deserialize)]
 pub struct SymphonyResponse {
     /// The searched word.
-    pub word: String,
+    pub word:        String,
     /// Total occurrences count.
     pub total_count: i64,
     /// Matching verses.
-    pub verses: Vec<SearchResult>,
+    pub verses:      Vec<SearchResult>
 }
 
 /// Fetches today's Bible reading.
@@ -229,7 +229,7 @@ pub async fn get_songbook_editions(songbook_id: Uuid) -> Result<Vec<SongbookEdit
 pub async fn get_songs_by_songbook(
     songbook_id: Uuid,
     page: Option<u32>,
-    limit: Option<u32>,
+    limit: Option<u32>
 ) -> Result<Vec<SongSummary>, String> {
     let limit = i64::from(limit.unwrap_or(50));
     let offset = page.map_or(0, |p| i64::from(p.max(1) - 1) * limit);

@@ -261,6 +261,6 @@ const fn get_book_category_var(book_id: i16) -> &'static str {
         45..=57 => "var(--cat-paul)",
         58..=65 => "var(--cat-general)",
         66 => "var(--cat-revelation)",
-        _ => "var(--cat-torah)",
+        _ => "var(--cat-torah)"
     }
 }

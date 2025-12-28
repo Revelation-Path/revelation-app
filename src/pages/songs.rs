@@ -221,8 +221,16 @@ pub fn SongbookDetail() -> impl IntoView {
 fn SongbookDetailContent(sb: Songbook, eds: Vec<SongbookEdition>, filter: bool) -> impl IntoView {
     let sb_id = sb.id;
     let has_editions = !eds.is_empty();
-    let count = if filter { sb.songs_with_chords_count } else { sb.songs_count };
-    let label = if filter { "Песни с аккордами" } else { "Все песни" };
+    let count = if filter {
+        sb.songs_with_chords_count
+    } else {
+        sb.songs_count
+    };
+    let label = if filter {
+        "Песни с аккордами"
+    } else {
+        "Все песни"
+    };
 
     view! {
         <div class=styles::grid>

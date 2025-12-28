@@ -115,7 +115,8 @@ fn SearchResults(results: Vec<revelation_bible::SearchResult>) -> impl IntoView 
                 <h2 class=common::emptyTitle>"Ничего не найдено"</h2>
                 <p class=common::emptyDesc>"Попробуйте изменить запрос"</p>
             </div>
-        }.into_any()
+        }
+        .into_any()
     } else {
         view! {
             <div>
@@ -126,7 +127,8 @@ fn SearchResults(results: Vec<revelation_bible::SearchResult>) -> impl IntoView 
                     }).collect::<Vec<_>>()}
                 </div>
             </div>
-        }.into_any()
+        }
+        .into_any()
     }
 }
 

@@ -23,7 +23,7 @@ const ABBREV_ORDER: [&str; 66] = [
     "ezr", "ne", "et", "job", "ps", "prv", "ec", "so", "is", "jr", "lm", "ez", "dn", "ho", "jl",
     "am", "ob", "jn", "mc", "na", "hk", "zp", "hg", "zc", "ml", "mt", "mk", "lk", "jo", "act",
     "rm", "1co", "2co", "gl", "eph", "ph", "cl", "1ts", "2ts", "1tm", "2tm", "tt", "phm", "hb",
-    "jm", "1pe", "2pe", "1jo", "2jo", "3jo", "jd", "re",
+    "jm", "1pe", "2pe", "1jo", "2jo", "3jo", "jd", "re"
 ];
 
 /// Russian book names.
@@ -93,37 +93,97 @@ const BOOK_NAMES_RU: [&str; 66] = [
     "2 Иоанна",
     "3 Иоанна",
     "Иуды",
-    "Откровение",
+    "Откровение"
 ];
 
 /// Russian abbreviations.
 const ABBREVIATIONS: [&str; 66] = [
-    "Быт", "Исх", "Лев", "Чис", "Втор", "Нав", "Суд", "Руф", "1Цар", "2Цар", "3Цар", "4Цар",
-    "1Пар", "2Пар", "Езд", "Неем", "Есф", "Иов", "Пс", "Притч", "Еккл", "Песн", "Ис", "Иер",
-    "Плач", "Иез", "Дан", "Ос", "Иоил", "Ам", "Авд", "Ион", "Мих", "Наум", "Авв", "Соф", "Агг",
-    "Зах", "Мал", "Мф", "Мк", "Лк", "Ин", "Деян", "Рим", "1Кор", "2Кор", "Гал", "Еф", "Флп",
-    "Кол", "1Фес", "2Фес", "1Тим", "2Тим", "Тит", "Флм", "Евр", "Иак", "1Пет", "2Пет", "1Ин",
-    "2Ин", "3Ин", "Иуд", "Откр",
+    "Быт",
+    "Исх",
+    "Лев",
+    "Чис",
+    "Втор",
+    "Нав",
+    "Суд",
+    "Руф",
+    "1Цар",
+    "2Цар",
+    "3Цар",
+    "4Цар",
+    "1Пар",
+    "2Пар",
+    "Езд",
+    "Неем",
+    "Есф",
+    "Иов",
+    "Пс",
+    "Притч",
+    "Еккл",
+    "Песн",
+    "Ис",
+    "Иер",
+    "Плач",
+    "Иез",
+    "Дан",
+    "Ос",
+    "Иоил",
+    "Ам",
+    "Авд",
+    "Ион",
+    "Мих",
+    "Наум",
+    "Авв",
+    "Соф",
+    "Агг",
+    "Зах",
+    "Мал",
+    "Мф",
+    "Мк",
+    "Лк",
+    "Ин",
+    "Деян",
+    "Рим",
+    "1Кор",
+    "2Кор",
+    "Гал",
+    "Еф",
+    "Флп",
+    "Кол",
+    "1Фес",
+    "2Фес",
+    "1Тим",
+    "2Тим",
+    "Тит",
+    "Флм",
+    "Евр",
+    "Иак",
+    "1Пет",
+    "2Пет",
+    "1Ин",
+    "2Ин",
+    "3Ин",
+    "Иуд",
+    "Откр"
 ];
 
 /// Raw Bible data from S3 JSON.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RawBook {
     /// Book abbreviation (English).
-    pub abbrev: String,
+    pub abbrev:   String,
     /// Chapters containing verse texts.
-    pub chapters: Vec<Vec<String>>,
+    pub chapters: Vec<Vec<String>>
 }
 
 /// Cached Bible with indexed access.
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct BibleCache {
-    version: String,
-    books: Vec<RawBook>,
+    version:      String,
+    books:        Vec<RawBook>,
     #[serde(skip)]
     abbrev_to_id: HashMap<String, i16>,
     #[serde(skip)]
-    id_to_abbrev: HashMap<i16, String>,
+    id_to_abbrev: HashMap<i16, String>
 }
 
 impl BibleCache {
@@ -163,10 +223,10 @@ impl BibleCache {
                         book_id,
                         chapter,
                         verse,
-                        text: text.clone(),
+                        text: text.clone()
                     })
                 })
-                .collect(),
+                .collect()
         )
     }
 
@@ -191,7 +251,7 @@ impl BibleCache {
                     name_ru: BOOK_NAMES_RU.get(idx).unwrap_or(&"").to_string(),
                     abbreviation: ABBREVIATIONS.get(idx).unwrap_or(&"").to_string(),
                     testament,
-                    chapters_count,
+                    chapters_count
                 })
             })
             .collect()
@@ -215,10 +275,12 @@ impl BibleProvider {
             return None;
         }
 
-        LocalStorage::get::<BibleCache>(CACHE_KEY).ok().map(|mut cache| {
-            cache.init_indices();
-            cache
-        })
+        LocalStorage::get::<BibleCache>(CACHE_KEY)
+            .ok()
+            .map(|mut cache| {
+                cache.init_indices();
+                cache
+            })
     }
 
     /// Saves to `LocalStorage`.
@@ -247,7 +309,10 @@ impl BibleProvider {
             return Err(format!("HTTP error: {}", response.status()));
         }
 
-        let books: Vec<RawBook> = response.json().await.map_err(|e| format!("Parse error: {e}"))?;
+        let books: Vec<RawBook> = response
+            .json()
+            .await
+            .map_err(|e| format!("Parse error: {e}"))?;
 
         let mut cache = BibleCache {
             version: CURRENT_VERSION.to_string(),

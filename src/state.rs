@@ -17,21 +17,21 @@ const ONLY_WITH_CHORDS_KEY: &str = "songs_only_with_chords";
 #[derive(Clone)]
 pub struct AppState {
     /// Current user ID.
-    pub user_id: RwSignal<Uuid>,
+    pub user_id:           RwSignal<Uuid>,
     /// Current user data.
-    pub user: RwSignal<Option<RUser>>,
+    pub user:              RwSignal<Option<RUser>>,
     /// Loading state indicator.
-    pub is_loading: RwSignal<bool>,
+    pub is_loading:        RwSignal<bool>,
     /// Sidebar collapsed state.
     pub sidebar_collapsed: RwSignal<bool>,
     /// Current Bible book ID.
-    pub current_book: RwSignal<i16>,
+    pub current_book:      RwSignal<i16>,
     /// Current Bible chapter number.
-    pub current_chapter: RwSignal<i16>,
+    pub current_chapter:   RwSignal<i16>,
     /// Cached Bible data.
-    pub bible: RwSignal<Option<BibleCache>>,
+    pub bible:             RwSignal<Option<BibleCache>>,
     /// Filter for songs with chords only.
-    pub only_with_chords: RwSignal<bool>,
+    pub only_with_chords:  RwSignal<bool>
 }
 
 impl AppState {
@@ -87,7 +87,7 @@ impl AppState {
             current_book,
             current_chapter,
             bible,
-            only_with_chords,
+            only_with_chords
         }
     }
 

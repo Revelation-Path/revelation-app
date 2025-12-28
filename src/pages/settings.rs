@@ -198,14 +198,20 @@ fn AppSection(
 
 #[must_use]
 #[component]
-fn PwaStatus(installed: bool, ios: bool, can_install: bool, set_pwa_installable: WriteSignal<bool>) -> impl IntoView {
+fn PwaStatus(
+    installed: bool,
+    ios: bool,
+    can_install: bool,
+    set_pwa_installable: WriteSignal<bool>
+) -> impl IntoView {
     if installed {
         view! {
             <div class=styles::row>
                 <span class=styles::rowLabel>"Статус"</span>
                 <span class=styles::installed><CheckIcon/>"Установлено"</span>
             </div>
-        }.into_any()
+        }
+        .into_any()
     } else if can_install {
         view! {
             <div class=styles::row>
@@ -215,21 +221,24 @@ fn PwaStatus(installed: bool, ios: bool, can_install: bool, set_pwa_installable:
                     set_pwa_installable.set(false);
                 }><InstallIcon/>"Установить"</button>
             </div>
-        }.into_any()
+        }
+        .into_any()
     } else if ios {
         view! {
             <div class=styles::row>
                 <span class=styles::rowLabel>"Установка"</span>
                 <span class=styles::hint>"Нажмите " <ShareIcon/> " → На экран Домой"</span>
             </div>
-        }.into_any()
+        }
+        .into_any()
     } else {
         view! {
             <div class=styles::row>
                 <span class=styles::rowLabel>"Установка"</span>
                 <span class=styles::hint>"Меню браузера → Установить"</span>
             </div>
-        }.into_any()
+        }
+        .into_any()
     }
 }
 
