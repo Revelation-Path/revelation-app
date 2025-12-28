@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && cargo install trunk --locked
 
 WORKDIR /app
-COPY Cargo.toml Cargo.lock index.html build.rs ./
+COPY Cargo.toml Cargo.lock index.html build.rs manifest.json sw.js ./
 COPY Trunk.docker.toml ./Trunk.toml
 COPY src ./src
 COPY assets ./assets
