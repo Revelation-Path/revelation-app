@@ -1,6 +1,6 @@
 use gloo_storage::{LocalStorage, Storage};
 use leptos::prelude::*;
-use revelation_user::User;
+use revelation_user::RUser;
 use uuid::Uuid;
 use wasm_bindgen_futures::spawn_local;
 
@@ -14,7 +14,7 @@ const ONLY_WITH_CHORDS_KEY: &str = "songs_only_with_chords";
 #[derive(Clone)]
 pub struct AppState {
     pub user_id:           RwSignal<Uuid>,
-    pub user:              RwSignal<Option<User>>,
+    pub user:              RwSignal<Option<RUser>>,
     pub is_loading:        RwSignal<bool>,
     pub sidebar_collapsed: RwSignal<bool>,
     pub current_book:      RwSignal<i16>,

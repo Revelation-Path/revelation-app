@@ -1,7 +1,7 @@
 use gloo_net::http::Request;
 use revelation_bible::{Book, ChapterInfo, DailyReading, Pericope, SearchResult, Testament, Verse};
 use revelation_songbook::{Song, SongSearchResult, SongSummary, Songbook, SongbookEdition};
-use revelation_user::User;
+use revelation_user::RUser;
 use uuid::Uuid;
 
 use crate::bible::BibleProvider;
@@ -36,7 +36,7 @@ pub async fn get_chapter_cached(book_id: i16, chapter: i16) -> Result<Vec<Verse>
     }
 }
 
-pub async fn get_or_create_user(user_id: Uuid) -> Result<User, String> {
+pub async fn get_or_create_user(user_id: Uuid) -> Result<RUser, String> {
     // Try to get user first
     let response = Request::get(&format!("{}/users/{}", api_base(), user_id))
         .send()
