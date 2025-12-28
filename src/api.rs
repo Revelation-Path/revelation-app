@@ -1,5 +1,7 @@
 use gloo_net::http::Request;
-use revelation_bible::{Book, ChapterInfo, DailyReading, Pericope, SearchResult, Testament, Verse};
+use revelation_bible::{
+    Book, ChapterInfo, DailyReading, Pericope, SearchResult, Testament, Verse
+};
 use revelation_songbook::{Song, SongSearchResult, SongSummary, Songbook, SongbookEdition};
 use revelation_user::RUser;
 use uuid::Uuid;

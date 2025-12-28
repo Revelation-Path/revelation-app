@@ -86,11 +86,7 @@ impl AppState {
     }
 
     /// Get chapter from cached Bible
-    pub fn get_chapter(
-        &self,
-        book_id: i16,
-        chapter: i16
-    ) -> Option<Vec<revelation_bible::Verse>> {
+    pub fn get_chapter(&self, book_id: i16, chapter: i16) -> Option<Vec<revelation_bible::Verse>> {
         self.bible.get()?.get_chapter(book_id, chapter)
     }
 
