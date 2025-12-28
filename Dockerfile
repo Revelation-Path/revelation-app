@@ -40,7 +40,7 @@ server {
     gzip_min_length 1000;
 
     location / {
-        try_files \$uri \$uri/ /index.html;
+        try_files \$uri /index.html;
     }
 
     location ~* \.(js|css|wasm|png|jpg|jpeg|gif|ico|svg|woff|woff2)$ {
