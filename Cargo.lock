@@ -1610,7 +1610,7 @@ dependencies = [
  "revelation-user",
  "serde",
  "serde_json",
- "stylance 0.7.4",
+ "stylance",
  "uuid",
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -1620,6 +1620,8 @@ dependencies = [
 [[package]]
 name = "revelation-bible"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e4bbf64bde9784c6fd7bee500c3b021e91649bd58b0f90183d9dcdd530f43944"
 dependencies = [
  "chrono",
  "serde",
@@ -1631,6 +1633,8 @@ dependencies = [
 [[package]]
 name = "revelation-songbook"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e03c6eff2207df3b289b097ba0c7886d984382435ea54e031a52c1f999ac6240"
 dependencies = [
  "chrono",
  "regex",
@@ -1642,12 +1646,14 @@ dependencies = [
 [[package]]
 name = "revelation-ui"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "460958748f85f1644b8ded5a51f2b108ce073c6aa62eb0e4937048f69c4e1f59"
 dependencies = [
  "gloo-storage",
  "gloo-timers",
  "leptos",
  "leptos_router",
- "stylance 0.5.5",
+ "stylance",
  "wasm-bindgen",
  "web-sys",
 ]
@@ -1655,6 +1661,8 @@ dependencies = [
 [[package]]
 name = "revelation-user"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "03c1d946ddd1ef91cf427c57b1506f34fa6cee373f4700d49d6c08d5624d730e"
 dependencies = [
  "bitflags",
  "bon",
@@ -1927,33 +1935,11 @@ checksum = "7da8b5736845d9f2fcb837ea5d9e2628564b3b043a70948a3f0b778838c5fb4f"
 
 [[package]]
 name = "stylance"
-version = "0.5.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fcda08e77bb732a73a207ce4f080670ff5f6933a7dd4c567cf5c038e2c950dfb"
-dependencies = [
- "stylance-macros 0.5.5",
-]
-
-[[package]]
-name = "stylance"
 version = "0.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "479a1d9e3f0411bdffb9d4cedcd732f5e70eac7dd4710e6ee585b969a9127f27"
 dependencies = [
- "stylance-macros 0.7.4",
-]
-
-[[package]]
-name = "stylance-core"
-version = "0.5.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c0cb8a158cacd104c770228a25173facdcf85f26c97730660ad62a905c4fc6f0"
-dependencies = [
- "anyhow",
- "serde",
- "siphasher",
- "toml 0.8.23",
- "winnow 0.5.40",
+ "stylance-macros",
 ]
 
 [[package]]
@@ -1971,19 +1957,6 @@ dependencies = [
 
 [[package]]
 name = "stylance-macros"
-version = "0.5.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0024020d03c9ea479ffbc7d4b85863648b9ffc8151b59d6bd6cdcf0dec27bf42"
-dependencies = [
- "anyhow",
- "proc-macro2",
- "quote",
- "stylance-core 0.5.5",
- "syn",
-]
-
-[[package]]
-name = "stylance-macros"
 version = "0.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9bfb85482de6162dae517408102671bd434459798a62bb9f3d5fb9d5863868c0"
@@ -1991,7 +1964,7 @@ dependencies = [
  "anyhow",
  "proc-macro2",
  "quote",
- "stylance-core 0.7.4",
+ "stylance-core",
  "syn",
 ]
 
