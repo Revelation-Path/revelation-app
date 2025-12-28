@@ -14,6 +14,7 @@ mod styles {
 use styles::common;
 
 /// Search page
+#[must_use]
 #[component]
 pub fn Search() -> impl IntoView {
     let query = RwSignal::new(String::new());
@@ -36,96 +37,96 @@ pub fn Search() -> impl IntoView {
     view! {
         <div class=common::page>
             <Header title="Поиск" back=true/>
-
             <div class=common::container>
-                // Search input with icon
-                <div class=common::searchWrapper>
-                    <div class=common::searchIcon>
-                        <SearchIcon/>
-                    </div>
-                    <input
-                        type="search"
-                        placeholder="Введите слово или фразу..."
-                        class=common::searchInput
-                        prop:value=query
-                        on:input=move |ev| query.set(event_target_value(&ev))
-                    />
-                </div>
-
-                // Search type tabs
-                <div class=common::tabs>
-                    <button
-                        class=move || if search_type.get() == SearchType::FullText {
-                            format!("{} {}", common::tab, common::tabActive)
-                        } else {
-                            common::tab.to_string()
-                        }
-                        on:click=move |_| search_type.set(SearchType::FullText)
-                    >
-                        "Поиск"
-                    </button>
-                    <button
-                        class=move || if search_type.get() == SearchType::Symphony {
-                            format!("{} {}", common::tab, common::tabActive)
-                        } else {
-                            common::tab.to_string()
-                        }
-                        on:click=move |_| search_type.set(SearchType::Symphony)
-                    >
-                        "Симфония"
-                    </button>
-                </div>
-
-                // Results
+                <SearchInput query=query/>
+                <SearchTabs search_type=search_type/>
                 <Suspense fallback=|| view! { <Loading/> }>
                     {move || {
                         let q = query.get();
                         if q.trim().is_empty() {
-                            Some(view! {
-                                <div class=common::emptyState>
-                                    <div class=common::emptyIcon>
-                                        <SearchBigIcon/>
-                                    </div>
-                                    <h2 class=common::emptyTitle>"Поиск по Библии"</h2>
-                                    <p class=common::emptyDesc>
-                                        "Введите слово или фразу для поиска"
-                                    </p>
-                                </div>
-                            }.into_any())
+                            Some(view! { <SearchEmptyState/> }.into_any())
                         } else {
-                            results.get().flatten().map(|results| {
-                                if results.is_empty() {
-                                    view! {
-                                        <div class=common::emptyState>
-                                            <div class=common::emptyIcon>
-                                                <NoResultsIcon/>
-                                            </div>
-                                            <h2 class=common::emptyTitle>"Ничего не найдено"</h2>
-                                            <p class=common::emptyDesc>
-                                                "Попробуйте изменить запрос"
-                                            </p>
-                                        </div>
-                                    }.into_any()
-                                } else {
-                                    view! {
-                                        <div>
-                                            <p class=common::resultCount>
-                                                "Найдено: " {results.len()} " стихов"
-                                            </p>
-                                            <div style="display: flex; flex-direction: column; gap: var(--space-xs);">
-                                                {results.into_iter().map(|r| view! {
-                                                    <VerseCard verse=r.verse book_name=r.book_name/>
-                                                }).collect::<Vec<_>>()}
-                                            </div>
-                                        </div>
-                                    }.into_any()
-                                }
-                            })
+                            results.get().flatten().map(|r| view! { <SearchResults results=r/> }.into_any())
                         }
                     }}
                 </Suspense>
             </div>
         </div>
+    }
+}
+
+#[must_use]
+#[component]
+fn SearchInput(query: RwSignal<String>) -> impl IntoView {
+    view! {
+        <div class=common::searchWrapper>
+            <div class=common::searchIcon><SearchIcon/></div>
+            <input
+                type="search"
+                placeholder="Введите слово или фразу..."
+                class=common::searchInput
+                prop:value=query
+                on:input=move |ev| query.set(event_target_value(&ev))
+            />
+        </div>
+    }
+}
+
+#[must_use]
+#[component]
+fn SearchTabs(search_type: RwSignal<SearchType>) -> impl IntoView {
+    view! {
+        <div class=common::tabs>
+            <button
+                class=move || if search_type.get() == SearchType::FullText {
+                    format!("{} {}", common::tab, common::tabActive)
+                } else { common::tab.to_string() }
+                on:click=move |_| search_type.set(SearchType::FullText)
+            >"Поиск"</button>
+            <button
+                class=move || if search_type.get() == SearchType::Symphony {
+                    format!("{} {}", common::tab, common::tabActive)
+                } else { common::tab.to_string() }
+                on:click=move |_| search_type.set(SearchType::Symphony)
+            >"Симфония"</button>
+        </div>
+    }
+}
+
+#[must_use]
+#[component]
+fn SearchEmptyState() -> impl IntoView {
+    view! {
+        <div class=common::emptyState>
+            <div class=common::emptyIcon><SearchBigIcon/></div>
+            <h2 class=common::emptyTitle>"Поиск по Библии"</h2>
+            <p class=common::emptyDesc>"Введите слово или фразу для поиска"</p>
+        </div>
+    }
+}
+
+#[must_use]
+#[component]
+fn SearchResults(results: Vec<revelation_bible::SearchResult>) -> impl IntoView {
+    if results.is_empty() {
+        view! {
+            <div class=common::emptyState>
+                <div class=common::emptyIcon><NoResultsIcon/></div>
+                <h2 class=common::emptyTitle>"Ничего не найдено"</h2>
+                <p class=common::emptyDesc>"Попробуйте изменить запрос"</p>
+            </div>
+        }.into_any()
+    } else {
+        view! {
+            <div>
+                <p class=common::resultCount>"Найдено: " {results.len()} " стихов"</p>
+                <div style="display: flex; flex-direction: column; gap: var(--space-xs);">
+                    {results.into_iter().map(|r| view! {
+                        <VerseCard verse=r.verse book_name=r.book_name/>
+                    }).collect::<Vec<_>>()}
+                </div>
+            </div>
+        }.into_any()
     }
 }
 
@@ -135,6 +136,7 @@ enum SearchType {
     Symphony
 }
 
+#[must_use]
 #[component]
 fn SearchIcon() -> impl IntoView {
     view! {
@@ -147,6 +149,7 @@ fn SearchIcon() -> impl IntoView {
     }
 }
 
+#[must_use]
 #[component]
 fn SearchBigIcon() -> impl IntoView {
     view! {
@@ -159,6 +162,7 @@ fn SearchBigIcon() -> impl IntoView {
     }
 }
 
+#[must_use]
 #[component]
 fn NoResultsIcon() -> impl IntoView {
     view! {

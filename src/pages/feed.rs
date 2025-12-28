@@ -12,6 +12,7 @@ mod styles {
 use styles::common;
 
 /// Feed page
+#[must_use]
 #[component]
 pub fn Feed() -> impl IntoView {
     view! {
@@ -38,6 +39,7 @@ pub fn Feed() -> impl IntoView {
     }
 }
 
+#[must_use]
 #[component]
 fn FeedIcon() -> impl IntoView {
     view! {

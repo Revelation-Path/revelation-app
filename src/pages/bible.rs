@@ -22,9 +22,10 @@ mod styles {
     stylance::import_crate_style!(pub settings, "src/styles/settings.module.css");
     stylance::import_crate_style!(pub chapters, "src/styles/chapters.module.css");
 }
-use styles::*;
+use styles::{books, chapters, colors, header, reader};
 
-/// Bible reader with book-style navigation
+/// Bible reader with book-style navigation.
+#[must_use]
 #[component]
 pub fn Bible() -> impl IntoView {
     let app_state = expect_context::<crate::state::AppState>();
@@ -36,7 +37,8 @@ pub fn Bible() -> impl IntoView {
     }
 }
 
-/// Bible chapter view (routed)
+/// Bible chapter view (routed).
+#[must_use]
 #[component]
 pub fn BibleChapter() -> impl IntoView {
     let params = use_params_map();
@@ -63,6 +65,7 @@ pub fn BibleChapter() -> impl IntoView {
 }
 
 /// Main Bible reader component
+#[must_use]
 #[component]
 fn BibleReader(initial_book: i16, initial_chapter: i16) -> impl IntoView {
     let app_state = expect_context::<crate::state::AppState>();
@@ -123,11 +126,11 @@ fn BibleReader(initial_book: i16, initial_chapter: i16) -> impl IntoView {
             request_animation_frame(move || {
                 request_animation_frame(move || {
                     request_animation_frame(move || {
-                        let scroll_height = el.scroll_height() as f64;
-                        let client_height = el.client_height() as f64;
+                        let scroll_height = f64::from(el.scroll_height());
+                        let client_height = f64::from(el.client_height());
                         let max_scroll = scroll_height - client_height;
                         if max_scroll > 1.0 {
-                            let scroll_top = el.scroll_top() as f64;
+                            let scroll_top = f64::from(el.scroll_top());
                             set_scroll_progress.set(Some(scroll_top / max_scroll));
                         } else {
                             set_scroll_progress.set(Some(1.0));
@@ -169,7 +172,7 @@ fn BibleReader(initial_book: i16, initial_chapter: i16) -> impl IntoView {
                             set_chapters_open.set(false);
                         }
                     >
-                        {move || current_book_info().map(|b| b.name_ru.clone()).unwrap_or_default()}
+                        {move || current_book_info().map(|b| b.name_ru).unwrap_or_default()}
                         <ChevronDownIcon/>
                     </button>
                     <button
@@ -207,9 +210,9 @@ fn BibleReader(initial_book: i16, initial_chapter: i16) -> impl IntoView {
                     on:scroll=move |ev| {
                         let target = ev.target().unwrap();
                         let el = target.unchecked_ref::<web_sys::HtmlElement>();
-                        let scroll_top = el.scroll_top() as f64;
-                        let scroll_height = el.scroll_height() as f64;
-                        let client_height = el.client_height() as f64;
+                        let scroll_top = f64::from(el.scroll_top());
+                        let scroll_height = f64::from(el.scroll_height());
+                        let client_height = f64::from(el.client_height());
                         let max_scroll = scroll_height - client_height;
                         if max_scroll > 0.0 {
                             set_scroll_progress.set(Some(scroll_top / max_scroll));
@@ -315,6 +318,7 @@ enum Side {
 }
 
 /// Thumb index component
+#[must_use]
 #[component]
 fn ThumbIndex(
     books: Vec<Book>,
@@ -343,8 +347,8 @@ fn ThumbIndex(
                         style:background=move || if is_active() { active_color } else { "" }
                         on:click=move |_| on_select(book_id)
                     >
-                        <span class=books::abbrev>{abbrev.clone()}</span>
-                        <span class=books::full>{full_name.clone()}</span>
+                        <span class=books::abbrev>{abbrev}</span>
+                        <span class=books::full>{full_name}</span>
                     </button>
                 }
             }).collect::<Vec<_>>()}
@@ -353,6 +357,7 @@ fn ThumbIndex(
 }
 
 /// Chapter navigation buttons (prev/next)
+#[must_use]
 #[component]
 fn ChapterNav(
     current_book: RwSignal<i16>,
@@ -375,7 +380,7 @@ fn ChapterNav(
     let can_go_next = move || {
         let ch = current_chapter.get();
         let book = current_book.get();
-        let max_ch = current_book_info().map(|b| b.chapters_count).unwrap_or(1);
+        let max_ch = current_book_info().map_or(1, |b| b.chapters_count);
         ch < max_ch || book < 66
     };
 
@@ -399,7 +404,7 @@ fn ChapterNav(
 
     let go_next = move |_| {
         let ch = current_chapter.get();
-        let max_ch = current_book_info().map(|b| b.chapters_count).unwrap_or(1);
+        let max_ch = current_book_info().map_or(1, |b| b.chapters_count);
         if ch < max_ch {
             current_chapter.set(ch + 1);
         } else {
@@ -434,6 +439,7 @@ fn ChapterNav(
 }
 
 /// Books panel with Old/New Testament tabs
+#[must_use]
 #[component]
 fn BooksPanel(
     books: Vec<Book>,
@@ -523,7 +529,9 @@ fn BooksPanel(
     }
 }
 
-/// Chapters list with expandable pericopes
+/// Chapters list with expandable pericopes.
+#[allow(clippy::redundant_clone)] // Clones required for Fn closures in view! macro
+#[must_use]
 #[component]
 fn ChaptersList(
     chapters_count: i16,
@@ -535,13 +543,13 @@ fn ChaptersList(
     let (expanded, set_expanded) = signal::<Option<i16>>(None);
 
     // Group pericopes by chapter and calculate verse ranges
+    #[allow(clippy::needless_collect)] // Required for view! macro
     let chapters_data: Vec<_> = (1..=chapters_count)
         .map(|ch| {
             let verse_count = chapters_info
                 .iter()
                 .find(|c| c.chapter == ch)
-                .map(|c| c.verse_count)
-                .unwrap_or(0);
+                .map_or(0, |c| c.verse_count);
 
             let mut chapter_percs: Vec<_> = pericopes
                 .iter()
@@ -576,7 +584,7 @@ fn ChaptersList(
                 let is_current = move || ch == current_chapter.get();
                 let is_expanded = move || expanded.get() == Some(ch);
                 let content_label = if verse_count > 0 {
-                    format!("{} ст.", verse_count)
+                    format!("{verse_count} ст.")
                 } else {
                     "Содержание".to_string()
                 };
@@ -602,7 +610,7 @@ fn ChaptersList(
                                                 });
                                             }
                                         >
-                                            {content_label.clone()}
+                                            {content_label}
                                             <Show when=is_expanded fallback=|| view! { <ChevronDownIcon/> }>
                                                 <ChevronUpIcon/>
                                             </Show>
@@ -611,7 +619,7 @@ fn ChaptersList(
                                 } else {
                                     view! {
                                         <span class=chapters::verseCountBadge>
-                                            {if verse_count > 0 { format!("{} ст.", verse_count) } else { String::new() }}
+                                            {if verse_count > 0 { format!("{verse_count} ст.") } else { String::new() }}
                                         </span>
                                     }.into_any()
                                 }}
@@ -624,9 +632,9 @@ fn ChaptersList(
                                     <ul class=chapters::pericopes>
                                         {percs.into_iter().map(|(start, end, heading)| {
                                             let range = if end > start {
-                                                format!("{}-{}", start, end)
+                                                format!("{start}-{end}")
                                             } else {
-                                                format!("{}", start)
+                                                format!("{start}")
                                             };
                                             view! {
                                                 <li class=chapters::pericope>
@@ -646,6 +654,7 @@ fn ChaptersList(
     }
 }
 
+#[must_use]
 #[component]
 fn ChevronUpIcon() -> impl IntoView {
     view! {
@@ -657,6 +666,7 @@ fn ChevronUpIcon() -> impl IntoView {
     }
 }
 
+#[must_use]
 #[component]
 fn VersesLoading() -> impl IntoView {
     view! {
@@ -668,7 +678,7 @@ fn VersesLoading() -> impl IntoView {
     }
 }
 
-fn get_book_color_class(book_id: i16) -> &'static str {
+const fn get_book_color_class(book_id: i16) -> &'static str {
     match book_id {
         1..=5 => colors::torah,
         6..=17 => colors::history,
@@ -680,14 +690,13 @@ fn get_book_color_class(book_id: i16) -> &'static str {
         45..=57 => colors::paul,
         58..=65 => colors::general,
         66 => colors::revelation,
-        _ => ""
+        _ => "",
     }
 }
 
-/// Get book category CSS variable
-fn get_book_category_var(book_id: i16) -> &'static str {
+/// Get book category CSS variable.
+const fn get_book_category_var(book_id: i16) -> &'static str {
     match book_id {
-        1..=5 => "var(--cat-torah)",
         6..=17 => "var(--cat-history)",
         18..=22 => "var(--cat-wisdom)",
         23..=27 => "var(--cat-major-prophets)",
@@ -697,12 +706,13 @@ fn get_book_category_var(book_id: i16) -> &'static str {
         45..=57 => "var(--cat-paul)",
         58..=65 => "var(--cat-general)",
         66 => "var(--cat-revelation)",
-        _ => "var(--cat-gospels)"
+        _ => "var(--cat-torah)",
     }
 }
 
 // Icons
 
+#[must_use]
 #[component]
 fn ChevronLeftIcon() -> impl IntoView {
     view! {
@@ -714,6 +724,7 @@ fn ChevronLeftIcon() -> impl IntoView {
     }
 }
 
+#[must_use]
 #[component]
 fn ChevronRightIcon() -> impl IntoView {
     view! {
@@ -725,6 +736,7 @@ fn ChevronRightIcon() -> impl IntoView {
     }
 }
 
+#[must_use]
 #[component]
 fn ChevronDownIcon() -> impl IntoView {
     view! {

@@ -11,6 +11,7 @@ mod styles {
 }
 use styles::common;
 
+#[must_use]
 #[component]
 pub fn Churches() -> impl IntoView {
     view! {
@@ -38,6 +39,7 @@ pub fn Churches() -> impl IntoView {
     }
 }
 
+#[must_use]
 #[component]
 pub fn ChurchDetail() -> impl IntoView {
     view! {
@@ -55,6 +57,7 @@ pub fn ChurchDetail() -> impl IntoView {
     }
 }
 
+#[must_use]
 #[component]
 fn ChurchIcon() -> impl IntoView {
     view! {

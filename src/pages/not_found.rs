@@ -9,6 +9,7 @@ mod styles {
 }
 use styles::common;
 
+#[must_use]
 #[component]
 pub fn NotFound() -> impl IntoView {
     view! {

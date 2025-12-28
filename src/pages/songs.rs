@@ -17,6 +17,7 @@ use crate::{
 stylance::import_crate_style!(styles, "src/styles/songs.module.css");
 
 /// Main songs page - shows songbooks
+#[must_use]
 #[component]
 pub fn Songs() -> impl IntoView {
     let app_state = expect_context::<AppState>();
@@ -84,14 +85,15 @@ pub fn Songs() -> impl IntoView {
 }
 
 /// Songbook card component
+#[must_use]
 #[component]
 fn SongbookCard(
     songbook: Songbook,
     #[prop(default = false)] filter_chords: bool
 ) -> impl IntoView {
     let year_info = match (songbook.year_first_published, songbook.edition_name.clone()) {
-        (Some(year), Some(edition)) => Some(format!("с {} г. • {}", year, edition)),
-        (Some(year), None) => Some(format!("с {} г.", year)),
+        (Some(year), Some(edition)) => Some(format!("с {year} г. • {edition}")),
+        (Some(year), None) => Some(format!("с {year} г.")),
         (None, Some(edition)) => Some(edition),
         (None, None) => None
     };
@@ -116,7 +118,7 @@ fn SongbookCard(
                     <p class=styles::songbookDesc>{info}</p>
                 })}
                 <span class=styles::songbookCount>
-                    {format!("{} песен", count)}
+                    {format!("{count} песен")}
                 </span>
                 {publisher.map(|p| view! {
                     <p class=styles::songbookCount>{p}</p>
@@ -130,6 +132,7 @@ fn SongbookCard(
 }
 
 /// Songbook detail page - shows info and editions
+#[must_use]
 #[component]
 pub fn SongbookDetail() -> impl IntoView {
     let app_state = expect_context::<AppState>();
@@ -173,7 +176,7 @@ pub fn SongbookDetail() -> impl IntoView {
             .flatten()
             .unwrap_or_else(|| "Сборник".to_string());
         if only_with_chords.get() {
-            format!("{} (с аккордами)", name)
+            format!("{name} (с аккордами)")
         } else {
             name
         }
@@ -192,53 +195,17 @@ pub fn SongbookDetail() -> impl IntoView {
                     {move || Suspend::new(async move {
                         let sb = songbook.await;
                         let eds = editions.await;
-
-                        match sb {
-                            Some(sb) => {
-                                let sb_id = sb.id;
-                                let has_editions = !eds.is_empty();
-                                let filter = only_with_chords.get();
-                                let count = if filter { sb.songs_with_chords_count } else { sb.songs_count };
-                                let label = if filter { "Песни с аккордами" } else { "Все песни" };
-
-                                view! {
-                                    <div class=styles::grid>
-                                        <SongbookHeader
-                                            name=sb.name_ru.clone()
-                                            year=sb.year_first_published
-                                            songs_count=count
-                                        />
-
-                                        {sb.history.clone().map(|h| view! {
-                                            <SongbookHistory history=h/>
-                                        })}
-
-                                        {has_editions.then(|| view! {
-                                            <EditionsList editions=eds.clone() songbook_id=sb_id/>
-                                        })}
-
-                                        <A href=format!("/songs/book/{}/songs", sb_id) attr:class=styles::songbookCard>
-                                            <div class=styles::songbookIcon>
-                                                <Icon icon=IconType::Music size=IconSize::Large/>
-                                            </div>
-                                            <div class=styles::songbookInfo>
-                                                <span class=styles::songbookName>
-                                                    {format!("{} ({})", label, count)}
-                                                </span>
-                                            </div>
-                                            <span class=styles::chevron>
-                                                <Icon icon=IconType::ChevronRight size=IconSize::Medium/>
-                                            </span>
-                                        </A>
-                                    </div>
-                                }.into_any()
-                            },
-                            None => view! {
+                        let filter = only_with_chords.get();
+                        sb.map_or_else(
+                            || view! {
                                 <div class=styles::empty>
                                     <span class=styles::emptyText>"Сборник не найден"</span>
                                 </div>
+                            }.into_any(),
+                            |sb| view! {
+                                <SongbookDetailContent sb=sb eds=eds filter=filter/>
                             }.into_any()
-                        }
+                        )
                     })}
                 </Suspense>
             </div>
@@ -248,7 +215,44 @@ pub fn SongbookDetail() -> impl IntoView {
     }
 }
 
+/// Inner content for songbook detail
+#[must_use]
+#[component]
+fn SongbookDetailContent(sb: Songbook, eds: Vec<SongbookEdition>, filter: bool) -> impl IntoView {
+    let sb_id = sb.id;
+    let has_editions = !eds.is_empty();
+    let count = if filter { sb.songs_with_chords_count } else { sb.songs_count };
+    let label = if filter { "Песни с аккордами" } else { "Все песни" };
+
+    view! {
+        <div class=styles::grid>
+            <SongbookHeader name=sb.name_ru.clone() year=sb.year_first_published songs_count=count/>
+
+            {sb.history.map(|h| view! { <SongbookHistory history=h/> })}
+
+            {has_editions.then(|| view! {
+                <EditionsList editions=eds.clone() songbook_id=sb_id/>
+            })}
+
+            <A href=format!("/songs/book/{sb_id}/songs") attr:class=styles::songbookCard>
+                <div class=styles::songbookIcon>
+                    <Icon icon=IconType::Music size=IconSize::Large/>
+                </div>
+                <div class=styles::songbookInfo>
+                    <span class=styles::songbookName>
+                        {format!("{label} ({count})")}
+                    </span>
+                </div>
+                <span class=styles::chevron>
+                    <Icon icon=IconType::ChevronRight size=IconSize::Medium/>
+                </span>
+            </A>
+        </div>
+    }
+}
+
 /// Songbook header with icon
+#[must_use]
 #[component]
 fn SongbookHeader(name: String, year: Option<i16>, songs_count: i32) -> impl IntoView {
     view! {
@@ -259,27 +263,27 @@ fn SongbookHeader(name: String, year: Option<i16>, songs_count: i32) -> impl Int
             <h1 class=styles::songDetailTitle style="text-align: center;">{name}</h1>
             {year.map(|y| view! {
                 <p class=styles::songbookDesc style="text-align: center;">
-                    {format!("с {} года", y)}
+                    {format!("с {y} года")}
                 </p>
             })}
             <p class=styles::songbookCount style="text-align: center;">
-                {format!("{} песен в базе", songs_count)}
+                {format!("{songs_count} песен в базе")}
             </p>
         </div>
     }
 }
 
 /// Songbook history section with expand/collapse
+#[must_use]
 #[component]
 fn SongbookHistory(history: String) -> impl IntoView {
     let expanded = RwSignal::new(false);
-    let history_clone = history.clone();
 
     view! {
         <div class=styles::songSection>
             <div class=styles::sectionLabel>"История"</div>
             <p class={move || if expanded.get() { styles::historyExpanded } else { styles::historyCollapsed }}>
-                {history_clone.clone()}
+                {history}
             </p>
             <button
                 class=styles::expandBtn
@@ -292,6 +296,7 @@ fn SongbookHistory(history: String) -> impl IntoView {
 }
 
 /// Editions list
+#[must_use]
 #[component]
 fn EditionsList(editions: Vec<SongbookEdition>, songbook_id: Uuid) -> impl IntoView {
     view! {
@@ -323,6 +328,7 @@ fn EditionsList(editions: Vec<SongbookEdition>, songbook_id: Uuid) -> impl IntoV
 }
 
 /// Songbook songs list page
+#[must_use]
 #[component]
 pub fn SongbookSongs() -> impl IntoView {
     let app_state = expect_context::<AppState>();
@@ -360,7 +366,7 @@ pub fn SongbookSongs() -> impl IntoView {
             .flatten()
             .unwrap_or_else(|| "Песни".to_string());
         if only_with_chords.get() {
-            format!("{} (с аккордами)", name)
+            format!("{name} (с аккордами)")
         } else {
             name
         }
@@ -384,15 +390,7 @@ pub fn SongbookSongs() -> impl IntoView {
                         } else {
                             song_list
                         };
-                        view! {
-                            <div class=styles::songList>
-                                <For
-                                    each=move || filtered.clone()
-                                    key=|s| s.id
-                                    children=|song| view! { <SongListItem song=song/> }
-                                />
-                            </div>
-                        }
+                        view! { <SongsList songs=filtered/> }
                     })}
                 </Suspense>
             </div>
@@ -402,7 +400,23 @@ pub fn SongbookSongs() -> impl IntoView {
     }
 }
 
+/// Songs list component
+#[must_use]
+#[component]
+fn SongsList(songs: Vec<SongSummary>) -> impl IntoView {
+    view! {
+        <div class=styles::songList>
+            <For
+                each=move || songs.clone()
+                key=|s| s.id
+                children=|song| view! { <SongListItem song=song/> }
+            />
+        </div>
+    }
+}
+
 /// Song list item
+#[must_use]
 #[component]
 fn SongListItem(song: SongSummary) -> impl IntoView {
     let first_line = if song.first_line.is_empty() {
@@ -414,7 +428,7 @@ fn SongListItem(song: SongSummary) -> impl IntoView {
     view! {
         <A href=format!("/songs/{}", song.id) attr:class=styles::songItem>
             <span class=styles::songNumber>
-                {song.number.map(|n| format!("#{}", n)).unwrap_or_default()}
+                {song.number.map(|n| format!("#{n}")).unwrap_or_default()}
             </span>
             <div class=styles::songInfo>
                 <span class=styles::songTitle>{song.title}</span>
@@ -430,6 +444,7 @@ fn SongListItem(song: SongSummary) -> impl IntoView {
 }
 
 /// Song detail page with chords
+#[must_use]
 #[component]
 pub fn SongDetail() -> impl IntoView {
     let params = use_params_map();
@@ -484,7 +499,7 @@ pub fn SongDetail() -> impl IntoView {
                             let t = transpose.get();
                             if t == 0 { "0".to_string() }
                             else if t > 6 { format!("-{}", 12 - t) }
-                            else { format!("+{}", t) }
+                            else { format!("+{t}") }
                         }}
                     </span>
                     <button
@@ -499,14 +514,14 @@ pub fn SongDetail() -> impl IntoView {
             <div class=styles::songDetail>
                 <Suspense fallback=|| view! { <LoadingSpinner/> }>
                     {move || Suspend::new(async move {
-                        match song.await {
-                            Some(s) => view! { <SongContent song=s/> }.into_any(),
-                            None => view! {
+                        (song.await).map_or_else(
+                            || view! {
                                 <div class=styles::empty>
                                     <span class=styles::emptyText>"Песня не найдена"</span>
                                 </div>
-                            }.into_any()
-                        }
+                            }.into_any(),
+                            |s| view! { <SongContent song=s/> }.into_any()
+                        )
                     })}
                 </Suspense>
             </div>
@@ -517,6 +532,7 @@ pub fn SongDetail() -> impl IntoView {
 }
 
 /// Song content with parsed chords
+#[must_use]
 #[component]
 fn SongContent(song: Song) -> impl IntoView {
     let parsed = ChordProParser::parse(&song.content);
@@ -525,7 +541,7 @@ fn SongContent(song: Song) -> impl IntoView {
         <div>
             <div class=styles::songHeader>
                 <h1 class=styles::songDetailTitle>
-                    {song.number.map(|n| format!("№{}. ", n)).unwrap_or_default()}
+                    {song.number.map(|n| format!("№{n}. ")).unwrap_or_default()}
                     {song.title}
                 </h1>
                 <div class=styles::songMeta>
@@ -549,8 +565,7 @@ fn SongContent(song: Song) -> impl IntoView {
                     <div class=styles::songSection>
                         {section_label.map(|label| {
                             let label_with_number = section.label.as_ref()
-                                .map(|n| format!("{} {}", label, n))
-                                .unwrap_or_else(|| label.to_string());
+                                .map_or_else(|| label.to_string(), |n| format!("{label} {n}"));
                             view! {
                                 <div class=styles::sectionLabel>{label_with_number}</div>
                             }
@@ -565,11 +580,10 @@ fn SongContent(song: Song) -> impl IntoView {
                                 }.into_any()
                             } else {
                                 let chord_line = render_chords_line(&line.text, &line.chords);
-                                let text = line.text.clone();
                                 view! {
                                     <div class=styles::songLine>
                                         <div class=styles::chordLine>{chord_line}</div>
-                                        <div class=styles::textLine>{text}</div>
+                                        <div class=styles::textLine>{line.text}</div>
                                     </div>
                                 }.into_any()
                             }
@@ -608,6 +622,7 @@ fn render_chords_line(text: &str, chords: &[PositionedChord]) -> String {
 }
 
 /// Song search page
+#[must_use]
 #[component]
 pub fn SongSearch() -> impl IntoView {
     let app_state = expect_context::<AppState>();
@@ -710,6 +725,7 @@ pub fn SongSearch() -> impl IntoView {
 }
 
 /// Loading spinner component
+#[must_use]
 #[component]
 fn LoadingSpinner() -> impl IntoView {
     view! {

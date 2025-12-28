@@ -1,14 +1,17 @@
-//! Main application
+//! Main application.
 
 use leptos::prelude::*;
-use leptos_meta::*;
-use leptos_router::{
-    components::{Redirect, Route, Router, Routes},
-    path
-};
-use revelation_ui::{BrowserChrome, THEME_CSS, ThemeProvider, ToastProvider};
+use leptos_meta::{provide_meta_context, Meta, Style, Title};
+use leptos_router::components::{Redirect, Route, Router, Routes};
+use leptos_router::path;
+use revelation_ui::{BrowserChrome, ThemeProvider, ToastProvider, THEME_CSS};
 
-use crate::{components::Sidebar, pages::*, state::AppState};
+use crate::components::Sidebar;
+use crate::pages::{
+    Bible, BibleChapter, ChurchDetail, Churches, DailyReading, Feed, NotFound, Onboarding,
+    Profile, Search, Settings, SongDetail, SongSearch, SongbookDetail, SongbookSongs, Songs,
+};
+use crate::state::AppState;
 
 /// Syncs browser chrome color with current book
 #[component]
@@ -21,7 +24,8 @@ fn ChromeSync() -> impl IntoView {
     });
 }
 
-/// Main application component
+/// Main application component.
+#[must_use]
 #[component]
 pub fn App() -> impl IntoView {
     provide_meta_context();

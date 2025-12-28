@@ -10,6 +10,7 @@ use crate::{
 
 stylance::import_crate_style!(styles, "src/styles/profile.module.css");
 
+#[must_use]
 #[component]
 pub fn Profile() -> impl IntoView {
     let state = expect_context::<AppState>();
@@ -120,6 +121,7 @@ pub fn Profile() -> impl IntoView {
     }
 }
 
+#[must_use]
 #[component]
 fn MenuItem(href: &'static str, label: &'static str, children: Children) -> impl IntoView {
     view! {
@@ -138,6 +140,7 @@ fn MenuItem(href: &'static str, label: &'static str, children: Children) -> impl
     }
 }
 
+#[must_use]
 #[component]
 fn ConnectItem(label: &'static str, connected: bool, children: Children) -> impl IntoView {
     view! {

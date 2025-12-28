@@ -1,3 +1,5 @@
+//! Application state management.
+
 use gloo_storage::{LocalStorage, Storage};
 use leptos::prelude::*;
 use revelation_user::RUser;
@@ -11,21 +13,31 @@ const BIBLE_BOOK_KEY: &str = "bible_current_book";
 const BIBLE_CHAPTER_KEY: &str = "bible_current_chapter";
 const ONLY_WITH_CHORDS_KEY: &str = "songs_only_with_chords";
 
+/// Global application state.
 #[derive(Clone)]
 pub struct AppState {
-    pub user_id:           RwSignal<Uuid>,
-    pub user:              RwSignal<Option<RUser>>,
-    pub is_loading:        RwSignal<bool>,
+    /// Current user ID.
+    pub user_id: RwSignal<Uuid>,
+    /// Current user data.
+    pub user: RwSignal<Option<RUser>>,
+    /// Loading state indicator.
+    pub is_loading: RwSignal<bool>,
+    /// Sidebar collapsed state.
     pub sidebar_collapsed: RwSignal<bool>,
-    pub current_book:      RwSignal<i16>,
-    pub current_chapter:   RwSignal<i16>,
-    pub bible:             RwSignal<Option<BibleCache>>,
-    pub only_with_chords:  RwSignal<bool>
+    /// Current Bible book ID.
+    pub current_book: RwSignal<i16>,
+    /// Current Bible chapter number.
+    pub current_chapter: RwSignal<i16>,
+    /// Cached Bible data.
+    pub bible: RwSignal<Option<BibleCache>>,
+    /// Filter for songs with chords only.
+    pub only_with_chords: RwSignal<bool>,
 }
 
 impl AppState {
+    /// Initializes application state from localStorage.
+    #[must_use]
     pub fn init() -> Self {
-        // Get or create user ID from localStorage
         let user_id = LocalStorage::get::<String>(USER_ID_KEY)
             .ok()
             .and_then(|s| Uuid::parse_str(&s).ok())
@@ -35,19 +47,19 @@ impl AppState {
                 id
             });
 
-        // Load saved Bible position from localStorage
         let saved_book = LocalStorage::get::<i16>(BIBLE_BOOK_KEY).unwrap_or(1);
         let saved_chapter = LocalStorage::get::<i16>(BIBLE_CHAPTER_KEY).unwrap_or(1);
         let saved_chords_filter = LocalStorage::get::<bool>(ONLY_WITH_CHORDS_KEY).unwrap_or(false);
 
         let bible = RwSignal::new(None);
 
-        // Load Bible from S3/cache asynchronously
         let bible_signal = bible;
         spawn_local(async move {
             match BibleProvider::init().await {
                 Ok(cache) => bible_signal.set(Some(cache)),
-                Err(e) => web_sys::console::error_1(&format!("Failed to load Bible: {}", e).into())
+                Err(e) => {
+                    web_sys::console::error_1(&format!("Failed to load Bible: {e}").into());
+                }
             }
         });
 
@@ -55,7 +67,6 @@ impl AppState {
         let current_chapter = RwSignal::new(saved_chapter);
         let only_with_chords = RwSignal::new(saved_chords_filter);
 
-        // Save Bible position to localStorage when changed
         Effect::new(move |_| {
             let book = current_book.get();
             let chapter = current_chapter.get();
@@ -63,7 +74,6 @@ impl AppState {
             let _ = LocalStorage::set(BIBLE_CHAPTER_KEY, chapter);
         });
 
-        // Save chords filter to localStorage when changed
         Effect::new(move |_| {
             let filter = only_with_chords.get();
             let _ = LocalStorage::set(ONLY_WITH_CHORDS_KEY, filter);
@@ -77,20 +87,24 @@ impl AppState {
             current_book,
             current_chapter,
             bible,
-            only_with_chords
+            only_with_chords,
         }
     }
 
+    /// Returns the current user ID.
+    #[must_use]
     pub fn user_id(&self) -> Uuid {
         self.user_id.get()
     }
 
-    /// Get chapter from cached Bible
+    /// Returns chapter verses from cached Bible.
+    #[must_use]
     pub fn get_chapter(&self, book_id: i16, chapter: i16) -> Option<Vec<revelation_bible::Verse>> {
         self.bible.get()?.get_chapter(book_id, chapter)
     }
 
-    /// Get all books from cached Bible
+    /// Returns all books from cached Bible.
+    #[must_use]
     pub fn get_books(&self) -> Option<Vec<revelation_bible::Book>> {
         Some(self.bible.get()?.get_books())
     }

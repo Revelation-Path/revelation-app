@@ -13,6 +13,7 @@ mod styles {
 }
 use styles::common;
 
+#[must_use]
 #[component]
 pub fn DailyReading() -> impl IntoView {
     let reading = LocalResource::new(|| async { api::get_today_reading().await.ok().flatten() });

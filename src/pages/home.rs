@@ -12,10 +12,11 @@ mod styles {
 use styles::common;
 
 /// Landing page component
+#[must_use]
 #[component]
 pub fn Home() -> impl IntoView {
     let state = expect_context::<AppState>();
-    let has_profile = move || state.user.get().map(|u| u.name.is_some()).unwrap_or(false);
+    let has_profile = move || state.user.get().is_some_and(|u| u.name.is_some());
 
     view! {
         <div class=common::page style="display: flex; flex-direction: column;">
@@ -109,6 +110,7 @@ enum FeatureIcon {
     Heart
 }
 
+#[must_use]
 #[component]
 fn FeatureCard(icon: FeatureIcon, title: &'static str, desc: &'static str) -> impl IntoView {
     view! {
@@ -128,6 +130,7 @@ fn FeatureCard(icon: FeatureIcon, title: &'static str, desc: &'static str) -> im
 }
 
 // SVG Icons
+#[must_use]
 #[component]
 fn CrossIcon() -> impl IntoView {
     view! {
@@ -137,6 +140,7 @@ fn CrossIcon() -> impl IntoView {
     }
 }
 
+#[must_use]
 #[component]
 fn CrossIconLarge() -> impl IntoView {
     view! {
@@ -146,6 +150,7 @@ fn CrossIconLarge() -> impl IntoView {
     }
 }
 
+#[must_use]
 #[component]
 fn BookIcon() -> impl IntoView {
     view! {
@@ -156,6 +161,7 @@ fn BookIcon() -> impl IntoView {
     }
 }
 
+#[must_use]
 #[component]
 fn SearchIcon() -> impl IntoView {
     view! {
@@ -166,6 +172,7 @@ fn SearchIcon() -> impl IntoView {
     }
 }
 
+#[must_use]
 #[component]
 fn ChurchIcon() -> impl IntoView {
     view! {
@@ -178,6 +185,7 @@ fn ChurchIcon() -> impl IntoView {
     }
 }
 
+#[must_use]
 #[component]
 fn HeartIcon() -> impl IntoView {
     view! {

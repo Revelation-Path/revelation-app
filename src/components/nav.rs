@@ -153,10 +153,10 @@ pub fn Header(
                     view! { <div class=nav::headerSpacer></div> }.into_any()
                 }}
                 <h1 class=nav::headerTitle>{move || title.get()}</h1>
-                {match children {
-                    Some(c) => view! { <div class=nav::headerRight>{c()}</div> }.into_any(),
-                    None => view! { <div class=nav::headerSpacer></div> }.into_any()
-                }}
+                {children.map_or_else(
+                    || view! { <div class=nav::headerSpacer></div> }.into_any(),
+                    |c| view! { <div class=nav::headerRight>{c()}</div> }.into_any()
+                )}
             </div>
         </header>
     }
@@ -249,10 +249,9 @@ fn ProfileIcon() -> impl IntoView {
     }
 }
 
-/// Get book category CSS variable
-fn get_book_category_var(book_id: i16) -> &'static str {
+/// Get book category CSS variable.
+const fn get_book_category_var(book_id: i16) -> &'static str {
     match book_id {
-        1..=5 => "var(--cat-torah)",
         6..=17 => "var(--cat-history)",
         18..=22 => "var(--cat-wisdom)",
         23..=27 => "var(--cat-major-prophets)",
@@ -262,6 +261,6 @@ fn get_book_category_var(book_id: i16) -> &'static str {
         45..=57 => "var(--cat-paul)",
         58..=65 => "var(--cat-general)",
         66 => "var(--cat-revelation)",
-        _ => "var(--cat-gospels)"
+        _ => "var(--cat-torah)",
     }
 }

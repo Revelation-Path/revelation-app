@@ -1,8 +1,9 @@
-//! Loading components
+//! Loading components.
 
 use leptos::prelude::*;
 
-/// Loading spinner
+/// Loading spinner.
+#[must_use]
 #[component]
 pub fn Loading() -> impl IntoView {
     view! {
@@ -14,7 +15,8 @@ pub fn Loading() -> impl IntoView {
     }
 }
 
-/// Full page loading
+/// Full page loading.
+#[must_use]
 #[component]
 pub fn LoadingPage() -> impl IntoView {
     view! {

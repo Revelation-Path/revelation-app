@@ -11,6 +11,7 @@ mod styles {
 use styles::common;
 
 /// Onboarding page with steps
+#[must_use]
 #[component]
 pub fn Onboarding() -> impl IntoView {
     let step = RwSignal::new(1);
@@ -56,6 +57,7 @@ pub fn Onboarding() -> impl IntoView {
     }
 }
 
+#[must_use]
 #[component]
 fn Step1(name: RwSignal<String>, on_next: impl Fn() + 'static) -> impl IntoView {
     view! {
@@ -94,6 +96,7 @@ fn Step1(name: RwSignal<String>, on_next: impl Fn() + 'static) -> impl IntoView 
     }
 }
 
+#[must_use]
 #[component]
 fn Step2(
     gender: RwSignal<Option<Gender>>,
@@ -150,6 +153,7 @@ fn Step2(
     }
 }
 
+#[must_use]
 #[component]
 fn GenderOption(
     label: &'static str,
@@ -174,6 +178,7 @@ fn GenderOption(
     }
 }
 
+#[must_use]
 #[component]
 fn Step3(on_back: impl Fn() + 'static) -> impl IntoView {
     let navigate = use_navigate();
@@ -198,7 +203,7 @@ fn Step3(on_back: impl Fn() + 'static) -> impl IntoView {
                 <button
                     class=common::btnPrimary
                     style="width: 100%;"
-                    on:click=move |_| navigate("/bible", Default::default())
+                    on:click=move |_| navigate("/bible", leptos_router::NavigateOptions::default())
                 >
                     "Открыть Библию"
                 </button>
@@ -214,6 +219,7 @@ fn Step3(on_back: impl Fn() + 'static) -> impl IntoView {
     }
 }
 
+#[must_use]
 #[component]
 fn CheckIcon() -> impl IntoView {
     view! {

@@ -25,7 +25,8 @@ extern "C" {
     fn hasVibrate() -> bool;
 }
 
-/// Check if vibration API is supported
+/// Check if vibration API is supported.
+#[must_use]
 pub fn is_supported() -> bool {
     hasVibrate()
 }
